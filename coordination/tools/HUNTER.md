@@ -48,7 +48,7 @@ in the repo, a short `calc`, `ext` + `simp [...]`, `constructor` + pieces, etc.
    Body: `Closes #<n>` per issue, one line per proof, axioms output, notes on anything degenerate
    (true only by construction, hypothesis restates the conclusion, ...); end with the line
    `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. Then remove those numbers from claims.txt.
-5. Repeat. Stop after 2 PRs or about 90 minutes, whichever comes first (short-lived hunters keep
+5. Repeat. Stop after 4 PRs or about 90 minutes, whichever comes first (short-lived hunters keep
    context and cost down; the coordinator launches fresh ones).
 6. Handoff: keep `/home/agent/wt/<P>-<k>/.agent/STATE.md` current in a few lines (claimed issues,
    which are proved, what is left, next step), so that a fresh agent can take over if you are cut
@@ -70,6 +70,10 @@ in the repo, a short `calc`, `ext` + `simp [...]`, `constructor` + pieces, etc.
   Helper lemmas go directly above the declaration.
 - /home/user/git is not writable. Never touch /home/agent/wt/sweep, /home/agent/wt/base or the main
   checkout's files, or other agents' worktrees.
+- Wrap every build in a timeout: `timeout 900 lake build ...` (single modules normally take
+  1–5 min). A build that runs much longer means one of your new proofs makes elaboration or the
+  kernel run away (heavy `rfl`/`decide`/`simp` unfolding): bisect by turning your new proofs back
+  into `sorry` one at a time, drop the culprit, release its issue, and hand in the rest.
 - Never wait for a build with `pgrep`/`pkill` on `lake` or `lean`: several agents and a background
   service build at the same time, so such a pattern matches their builds too. Either run the build in
   the foreground (Bash timeout up to 600000 ms), or run it in the background with your tool's

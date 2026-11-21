@@ -7,4 +7,4 @@ appD  2026-11-21T06:26Z  appd2 finished (#2761 #2811)
 ch05  2026-11-21T07:05Z  ch05b finished (#2859); mined out at this time (rest needs continuation uniqueness, closed kernels, Mellin topology, real Tate factor #2363)
 ch04  2026-11-21T06:35Z
 ch09  2026-11-21T06:37Z
-appB  2026-11-21T07:05Z
+appB  2026-11-21T07:11Z  appb finished (#2862, Sec4a); §B.3 issues #2839 #2091 were claimed by others

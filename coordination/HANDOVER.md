@@ -108,6 +108,11 @@ prefix <P> is `hunt/X<n>`.` plus any leads and exclusions (issues in open PRs).
 
 ## Lessons (read before changing anything)
 
+- **Bound every build with `timeout`.** A new proof can make elaboration or the kernel run away
+  (seen in Ch04 Sec5/Sec6 and Ch09 Sec3: 20–40 min at 100% CPU), and a hunter waiting on its
+  monitor then waits forever. `status.sh` does not detect this; check Lean processes' CPU time
+  under `/home/agent/wt/hunt/` if a hunter reports "waiting for the build" for more than ~15 min.
+
 - **Never `pgrep -f`/`pkill -f` a pattern that occurs in your own command line** (it kills your
   shell, exit 144), and never wait on builds with `pgrep lake`: several agents build at once.
   **Never `pkill -u`, `pkill -x lean`, `killall`**: one hunter did and killed other agents'
