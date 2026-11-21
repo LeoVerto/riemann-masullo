@@ -379,7 +379,19 @@ variable (A : Set (E →L[ℂ] F))
 zero-neighborhood that every map sends into the prescribed target zero-neighborhood. -/
 theorem equicontinuousAt_zero_iff_mapsTo :
     EquicontinuousAt (fun f : A ↦ (f.val : E → F)) 0 ↔
-      ∀ V ∈ 𝓝 (0 : F), ∃ U ∈ 𝓝 (0 : E), ∀ f ∈ A, MapsTo f U V := by sorry
+      ∀ V ∈ 𝓝 (0 : F), ∃ U ∈ 𝓝 (0 : E), ∀ f ∈ A, MapsTo f U V := by
+  have hb : (uniformity F).HasBasis (fun V : Set F ↦ V ∈ 𝓝 (0 : F))
+      (fun V ↦ (fun x : F × F ↦ x.2 - x.1) ⁻¹' V) := by
+    rw [uniformity_eq_comap_nhds_zero]
+    exact (𝓝 (0 : F)).basis_sets.comap _
+  rw [hb.equicontinuousAt_iff_right]
+  refine forall₂_congr fun V _ ↦ ?_
+  simp only [mem_preimage, map_zero, sub_zero, Filter.eventually_iff_exists_mem]
+  constructor
+  · rintro ⟨U, hU, h⟩
+    exact ⟨U, hU, fun f hf x hx ↦ h x hx ⟨f, hf⟩⟩
+  · rintro ⟨U, hU, h⟩
+    exact ⟨U, hU, fun x hx f ↦ h f f.2 hx⟩
 
 include heq in
 /-- Paper: Lemma C.2.1.9(1), p. 672. An equicontinuous set is bounded for uniform
@@ -453,7 +465,24 @@ theorem isPolarBornology_bounded : IsPolarBornology {T : Set E | IsVonNBounded �
 to the absolute polar of some member of a given zero-neighborhood basis. -/
 theorem continuous_iff_mem_polar_of_basis {ι : Type*} {p : ι → Prop} {U : ι → Set E}
     (hU : (𝓝 0).HasBasis p U) (l : Module.Dual ℂ E) :
-    Continuous l ↔ ∃ i, p i ∧ l ∈ (Module.Dual.eval ℂ E).polar (U i) := by sorry
+    Continuous l ↔ ∃ i, p i ∧ l ∈ (Module.Dual.eval ℂ E).polar (U i) := by
+  constructor
+  · intro hl
+    have h : l ⁻¹' Metric.closedBall 0 1 ∈ 𝓝 (0 : E) :=
+      hl.continuousAt.preimage_mem_nhds (by simpa using Metric.closedBall_mem_nhds (0 : ℂ) one_pos)
+    obtain ⟨i, hi, hsub⟩ := hU.mem_iff.1 h
+    refine ⟨i, hi, (LinearMap.polar_mem_iff _ _ _).2 fun x hx ↦ ?_⟩
+    simpa using hsub hx
+  · rintro ⟨i, hi, hl⟩
+    have hp : Continuous ((normSeminorm ℂ ℂ).comp l) := by
+      refine Seminorm.continuous' (r := 1) (Filter.mem_of_superset (hU.mem_of_mem hi) ?_)
+      intro x hx
+      simpa [Seminorm.mem_closedBall] using (LinearMap.polar_mem_iff _ _ _).1 hl x hx
+    refine continuous_of_continuousAt_zero l ?_
+    rw [ContinuousAt, map_zero, tendsto_zero_iff_norm_tendsto_zero]
+    have h := hp.tendsto 0
+    rw [map_zero] at h
+    exact h
 
 end Bornologies
 
@@ -542,7 +571,9 @@ def polarTopology (S : Set (Set F)) : TopologicalSpace E :=
 
 /-- Paper: §C.2.2.1, p. 673. Testing a pairing on finite subsets gives its weak topology. -/
 theorem polarTopology_finite_eq_weak :
-    polarTopology B {A | A.Finite} = WeakBilin.instTopologicalSpace B := by sorry
+    polarTopology B {A | A.Finite} = WeakBilin.instTopologicalSpace B := by
+  rw [polarTopology, (UniformOnFun.isEmbedding_toFun_finite F ℂ).eq_induced, induced_compose]
+  rfl
 
 /-- Paper: §C.2.2.2, p. 674. A topology on E is consistent with the pairing if its
 continuous linear functionals are exactly the evaluations against elements of F. -/
@@ -551,7 +582,16 @@ def IsConsistentWithDuality (t : TopologicalSpace E) : Prop :=
 
 /-- Paper: §C.2.2.2, p. 674. The weak topology of a separating pairing is consistent. -/
 theorem weakTopology_isConsistentWithDuality (hB : B.Nondegenerate) :
-    IsConsistentWithDuality B (WeakBilin.instTopologicalSpace B) := by sorry
+    IsConsistentWithDuality B (WeakBilin.instTopologicalSpace B) := by
+  intro l
+  constructor
+  · intro hl
+    obtain ⟨y, hy⟩ := LinearMap.dualEmbedding_surjective B
+      (⟨l, hl⟩ : StrongDual ℂ (WeakBilin B))
+    refine ⟨y, LinearMap.ext fun x ↦ ?_⟩
+    exact congrArg (fun φ : StrongDual ℂ (WeakBilin B) ↦ φ x) hy
+  · rintro ⟨y, rfl⟩
+    exact WeakBilin.eval_continuous B y
 
 /-- Paper: §C.2.2.2, p. 674. The Mackey topology on E is uniform convergence on the
 convex circled subsets of F which are compact for the opposite weak topology. -/
