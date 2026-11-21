@@ -986,7 +986,7 @@ local notation "diagₛ" =>
     (Subring.subtype (integralAdelesOutside F S)))))
     (MonoidHom.range (Units.map (RingHom.toMonoidHom (integralAdeleDiagonal F S))))
 
-/-- Paper: §3.3.1, p. 128. The product σ-algebra on the S-adeles is the Borel σ-algebra. -/
+/-- The product σ-algebra on the S-adeles is the Borel σ-algebra. -/
 theorem sAdeleRing_borelSpace : BorelSpace Aₛ := by
   let (v : S) : ProperSpace (v.val.adicCompletion F) := properSpace_adicCompletion v.val
   let (w : InfinitePlace F) : SecondCountableTopology w.Completion :=
@@ -996,8 +996,8 @@ theorem sAdeleRing_borelSpace : BorelSpace Aₛ := by
   exact inferInstanceAs (BorelSpace
     (((w : InfinitePlace F) → w.Completion) × ((v : S) → v.val.adicCompletion F)))
 
-/-- Paper: §3.3.1, p. 128. The σ-algebra on the S-ideles pulled back from the S-adeles is
-their Borel σ-algebra, because the S-ideles carry the subspace topology. -/
+/-- The σ-algebra on the S-ideles pulled back from the S-adeles is their Borel σ-algebra,
+because the S-ideles carry the subspace topology. -/
 theorem sIdeleGroup_borelSpace : BorelSpace Iₛ := by
   have := sAdeleRing_borelSpace (F := F) (S := S)
   refine ⟨?_⟩
