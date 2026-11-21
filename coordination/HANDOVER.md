@@ -1,131 +1,155 @@
-# Coordinator handover: low-hanging-fruit campaign
+# Coordinator handover: low-hanging fruit and critical path
 
-State as of 2026-11-21 ~07:30Z. This branch (`coordination/low-hanging-campaign` on the
-`LeoVerto` fork) is **not meant to be merged**: `scripts/` and `prompts/` are integrator-owned,
-and `lean/Sweep*.lean.txt` define tactic macros, which the project bans from the library. It
-records the strategy, the tools and the state needed to take over the coordinator role.
+State as of 2026-11-21 ~23:55Z. This branch (`coordination/low-hanging-campaign` on the `LeoVerto`
+fork) is **not meant to be merged**. `scripts/` and `prompts/` are integrator-owned, and
+`lean/Sweep*.lean.txt` define tactic macros, which the project bans from the library. The branch
+records the strategy, the tools and the state needed to take over the coordinator role. The live
+copies are in `/home/agent/sweeptools/`; `tools/`, `state/` and `critical/` here are snapshots.
 
-## Goal and results
+## Role and standing instructions (from the user)
 
-The directive: find and close low-hanging proof issues in `mccorvie/riemann-masullo`,
-delegating to subagents in their own worktrees and keeping the coordinator's own context lean.
+- **You are the coordinator:** do no proof work yourself. Route work to subagents in their own
+  worktrees and keep the main context lean.
+- **Models:**
+  - Hunters and fixers run on Sonnet, effort medium (`model: "sonnet"`, `effort: "medium"`). Hunters
+    keep going until they have opened 4 PRs (or about 3 h).
+  - Critical-path provers run on Opus with no effort override, one issue each.
+- **Advisor:** the `advisor` tool (Opus) is for subagents to escalate to. The coordinator does not
+  call it. Both briefs tell agents to use it when stuck.
+- **Token:** use it only for `mccorvie/riemann-masullo` (remote `origin`) and
+  `LeoVerto/riemann-masullo` (remote `fork`).
+- **Upstream posting:** ask the user before posting anything new upstream. Extending a report
+  already filed is fine: #1288 (instance timeouts), #561 (`ApproxProp`), #3230 (issue-sync damage).
+- **Open question to the user:** whether to raise BLOCKERS §0 with the integrator: nothing in the
+  library connects to `Main.lean`, and there is no `riemannZeta` or Dirichlet bridge.
 
-- 39 PRs from `LeoVerto` merged (3 of them before this campaign), closing about 175 proof issues.
-  Open at handover: #2773, #2850, #2859.
-- Statement problems found and reported on the issues, for the integrator:
-  - **#561 `hilbert_approximationProperty` is false as stated.** The ascription to
-    `PrecompactConvergenceCLM` does not change the topology `closure` and `DenseRange` use, so
-    it states operator-norm density of finite-rank operators, which is false in infinite
-    dimensions. The same flaw affects the `ApproxProp` hypothesis of the Sec3a `nuclearTrace`
-    lemmas and #429, #430, #434.
-  - #1288 `homogeneousAdelicTheta_isLinear`: instance synthesis on
-    `SchwartzBruhat (Multiplicative 𝔸[F])` times out in Ch02 Sec2b.
-  - #1784: `rfl` works from a scratch file but elaboration exceeds 100 s inside AppD Sec3b.
-- Many proofs are true only by construction (a definition already encodes the claim, or the
-  lemma unpacks a `Classical.choose` witness). The PRs say so; the real content sits in the open
-  existence issues.
+## State right now
 
-## Strategy
+- **Paused for usage (93%; reset 2026-11-22 12:40Z).** The user authorized usage credits so that
+  **only** the Opus prover on **#1219** (`globalIdelicZetaIntegral_integrable`, worktree
+  `/home/agent/wt/crit-1219`, branch `crit/1219`) can finish. It was in its last checks (module
+  rebuilds, axioms, signatures) before opening a PR. Its plan and progress are in that worktree's
+  `.agent/STATE.md`.
+- **Nothing else runs.** No hourly cron (deleted). `/home/agent/sweeptools/no-resume` exists, so
+  the watchdog does not auto-resume.
+- **A one-shot cron** was scheduled in the old session for 12:41Z, but it is session-only. If you
+  are a new session, do its steps yourself after the reset:
+  1. `rm /home/agent/sweeptools/no-resume`; check that `warm.sh`, `watchdog.sh` and `memguard.sh`
+     are running.
+  2. Create ONE hourly check (run `CronList` first: a duplicate cron once ran every check twice).
+  3. #1219: if there is no PR, hand it to a fresh agent from its `STATE.md`. If there is a PR,
+     check its Verdict and comments.
+  4. **New sections were being digested** on 2026-11-21 ~23:50Z. Look for new labels or newest
+     issue numbers in `status.sh`'s census, and launch up to 2 Sonnet hunters there.
+  5. Start the next Opus critical prover: the top unclaimed entry of `critical/QUEUE.md`, likely
+     #1902.
 
-1. **Hunters do the work, the coordinator routes.** A hunter is a subagent given one label
-   (chapter). It reads `tools/HUNTER.md`: list unclaimed issues for the label, newest first;
-   claim a batch of 2–8 short ones in one file; prove; full checks; one PR per batch. It stops
-   after **2 PRs or ~90 minutes**. Short lives keep context and cost low.
-2. **At most 3 hunters at once**, each on a different label. Labels are chosen from the label
-   census in `tools/status.sh` (unclaimed count, newest issue, last hunt from
-   `state/hunted.txt`), not from a fixed list. New chapters keep being digested, and
-   "mined-out" labels get new issues from splits and digests.
-3. **Model and effort (user's choice):** subagents on Opus (no `model` override), `effort:
-   "medium"` for hunters and PR fixers, `"low"` for single-hit checks and rebases.
-4. **Knowledge carries between hunters** through `state/leads.txt` (short-looking issues, things
-   to skip and why) and `.agent/STATE.md` in each worktree (handoff if cut off).
-5. **Tactic sweep (`tools/sweep.py`)** replaces every `sorry` in a file by a `first | rfl |
-   simp | aesop | ... | exact?` macro and reports which close. Yield was about 1% (12 of 1191),
-   so it is a side channel only. Hits are re-verified by a subagent in a clean worktree before
-   any PR. It runs at nice 19 / idle I/O. As agreed with the user, it was **not** proposed
-   upstream given that hit rate.
+## Results so far
 
-## Infrastructure (all under `/home/agent/`, copies in `tools/`)
+- **About 50 PRs from LeoVerto merged**, closing roughly 200 proof issues. Today's include #3335
+  #3344 #3346 #3356 #3365 #3367 #3384 #3395 #3607 #3650.
+- **Critical path:**
+  - #3660 proves #1223 (Tate's theorem for the global idelic zeta integral) apart from #1219 and
+    older upstream sorries, by porting the Tate split from AppB Sec1.
+  - #3681 fully proves #1906 and adds `ForMathlib/MeasureTheory/Measure/{Count,Haar/Units}.lean`.
+- **Low-hanging fruit is mostly gone.** `state/leads.txt` lists what is left per label, and why.
+  - ch02, ch04 and ch09: blocked by `SchwartzBruhat` / `ModulatedExponentialDecay` elaboration
+    timeouts (#1288 class).
+  - appA–appD, ch03 and ch05: mined out.
+  - `critical/CONE_SHORT.md` is exhausted apart from #1769 and #1236.
+
+## Upstream problems reported (integrator decides)
+
+- **#3230, issue-sync damage** (two comments):
+  - The batch #3183–#3322 has fragment titles (`e`, `act`, ...).
+  - The same run *closed* 124 live proof issues as completed at 15:23–15:27Z (e.g. #862, #848,
+    #1288).
+  - Six live sorries have no issue at all, including `exists_archimedeanHeckeTest` and
+    `exists_globalHeckeTest`, which #1223's chain needs.
+  - No reply yet. When a merged-batch issue is proved, the merger asks for `Closes #<original>`:
+    find the original by title.
+- **#1288:** the consolidated instance-timeout report. Note that #1288 itself was closed by the
+  sync run.
+- **#561:** the `ApproxProp` statements were false as stated. #3330 repaired them upstream.
+
+## Workstreams
+
+### 1. Hunters (`tools/HUNTER.md`)
+
+- Each hunter gets one label, or a list file such as `critical/CONE_SHORT.md`, and claims batches
+  of 2–8 short issues in one file.
+- It runs the full checks and opens one PR per batch. It stops after 4 PRs or ~3 h.
+- The brief includes:
+  - a fail-fast probe for the #1288 elaboration blocker: elaborate the bare statement under
+    `timeout 120` first;
+  - the advisor hint;
+  - "never pipe `lake build` into `head`";
+  - the heartbeat rule: proofs that raise `maxHeartbeats` are held for a human read.
+- Launch prompt: `Read /home/agent/sweeptools/HUNTER.md and follow it exactly. Your label <L> is
+  `X` and your branch prefix <P> is `hunt/X<n>`.` Add overrides, leads and exclusions. Always tell
+  hunters to read an issue's latest comments before claiming: one wrongly claimed issues someone
+  else held.
+
+### 2. Critical path (`critical/`)
+
+- **Mapper findings:**
+  - `Main.lean`'s own cone is **empty**: it imports only `Statements` (pure Mathlib), and all 7
+    targets are bare `sorry`.
+  - The mapper used an *anchored* cone instead: the `completedHeckeL` bridge plus the items that
+    Ch.5.2–13 cite, 416 sorry nodes in all. That gives `QUEUE.md` (ranked tasks with approaches),
+    `BLOCKERS.md`, `CONE_SHORT.md` and `graph.tsv`.
+  - Regenerate the cone with the scripts in `critical/mapper/` (live in
+    `/home/agent/wt/crit-map/.agent/`; the graph dump uses upstream `scripts/progress/Deps.lean`).
+    It takes about a minute on a built tree. Claim and closed-issue annotations are separate,
+    hand-run steps.
+- **Provers:** one Opus agent per issue, started one after another. Prompt: `Read
+  /home/agent/sweeptools/critical/CRITICAL_PROVER.md and follow it. Your issue is #<n>.`
+  - Worktree `/home/agent/wt/crit-<n>`, branch `crit/<n>`.
+  - The prover either proves the issue or splits it (prompts/prover.md), and appends to
+    `critical/status.txt`.
+  - `scripts/agent.sh` is unusable here: it puts worktrees under `/home/user/git`, which is not
+    writable, and pushes to `origin`, which here is upstream.
+- **Queue after #1219:** #1902, then #1891 and #1890. `state/leads.txt` has notes on #1912 (not a
+  Weil application; uniqueness needs a section into the S-ideles) and a possible quick win at
+  Ch04 Sec5:605 using `Count.lean`.
+
+## Infrastructure (`/home/agent/`; copies in `tools/`)
 
 | Piece | What it does |
 |---|---|
-| `wt/base` + `warm.sh` | keeps a worktree built at `origin/main` (checks every 10 min) and publishes `sweeptools/base/{COMMIT,build,sig.txt}` |
-| `newwt.sh <branch> <dir>` | new worktree at the warm commit with a ready `.lake/build` and baseline signatures in `<dir>-before.txt`: no baseline build |
-| `build.sh <wt>` | `lake build` with exit status in `<wt>/.agent/build.exit`; agents wait on that file, never `pgrep` |
-| `status.sh` | one-shot check: RAM/disk, PR verdicts, `claims.txt`, orphan and stale claims, warm base, sweep hits not yet in `dispatched.txt`, label census |
-| `cleanup.sh` | removes worktrees whose PR is merged (disk fills fast; run it on every check) |
-| `watchdog.sh` | if no Claude transcript changes for 20 min, releases every `claims.txt` issue without an open PR ("Releasing" comment); after 2 h idle it probes the API and resumes the session |
-| `memguard.sh` | kills the newest sweep Lean process when available RAM < 1.5 GB (`exact?` needs 3–5 GB per process) |
-| `run_sweep.sh`, `run_list*.sh`, `chain.sh` | sweep drivers; `sweep2` worktree sweeps files changed since the first base |
-
-Worktrees: `/home/user/git` is not writable, so everything is under `/home/agent/wt/` (the
-overlay disk). Each worktree shares Mathlib via a symlink to the main checkout's
-`.lake/packages` and is about 0.5 GB.
-
-## Coordinator loop
-
-A cron job (session-only, so re-create it after any restart; it was deleted at handover to save
-budget) ran at :17 and :57 with this prompt:
-
-> Periodic hunter check (budget-conscious: keep it to a few tool calls). Run
-> /home/agent/sweeptools/status.sh and /home/agent/sweeptools/cleanup.sh and act on them:
-> (1) failing Verdict or review comment on a LeoVerto PR -> fresh short-lived subagent to fix;
-> (2) ORPHAN / STALE / NO-CLAIM-COMMENT issues not owned by a live hunter -> release and drop
-> from claims.txt; CLOSED -> drop; (3) RAM < 2 GB -> hold off new hunters; (4) NEW HIT lines ->
-> if the issue is unclaimed, hand it to a hunter or subagent, then add the key to
-> dispatched.txt; (5) relay finished hunters' results; keep at most 3 concurrent fresh hunters
-> from HUNTER.md (2-PR cap), labels from the census, preferring never-hunted labels and recent
-> issues; record each launch in hunted.txt. Report in one or two lines.
-
-Launching a hunter: Agent tool, `effort: "medium"`, prompt `Read
-/home/agent/sweeptools/HUNTER.md and follow it exactly. Your label <L> is `X` and your branch
-prefix <P> is `hunt/X<n>`.` plus any leads and exclusions (issues in open PRs).
-
-## State at handover
-
-- Running when this was written, told to finish their current batch and stop: hunters on
-  `ch04`, `ch09`, `appB`. Their claims are in `state/claims.txt`; the watchdog releases leftovers
-  20 min after activity stops.
-- `state/hunted.txt`: last hunt per label. `ch03` and `ch05` were mined out at the time; the
-  census shows if that changed. `appB` was hunted last.
-- `state/leads.txt`: short-looking issues and skips per label.
-- Background services running: `warm.sh`, `watchdog.sh`, `memguard.sh`, and the low-priority
-  sweep chain (the `exact?` pass on `wt/sweep`, the cheap pass on `wt/sweep2`).
-
-## Upstream facts worth knowing
-
-- **PR check / Verdict** gates merging: `merge` goes to Auto-merge; `read` means the integrator
-  reads it first (usually quick); `fail` needs fixing. The reason is in the run log ("Check the
-  pull request" step); the artifact host is blocked from the sandbox.
-- "Lean Action CI" only targets non-library PRs; cancelled runs on proof PRs are expected. Do
-  not re-run them: they clog the shared queue, which delays claims too.
-- `scripts/proof_review.sh` flags any added line starting with `inductive…` (no word boundary),
-  e.g. `inductiveTensorMap`, giving `read`. Harmless.
-- Issues of merged PRs stay open until the merger's `scripts/issues.py --apply` closes them in a
-  batch: not orphans.
-- Claims are comments ("Claiming", "Releasing"); the Claims workflow applies labels with a lag,
-  so check recent comments, not only the `claimed` label.
+| `wt/base` + `warm.sh` | keeps a worktree built at `origin/main` and publishes `sweeptools/base/{COMMIT,build,sig.txt}`. **Falls back to building failed index modules one at a time** (added after it silently failed for 4 h) |
+| `newwt.sh <branch> <dir>` | new worktree at the warm commit with a copied `.lake/build` and baseline signatures in `<dir>-before.txt` |
+| `build.sh <wt>` | `lake build` with its exit status in `<wt>/.agent/build.exit` |
+| `status.sh` | RAM, disk, real Lake-cache size, PR verdicts, claims, orphans, stale claims, warm base, sweep hits, label census |
+| `cleanup.sh` | removes worktrees whose PR merged (run it on every check; disk is tight, ~7 GB free) |
+| `watchdog.sh` | releases idle claims after 20 min; auto-resumes after 2 h idle unless `no-resume` exists |
+| `memguard.sh` | kills the newest sweep Lean process when RAM < 1.5 GB |
+| **Lake artifact cache** | `LAKE_ARTIFACT_CACHE=true`, `LAKE_CACHE_DIR=/home/user/git/riemann-masullo/.lake/artifact-cache`, exported in `/etc/sandbox-persistent.sh`, `warm.sh` and `build.sh`. On the same filesystem as `.lake/packages`, so Mathlib artifacts are hardlinked (~45 MB real use; plain `du` shows ~6.8 GB). The user approved writing to that `.lake` subdirectory only. Tested with concurrent builds |
 
 ## Lessons (read before changing anything)
 
-- **Bound every build with `timeout`.** A new proof can make elaboration or the kernel run away
-  (seen in Ch04 Sec5/Sec6 and Ch09 Sec3: 20–40 min at 100% CPU), and a hunter waiting on its
-  monitor then waits forever. `status.sh` does not detect this; check Lean processes' CPU time
-  under `/home/agent/wt/hunt/` if a hunter reports "waiting for the build" for more than ~15 min.
-
-- **Never `pgrep -f`/`pkill -f` a pattern that occurs in your own command line** (it kills your
-  shell, exit 144), and never wait on builds with `pgrep lake`: several agents build at once.
-  **Never `pkill -u`, `pkill -x lean`, `killall`**: one hunter did and killed other agents'
-  builds. Kill only PIDs you started.
-- **After a usage-limit halt, do not resume long-lived subagents with SendMessage**: once the
-  prompt cache has expired, each resume re-sends a ~200k-token transcript at full price. Start
-  fresh hunters from the `STATE.md` handoffs instead.
-- **Re-check a PR's state before touching its branch or description.** One PR was edited after
-  it had already merged and had to be restored.
-- **`gh` caches GraphQL responses for 24 h** (`~/.cache/gh`). An instant 401 after a token
-  change is a cached one: `rm -rf ~/.cache/gh`.
-- `lake env lean` fails on a `module` file itself: iterate with `lake build <Module>`, or use
-  scratch files under `.agent/` that import the module.
-- `git fetch` can fail with "cannot lock ref" while another agent fetches: retry.
-- `scripts/paper.sh` needs `poppler-utils` (`sudo apt-get install -y poppler-utils`).
-- The GitHub token may be used only for `mccorvie/riemann-masullo` and `LeoVerto/riemann-masullo`.
+- **The sandbox can crash.** Afterwards:
+  - Background services are dead: restart them with `cd /home/agent/sweeptools && setsid nohup
+    ./<name>.sh >> <name>.log 2>&1 < /dev/null &`.
+  - Session-only crons are gone, but a pre-crash cron can also *survive*: run `CronList`.
+  - Some subagents restart automatically, others do not; check `ListAgents` and the worktrees'
+    `.agent/STATE.md`.
+- **Watch `warm.log`.** If the base stops advancing, every agent recompiles hours of upstream
+  changes after rebasing.
+- **"Too many open files" / "failed to open file":** the ~20 chapter index modules each import
+  all of Mathlib. Build them one at a time with `lake build <Module>`, then re-run.
+- **AppD Sec2b takes about 30 minutes** in a full build. That is upstream, not the agent.
+- **Agents often go silent while "waiting on a build".** Twice an agent died there without
+  pushing. Check its worktree (local commits vs `fork/<branch>`) and hand the rest to a fresh
+  agent with exact steps.
+- **Bound every build with `timeout`.** Never `pgrep`/`pkill` on lake or lean patterns, and never
+  `pkill -f` a pattern from your own command line. Kill only PIDs you started.
+- **Never resume long-lived subagents with SendMessage after a pause.** Start fresh agents from
+  their `STATE.md` instead.
+- **Re-check a PR's state right before editing it or commenting on it.** A comment once went onto
+  an already merged PR and had to be deleted.
+- **`gh` caches GraphQL responses for 24 h** (`~/.cache/gh`): an instant 401 is a cached one.
+- **Issues of merged PRs stay open** until the merger's `scripts/issues.py --apply`: they are not
+  orphans.
+- **The "PR check" Verdict is the merge gate.** Cancelled "Lean Action CI" runs are expected: do
+  not re-run them.

@@ -7,6 +7,8 @@
 #   /home/agent/sweeptools/base/sig.txt       scripts/signatures.sh output at COMMIT
 # A snapshot is swapped in with mv, so readers see either the old or the new one.
 set -u
+export LAKE_ARTIFACT_CACHE=true
+export LAKE_CACHE_DIR=/home/user/git/riemann-masullo/.lake/artifact-cache
 T=/home/agent/sweeptools; B=$T/base; WT=/home/agent/wt/base; MAIN=/home/user/git/riemann-masullo
 INTERVAL=${INTERVAL:-600}
 mkdir -p $B
@@ -21,7 +23,16 @@ while true; do
   have=$(cat $B/COMMIT 2>/dev/null || true)
   if [ "$want" != "$have" ]; then
     cd $WT && git checkout -q --detach "$want"
-    if lake build >$B/build.log 2>&1 && scripts/signatures.sh >$B/sig.tmp 2>>$B/build.log; then
+    # The chapter index modules each import all of Mathlib; built in parallel they exhaust the host
+    # mount's file handles ("failed to open file"). Fall back to building the failed ones one at a time.
+    ok=0
+    if lake build >$B/build.log 2>&1; then ok=1; else
+      for m in $(grep -oE '✖ \[[0-9]+/[0-9]+\] Building [A-Za-z0-9_.]+' $B/build.log | awk '{print $NF}'); do
+        lake build "$m" >>$B/build.log 2>&1 || true
+      done
+      lake build >>$B/build.log 2>&1 && ok=1
+    fi
+    if [ $ok = 1 ] && scripts/signatures.sh >$B/sig.tmp 2>>$B/build.log; then
       rm -rf $B/build.new && cp -r $WT/.lake/build $B/build.new
       # publish: COMMIT is written last, so a reader who reads COMMIT first and then copies
       # may get a newer build than COMMIT names; readers re-check COMMIT after copying.

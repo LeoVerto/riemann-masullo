@@ -2,6 +2,7 @@
 # One-shot status for the coordinator's periodic check.
 T=/home/agent/sweeptools; R=mccorvie/riemann-masullo
 echo "== $(date '+%H:%M') host"; free -m | awk 'NR==2{print "mem avail "$7"MB"}'; df -h / | awk 'NR==2{print "disk free "$4}'; uptime | sed 's/.*load/load/'
+echo "lake cache (unique, excluding hardlinks into packages) $(du -sh /home/user/git/riemann-masullo/.lake/packages /home/user/git/riemann-masullo/.lake/artifact-cache 2>/dev/null | tail -1 | cut -f1)"
 echo "== PRs (LeoVerto, open + merged today)"
 gh pr list --repo $R --author LeoVerto --state all --limit 30 --json number,state,title,statusCheckRollup,reviews,comments \
   --jq '.[] | select(.state=="OPEN" or .state=="MERGED") | "\(.number) \(.state) \([.statusCheckRollup[]? | select(.name=="Verdict") | .conclusion] | join(",")) rev=\(.reviews|length) com=\(.comments|length) \(.title[:60])"' 2>&1 | head -30
@@ -46,5 +47,5 @@ true
 echo "== label census (unclaimed open proof issues; newest issue number; last hunter start)"
 gh api --paginate "repos/$R/issues?state=open&labels=proof&per_page=100" --jq '.[] | select(.pull_request|not) | select([.labels[].name] | (index("claimed") or index("blocked") or index("stuck")) | not) | "\([.labels[].name] | map(select(. != "proof")) | join(",")) \(.number)"' |
   awk '{c[$1]++; if ($2>m[$1]) m[$1]=$2} END {for (l in c) print l, c[l], m[l]}' | sort -k2 -nr |
-  while read l c m; do h=$(awk -v l="$l" '$1==l {print $2}' $T/hunted.txt); echo "$l unclaimed=$c newest=#$m last_hunt=${h:-NEVER}"; done
+  while read l c m; do h=$(awk -v l="$l" '$1==l {h=$2} END {print h}' $T/hunted.txt); echo "$l unclaimed=$c newest=#$m last_hunt=${h:-NEVER}"; done
 true

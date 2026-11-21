@@ -14,3 +14,5 @@ RiemannMasullo/Ch09_HardySobolev/Sec1.lean::weightedSobolev_complete
 RiemannMasullo/AppA_AlgebraicNT/Sec2.lean::rationalAdeleEmbedding_spec
 RiemannMasullo/AppC_LCTVS/Sec3a.lean::continuous_tensorToFiniteRank_opNorm
 RiemannMasullo/AppD_SchwartzBruhat/Sec1b.lean::BruhatStructuralPair.quotient_mk_eq_one
+RiemannMasullo/Ch05_ThetaZSpaces/Sec1.lean::globalIdelicMellin_apply
+RiemannMasullo/Ch05_ThetaZSpaces/Sec1.lean::sLocalIdelicMellin_apply

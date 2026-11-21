@@ -8,3 +8,25 @@ ch05  2026-11-21T07:05Z  ch05b finished (#2859); mined out at this time (rest ne
 ch04  2026-11-21T06:35Z
 ch09  2026-11-21T06:37Z
 appB  2026-11-21T07:11Z  appb finished (#2862, Sec4a); §B.3 issues #2839 #2091 were claimed by others
+ch02  2026-11-21T14:53Z  hunt/ch02b started (sonnet, 4 PRs)
+appD  2026-11-21T14:53Z  hunt/appd3 started (sonnet, 4 PRs)
+ch09  2026-11-21T14:53Z  hunt/ch09c started (sonnet, 4 PRs; salvage #2614 #2629)
+ch02  2026-11-21T15:40Z  hunt/ch02b finished, 0 PRs, mined out (instance timeouts)
+ch04  2026-11-21T15:40Z  hunt/ch04b started (sonnet, 4 PRs)
+ch09  2026-11-21T16:13Z  hunt/ch09c finished: PRs #3334 #3335
+appC  2026-11-21T16:13Z  hunt/appc5 started (sonnet, 4 PRs)
+ch04  2026-11-21T16:22Z  hunt/ch04b finished, 0 PRs (instance timeouts)
+appA  2026-11-21T16:23Z  hunt/appa4 started (sonnet, 4 PRs)
+appD  2026-11-21T16:43Z  hunt/appd3 finished: PRs #3332 #3356; mostly mined
+appB  2026-11-21T16:43Z  hunt/appb2 started (sonnet, 4 PRs)
+appB  2026-11-21T16:44Z  hunt/appb2 finished, 0 PRs (all short ones claimed by others)
+appA  2026-11-21T17:08Z  hunt/appa4 finished: PRs #3344 #3346 #3367 #3384 (3367/3384 close malformed-batch #3206 #3209 #3210: expect re-link request)
+appC  2026-11-21T17:25Z  hunt/appc5 finished: PRs #3365 #3395; mined out
+crit  2026-11-21T17:37Z  crit/1223 started (opus, single issue)
+cone  2026-11-21T17:37Z  hunt/cone1 started (sonnet, CONE_SHORT.md list)
+crit  2026-11-21T19:40Z  crit/1223 restarted (opus, single issue)
+cone  2026-11-21T19:40Z  hunt/cone2 started (sonnet, CONE_SHORT.md; resumes #2514-#2518 diff)
+cone  2026-11-21T20:29Z  hunt/cone2 finished: PRs #3607 #3650; CONE_SHORT exhausted except #1769 #1236
+crit  2026-11-21T20:29Z  crit/1906 started (opus, single issue)
+crit  2026-11-21T21:59Z  crit/1906 finished: PR #3681 (fully proved)
+crit  2026-11-21T21:59Z  crit/1219 started (opus, single issue)

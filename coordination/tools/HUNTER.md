@@ -54,7 +54,16 @@ in the repo, a short `calc`, `ext` + `simp [...]`, `constructor` + pieces, etc.
    which are proved, what is left, next step), so that a fresh agent can take over if you are cut
    off by a usage limit.
 
+## Fail fast on the known elaboration blocker
+Terms using `+`, `-`, `•` on `SchwartzBruhat` / `ModulatedExponentialDecay` values, or `Lβ`
+coercions, often time out or hang (blocked #1288 #1463 #2614 #2686 #2710 #2841 #2842). Before
+claiming such an issue, elaborate the bare statement with a `sorry` body in a scratch file under
+`timeout 120 lake env lean .agent/Probe.lean`; if that does not finish, skip the issue. Known
+workarounds: `(someLinearMap).map_add f f'` elaborates; `Eq.trans ?_ (integral_add ..)` works
+where `rw [← integral_add ..]` times out.
+
 ## Facts about this environment
+- If you have an `advisor` tool, call it when stuck (a proof not converging, a build hanging, or before releasing an issue that looked short): it is a stronger model that sees your transcript.
 - Upstream CI: "PR check" (job Verdict) gates merging; verdict merge → Auto-merge, read → the
   integrator reads it (usually quick), fail → fix it. "Lean Action CI" runs being cancelled is
   expected; do not re-run them. Do not babysit CI; once the PR is open, move on.
@@ -88,3 +97,5 @@ in the repo, a short `calc`, `ext` + `simp [...]`, `constructor` + pieces, etc.
 ## Report back
 For each PR: URL and issues closed. Also issues released and why, and any false/vacuous
 statements found. Keep it short.
+- Never pipe `lake build` into `head` (or anything that exits early): the build keeps running after the pipe closes, and you end up with two builds in one worktree. Redirect to a log file and read that instead. In a full build, if the chapter index modules fail with "Too many open files", build them one at a time with `lake build <Module>` and re-run.
+- Upstream PR checks hold proofs that raise `maxHeartbeats` (`set_option maxHeartbeats N in`) for a human read (scripts/ci/test_plain_proof.py), and `scripts/agent.sh` refuses hand-ins whose changed file takes over 10 min to compile. Prefer restructuring a slow proof to raising heartbeats; if you must raise them, say why in the PR body. AppD_SchwartzBruhat/Sec2b alone takes ~30 min in a full build: that is upstream, not you.

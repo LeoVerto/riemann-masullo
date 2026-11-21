@@ -1,0 +1,2 @@
+1223 PROVED https://github.com/mccorvie/riemann-masullo/pull/3660 modulo sibling #1219 sorry; ported AppB Sec1 Tate split; axioms propext,sorryAx,choice,Quot.sound
+1906 PROVED https://github.com/mccorvie/riemann-masullo/pull/3681 via weilQuotientMeasure_existsUnique; also proves sMultiplicativeTamagawaMeasure Haar+Regular (reusable for #1912)
