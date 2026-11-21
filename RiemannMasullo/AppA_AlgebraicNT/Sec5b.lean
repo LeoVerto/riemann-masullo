@@ -260,7 +260,14 @@ def dSequenceMaximal (μ : Measure G) (U : ℕ → Set G) (f : G → ℂ) (x : G
 singleton of positive finite mass, the maximal function is the pointwise norm. -/
 theorem dSequenceMaximal_eventually_singleton [μ.IsHaarMeasure]
     (h₀ : 0 < μ {1}) (hfin : μ {1} < ∞) (hU : ∀ᶠ k in atTop, U k = {1})
-    (f : G → ℂ) (x : G) : dSequenceMaximal μ U f x = ‖f x‖ₑ := by sorry
+    (f : G → ℂ) (x : G) : dSequenceMaximal μ U f x = ‖f x‖ₑ := by
+  have hx : μ {x} = μ {1} := by
+    rw [← measure_smul μ x ({1} : Set G), Set.smul_set_singleton, smul_eq_mul, mul_one]
+  have hev : ∀ᶠ k in atTop, ⨍⁻ y in x • U k, ‖f y‖ₑ ∂μ = ‖f x‖ₑ := by
+    filter_upwards [hU] with k hk
+    rw [hk, Set.smul_set_singleton, smul_eq_mul, mul_one, setLAverage_eq, lintegral_singleton,
+      hx, ENNReal.mul_div_cancel_right h₀.ne' hfin.ne]
+  rw [dSequenceMaximal, limsup_congr hev, limsup_const]
 
 /-- Paper: Theorem A.5.3.6, p. 581. The local function maximal operator gives
 a function measurable for the completed Haar measure. -/
@@ -401,7 +408,9 @@ def dSequenceSmoothening (μ : Measure G) (U : ℕ → Set G) (f : G → ℂ)
 same constant on its regular set. -/
 theorem dSequenceSmoothening_const [μ.IsHaarMeasure] (hU : IsDSequence μ U) (c : ℂ)
     (x : dSequenceRegularSet μ U (fun _ ↦ c)) :
-    dSequenceSmoothening μ U (fun _ ↦ c) x = c := by sorry
+    dSequenceSmoothening μ U (fun _ ↦ c) x = c := by
+  simp only [dSequenceSmoothening, dSequenceAverage_const hU]
+  exact tendsto_const_nhds.limUnder_eq
 
 -- TODO(paper-gap): Remark A.5.4.2 refers to D_f without specifying it.
 

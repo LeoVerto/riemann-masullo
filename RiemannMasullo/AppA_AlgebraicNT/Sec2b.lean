@@ -1308,7 +1308,15 @@ theorem mem_sIdeleFundamentalDomain_of_classNumberOne [Subsingleton Picₛ(F, S)
     (rₛ : Picₛ(F, S) → outsideNormOne(F, S)) (h₁ : rₛ 1 = 1) (g : outsideNormOne(F, S)) :
     g ∈ sIdeleFundamentalDomain F v₀ σ S bₛ rₛ ↔
       projectS (outsideInclusion g.val) ∈ (Subgroup.subtype Nₛ '' Eₛ) := by
-  sorry
+  simp only [sIdeleFundamentalDomain, Set.mem_iUnion]
+  constructor
+  · rintro ⟨c, hg⟩
+    rw [Subsingleton.elim c 1, h₁, one_smul] at hg
+    exact hg
+  · intro hg
+    refine ⟨1, ?_⟩
+    rw [h₁, one_smul]
+    exact hg
 
 /-- Paper: Proposition A.2.4.4(1), p. 555. The local domain has compact closure in
 the norm-one S-ideles. -/
