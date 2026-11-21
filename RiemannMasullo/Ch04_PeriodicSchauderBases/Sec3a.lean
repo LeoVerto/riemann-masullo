@@ -40,7 +40,7 @@ variable (ν : Measure G) [hν : ν.IsHaarMeasure]
 include hν
 
 /-- Paper: Lemma 4.3.1.3, p. 175. Haar measure is regular. -/
-theorem regularL2_haar_regular : ν.Regular := by sorry
+theorem regularL2_haar_regular : ν.Regular := by infer_instance
 
 /-- Paper: Lemma 4.3.1.3, p. 175. Haar measure is Radon, expressed by inner
 regularity by compact sets together with finiteness on compact sets. -/
