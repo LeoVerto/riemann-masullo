@@ -50,7 +50,11 @@ def schwartzBruhatTranslationAction : G →* (SchwartzBruhat G →L[ℂ] Schwart
 /-- Paper: (D.2.1.2), p. 792. The bundled left translation is given
 by evaluation at the inverse translate. -/
 theorem schwartzBruhatTranslationAction_apply (g x : G) (f : SchwartzBruhat G) :
-    schwartzBruhatTranslationAction (G := G) g f x = f (g⁻¹ * x) := by sorry
+    schwartzBruhatTranslationAction (G := G) g f x = f (g⁻¹ * x) := by
+  have h : schwartzBruhatTranslationAction (G := G) g f = schwartzBruhatTranslate g f :=
+    (Classical.choose_spec (existsUnique_schwartzBruhatTranslationAction (G := G)).exists) g f
+  rw [h]
+  rfl
 
 end SchwartzBruhatAction
 
