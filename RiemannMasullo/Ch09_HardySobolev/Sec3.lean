@@ -252,7 +252,41 @@ theorem mem_modulatedFrequencyBand_iff_normTwist (χ ψ : PontryaginDual G) (α 
     let j : Circle →ₜ* ℂ := ⟨Circle.coeHom, continuous_subtype_val⟩
     ψ ∈ modulatedFrequencyBand m χ α β ↔ ∃ t ∈ Icc α β,
       j.comp ψ = quasiCharacterNormTwist m.toMonoidHom m.continuous (j.comp χ) ((t : ℂ) * Complex.I) :=
-  by sorry
+  by
+  intro j
+  have key : ∀ (g : G) (t : ℝ), ((((m g).val : ℝ≥0) : ℝ) : ℂ) ^ ((t : ℂ) * Complex.I) =
+      ((Circle.exp (t * Real.log ((m g).val : ℝ)) : Circle) : ℂ) := by
+    intro g t
+    have hpos : (0 : ℝ) < (((m g).val : ℝ≥0) : ℝ) := NNReal.coe_pos.mpr (Units.zero_lt _)
+    rw [Complex.cpow_def_of_ne_zero (Complex.ofReal_ne_zero.mpr hpos.ne'),
+      ← Complex.ofReal_log hpos.le, Circle.coe_exp]
+    congr 1
+    push_cast
+    ring
+  have hv : ∀ (c : QuasiCharacter G) (z : ℂ) (g : G),
+      (quasiCharacterNormTwist m.toMonoidHom m.continuous c z) g =
+        c g * ((((m g).val : ℝ≥0) : ℝ) : ℂ) ^ z := fun _ _ _ => rfl
+  have hg : ∀ (t : ℝ), j.comp ψ = quasiCharacterNormTwist m.toMonoidHom m.continuous (j.comp χ)
+      ((t : ℂ) * Complex.I) ↔ ∀ g, ψ g = χ g * Circle.exp (t * Real.log ((m g).val : ℝ)) := by
+    intro t
+    constructor
+    · intro h g
+      have := DFunLike.congr_fun h g
+      rw [hv, key] at this
+      apply Subtype.ext
+      rw [Circle.coe_mul]
+      exact this
+    · intro h
+      ext g
+      rw [hv, key]
+      have := congrArg (fun z : Circle => (z : ℂ)) (h g)
+      rw [Circle.coe_mul] at this
+      exact this
+  constructor
+  · rintro ⟨t, ht, h⟩
+    exact ⟨t, ht, (hg t).2 h⟩
+  · rintro ⟨t, ht, h⟩
+    exact ⟨t, ht, (hg t).1 h⟩
 
 /-- Paper: Lemma 9.3.2.1(1)–(4), pp. 422–424. On each fixed kernel isotype
 there is a uniformly bounded sequence of convolutions converging strongly to
