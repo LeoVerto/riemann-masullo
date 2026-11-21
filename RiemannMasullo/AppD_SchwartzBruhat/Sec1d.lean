@@ -1723,7 +1723,10 @@ theorem ideleClassComponent_weightedSup_generates
 of the norm-one idele classes has image in their identity component. -/
 theorem normOneIdeleClass_direction_mem_connectedComponent
     (γ : LCATopologicalLie C₁[F]) (t : ℝ) :
-    γ (Multiplicative.ofAdd t) ∈ Subgroup.connectedComponentOfOne C₁[F] := by sorry
+    γ (Multiplicative.ofAdd t) ∈ Subgroup.connectedComponentOfOne C₁[F] := by
+  have : PreconnectedSpace (Multiplicative ℝ) := inferInstanceAs (PreconnectedSpace ℝ)
+  exact (isPreconnected_range γ.continuous).subset_connectedComponent
+    ⟨1, map_one γ⟩ ⟨_, rfl⟩
 
 -- TODO(paper-gap): In D.1.10.9 the subgroup Γ is unbound. The stage S(k,C_F) in
 -- the title and conclusion uses the full group, which is compactly generated.
