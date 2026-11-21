@@ -331,7 +331,34 @@ def sLocalEpsilonFactor (c : QuasiCharacter Jₛ) : ℂ :=
 /-- Paper: Equation (3.3.1.28), p. 135. With only archimedean places, the
 trivial component has epsilon factor one. -/
 theorem sLocalEpsilonFactor_archimedean_trivial (s : ℂ) :
-    sLocalEpsilonFactor (emptyChart s) = 1 := by sorry
+    sLocalEpsilonFactor (emptyChart s) = 1 := by
+  rw [sLocalEpsilonFactor, Finset.univ_eq_attach, Finset.attach_empty, Finset.prod_empty, mul_one]
+  refine Finset.prod_eq_one fun w _ ↦ ?_
+  have hval (g : w.Completionˣ) : sLocalInfiniteRestriction w (emptyChart s) g =
+      (((m∞(w) g : ℝ≥0) : ℝ) : ℂ) ^ s :=
+    sLocalInfiniteRestriction_normTwist (S := ∅) w s g
+  by_cases hw : w.IsReal
+  · have hshape : realShape[hw, (sLocalInfiniteRestriction w (emptyChart s)), s, (0 : Fin 2)] := by
+      intro x
+      have hn : ‖((realModel(hw)).symm (x : ℝ) : w.Completion)‖ = ‖(x : ℝ)‖ :=
+        (InfinitePlace.Completion.isometryEquivRealOfIsReal hw).symm.isometry.norm_map_of_map_zero
+          (map_zero (realModel(hw)).symm) (x : ℝ)
+      rw [hval]
+      simp [InfinitePlace.mult, hw, hn]
+    have h := (realLocalEulerParameters w hw (sLocalInfiniteRestriction w (emptyChart s))).unique
+      (realLocalEulerParameters w hw _).exists.choose_spec (y₂ := (s, 0)) hshape
+    simp only [infiniteLocalEpsilonFactor, hw, ↓reduceDIte, h, Fin.val_zero, pow_zero]
+  · have hc : w.IsComplex := InfinitePlace.not_isReal_iff_isComplex.mp hw
+    have hshape : complexShape[hc, (sLocalInfiniteRestriction w (emptyChart s)), s, (0 : ℤ)] := by
+      intro x
+      have hn : ‖((complexModel(hc)).symm (x : ℂ) : w.Completion)‖ = ‖(x : ℂ)‖ :=
+        (InfinitePlace.Completion.isometryEquivComplexOfIsComplex hc).symm.isometry.norm_map_of_map_zero
+          (map_zero (complexModel(hc)).symm) (x : ℂ)
+      rw [hval]
+      simp [InfinitePlace.mult, hw, hn]
+    have h := (complexLocalEulerParameters w hc (sLocalInfiniteRestriction w (emptyChart s))).unique
+      (complexLocalEulerParameters w hc _).exists.choose_spec (y₂ := (s, 0)) hshape
+    simp only [infiniteLocalEpsilonFactor, hw, ↓reduceDIte, h, Int.natAbs_zero, pow_zero]
 
 /-- Paper: Lemma 3.3.1.7(3)(b), p. 136. The S-local epsilon factor is entire. -/
 theorem sLocalEpsilonFactor_entire (χ : PontryaginDual Jₛ) :
