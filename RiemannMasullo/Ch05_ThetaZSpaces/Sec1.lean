@@ -95,7 +95,23 @@ def globalIdelicOrderBound (c : X𝔽) : WithTop ℤ :=
 The trivial character allows a simple pole and the squared norm character allows none. -/
 theorem globalIdelicOrderBound_one_and_normSquared :
     globalIdelicOrderBound (1 : X𝔽) = -1 ∧
-      globalIdelicOrderBound (ideleClassNormTwist (1 : PontryaginDual C𝔽) 2) = 0 := by sorry
+      globalIdelicOrderBound (ideleClassNormTwist (1 : PontryaginDual C𝔽) 2) = 0 := by
+  refine ⟨ite_eq_left (Or.inl rfl), ite_eq_right ?_⟩
+  obtain ⟨g, hg⟩ :=
+    (ideleGroup_quotient.{_, 0} F).2.2.2.2.2.2.2.2.2.1 (Units.mk0 (2 : ℝ≥0) two_ne_zero)
+  have hval : ∀ s : ℂ, ideleClassNormTwist (1 : PontryaginDual C𝔽) s g = (2 : ℂ) ^ s := by
+    intro s
+    change (((1 : PontryaginDual C𝔽) g : Circle) : ℂ) *
+      (((ideleClassNorm F g : ℝ≥0) : ℝ) : ℂ) ^ s = _
+    rw [hg]
+    simp
+  rintro (h | h)
+  · have := DFunLike.congr_fun h g
+    rw [hval] at this
+    norm_num at this
+  · have := DFunLike.congr_fun h g
+    rw [hval, hval] at this
+    norm_num at this
 
 local notation "globalMeromorphic" =>
   meromorphicWithPoleBound (X := X𝔽) normChart𝔽 (globalIdelicOrderBound (F := F))
@@ -335,7 +351,8 @@ def sLocalThetaToZ : SLocalAdelicThetaSpace F S →ₗ[ℂ] SLocalIdelicZSpace F
 /-- Paper: Definition 5.1.1.1(4), p. 223.
 The map from the S-local theta space onto its Z-space is a quotient map. -/
 theorem sLocalThetaToZ_isQuotientMap :
-    IsQuotientMap (sLocalThetaToZ (F := F) (S := S)) := by sorry
+    IsQuotientMap (sLocalThetaToZ (F := F) (S := S)) :=
+  { eq_coinduced := rfl, surjective := LinearMap.surjective_rangeRestrict _ }
 
 /-- Paper: Remark 5.1.1.2, p. 223.
 The global theta quotient is locally convex. -/
@@ -351,13 +368,17 @@ theorem sLocalAdelicThetaSpace_polynormable : PolynormableSpace ℂ (SLocalAdeli
 The global theta quotient is Hausdorff if the global theta kernel is closed. -/
 theorem globalAdelicThetaSpace_t2_of_isClosed
     (h : IsClosed (LinearMap.ker theta𝔽 : Set ℬ𝔽)) :
-    T2Space (GlobalAdelicThetaSpace F) := by sorry
+    T2Space (GlobalAdelicThetaSpace F) := by
+  have : IsClosed (LinearMap.ker theta𝔽 : Set ℬ𝔽) := h
+  infer_instance
 
 /-- Paper: Remark 5.1.1.2, p. 223.
 The S-local theta quotient is Hausdorff if the S-local theta kernel is closed. -/
 theorem sLocalAdelicThetaSpace_t2_of_isClosed
     (h : IsClosed (LinearMap.ker thetaₛ : Set ℬₛ)) :
-    T2Space (SLocalAdelicThetaSpace F S) := by sorry
+    T2Space (SLocalAdelicThetaSpace F S) := by
+  have : IsClosed (LinearMap.ker thetaₛ : Set ℬₛ) := h
+  infer_instance
 
 /-- Paper: Theorem 5.1.1.3, p. 223.
 The Mellin transform is injective on the global theta quotient. -/
