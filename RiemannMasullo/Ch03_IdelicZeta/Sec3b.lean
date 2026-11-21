@@ -299,7 +299,60 @@ theorem finiteLocalEpsilonFactor_ramified (v : Primes)
 /-- Paper: Lemma 3.3.1.7(3)(a), p. 135. The infinite local epsilon factor
 is entire in each norm-twist chart. -/
 theorem infiniteLocalEpsilonFactor_entire (w : InfinitePlace F) (χ : PontryaginDual w.Completionˣ) :
-    AnalyticOnNhd ℂ (infiniteLocalEpsilonFactor w ∘ chart∞[w, χ]) univ := by sorry
+    AnalyticOnNhd ℂ (infiniteLocalEpsilonFactor w ∘ chart∞[w, χ]) univ := by
+  suffices h : ∀ s, infiniteLocalEpsilonFactor w (chart∞[w, χ] s) =
+      infiniteLocalEpsilonFactor w (chart∞[w, χ] 0) by
+    rw [show infiniteLocalEpsilonFactor w ∘ chart∞[w, χ] =
+      fun _ ↦ infiniteLocalEpsilonFactor w (chart∞[w, χ] 0) from funext h]
+    exact fun _ _ ↦ analyticAt_const
+  intro s
+  have hval (t : ℂ) (g : w.Completionˣ) : chart∞[w, χ] t g =
+      (χ g : ℂ) * ((((m∞(w) g : ℝ≥0) : ℝ)) : ℂ) ^ t := rfl
+  by_cases hw : w.IsReal
+  · have hp := (realLocalEulerParameters w hw (chart∞[w, χ] 0)).exists.choose_spec
+    have hshape : realShape[hw, (chart∞[w, χ] s),
+        (realLocalEulerParameters w hw (chart∞[w, χ] 0)).exists.choose.1 + s,
+        (realLocalEulerParameters w hw (chart∞[w, χ] 0)).exists.choose.2] := by
+      intro x
+      have hn : ‖((realModel(hw)).symm (x : ℝ) : w.Completion)‖ = ‖(x : ℝ)‖ :=
+        (InfinitePlace.Completion.isometryEquivRealOfIsReal hw).symm.isometry.norm_map_of_map_zero
+          (map_zero (realModel(hw)).symm) (x : ℝ)
+      have h0 := hp x
+      rw [hval, Complex.cpow_zero, mul_one] at h0
+      have hm : (((m∞(w) (Units.map (realModel(hw)).symm.toMonoidHom x) : ℝ≥0) : ℝ)) =
+          ‖(x : ℝ)‖ := by
+        simp [InfinitePlace.mult, hw, hn]
+      have hx : ((‖(x : ℝ)‖ : ℝ) : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr (norm_ne_zero_iff.mpr x.ne_zero)
+      rw [hval, h0, hm, Complex.cpow_add _ _ hx]
+      ring
+    have h := (realLocalEulerParameters w hw (chart∞[w, χ] s)).unique
+      (realLocalEulerParameters w hw (chart∞[w, χ] s)).exists.choose_spec
+      (y₂ := ((realLocalEulerParameters w hw (chart∞[w, χ] 0)).exists.choose.1 + s,
+        (realLocalEulerParameters w hw (chart∞[w, χ] 0)).exists.choose.2)) hshape
+    simp only [infiniteLocalEpsilonFactor, hw, ↓reduceDIte, h]
+  · have hc : w.IsComplex := InfinitePlace.not_isReal_iff_isComplex.mp hw
+    have hp := (complexLocalEulerParameters w hc (chart∞[w, χ] 0)).exists.choose_spec
+    have hshape : complexShape[hc, (chart∞[w, χ] s),
+        (complexLocalEulerParameters w hc (chart∞[w, χ] 0)).exists.choose.1 + s,
+        (complexLocalEulerParameters w hc (chart∞[w, χ] 0)).exists.choose.2] := by
+      intro x
+      have hn : ‖((complexModel(hc)).symm (x : ℂ) : w.Completion)‖ = ‖(x : ℂ)‖ :=
+        (InfinitePlace.Completion.isometryEquivComplexOfIsComplex hc).symm.isometry.norm_map_of_map_zero
+          (map_zero (complexModel(hc)).symm) (x : ℂ)
+      have h0 := hp x
+      rw [hval, Complex.cpow_zero, mul_one] at h0
+      have hm : (((m∞(w) (Units.map (complexModel(hc)).symm.toMonoidHom x) : ℝ≥0) : ℝ)) =
+          ‖(x : ℂ)‖ ^ 2 := by
+        simp [InfinitePlace.mult, hw, hn]
+      have hx : (((‖(x : ℂ)‖ ^ 2 : ℝ)) : ℂ) ≠ 0 :=
+        Complex.ofReal_ne_zero.mpr (pow_ne_zero _ (norm_ne_zero_iff.mpr x.ne_zero))
+      rw [hval, h0, hm, Complex.cpow_add _ _ hx]
+      ring
+    have h := (complexLocalEulerParameters w hc (chart∞[w, χ] s)).unique
+      (complexLocalEulerParameters w hc (chart∞[w, χ] s)).exists.choose_spec
+      (y₂ := ((complexLocalEulerParameters w hc (chart∞[w, χ] 0)).exists.choose.1 + s,
+        (complexLocalEulerParameters w hc (chart∞[w, χ] 0)).exists.choose.2)) hshape
+    simp only [infiniteLocalEpsilonFactor, hw, ↓reduceDIte, h]
 
 /-- Paper: Lemma 3.3.1.7(3)(a), p. 135. The finite local epsilon factor
 is entire in each norm-twist chart. -/
