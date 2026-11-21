@@ -347,13 +347,42 @@ theorem approximationNumber_max_min (A : H →L[ℂ] H) (hA : IsCompactOperator 
 
 -- Lemma C.3.5.4(1) is Mathlib's IsCompactOperator.comp_clm and IsCompactOperator.clm_comp.
 
+omit [CompleteSpace H] in
+/-- An approximation number is bounded by the error of any admissible approximant. -/
+private theorem approximationNumber_le_norm_sub (T S : H →L[ℂ] H) {n : ℕ}
+    (hS : Module.rank ℂ S.toLinearMap.range ≤ (n : Cardinal)) :
+    approximationNumber T n ≤ ‖S - T‖ :=
+  csInf_le ⟨0, by rintro _ ⟨_, _, rfl⟩; exact norm_nonneg _⟩ ⟨S, hS, rfl⟩
+
+omit [CompleteSpace H] in
+/-- If an operation `S ↦ S'` on approximants does not raise the rank and multiplies the
+error by at most `‖B‖`, then it bounds the approximation numbers of the new operator `A'`. -/
+private theorem approximationNumber_mul_le_of_rank_le (A B : H →L[ℂ] H) {n : ℕ}
+    {A' : H →L[ℂ] H} {op : (H →L[ℂ] H) → H →L[ℂ] H}
+    (hrank : ∀ S, Module.rank ℂ (op S).toLinearMap.range ≤ Module.rank ℂ S.toLinearMap.range)
+    (hnorm : ∀ S, ‖op S - A'‖ ≤ ‖S - A‖ * ‖B‖) :
+    approximationNumber A' n ≤ approximationNumber A n * ‖B‖ := by
+  rcases (norm_nonneg B).eq_or_lt with hB | hB
+  · rw [← hB, mul_zero]
+    have h := approximationNumber_le_norm_sub A' (op 0) (n := n)
+      ((hrank 0).trans (by simp))
+    simpa [← hB] using h.trans (hnorm 0)
+  · rw [← div_le_iff₀ hB]
+    refine le_csInf ⟨_, 0, by simp, rfl⟩ ?_
+    rintro _ ⟨S, hS, rfl⟩
+    rw [div_le_iff₀ hB]
+    exact (approximationNumber_le_norm_sub A' (op S) ((hrank S).trans hS)).trans (hnorm S)
+
 /-- Paper: Lemma C.3.5.4(2), p. 701. The singular value of a compact
 endomorphism composed on the right by a bounded operator is bounded by the
 same singular value times the norm of the right factor.
 Deviation: The approximation-number index starts at zero. -/
 theorem approximationNumber_mul_le_right (A B : H →L[ℂ] H) (hA : IsCompactOperator A)
     (n : ℕ) (hn : (n : Cardinal) < Module.rank ℂ H) :
-    approximationNumber (A * B) n ≤ approximationNumber A n * ‖B‖ := by sorry
+    approximationNumber (A * B) n ≤ approximationNumber A n * ‖B‖ :=
+  approximationNumber_mul_le_of_rank_le A B (op := fun S ↦ S * B)
+    (fun S ↦ Submodule.rank_mono (LinearMap.range_comp_le_range B.toLinearMap S.toLinearMap))
+    (fun S ↦ by rw [← sub_mul]; exact norm_mul_le _ _)
 
 /-- Paper: Lemma C.3.5.4(2), p. 701. The singular value of a compact
 endomorphism composed on the left by a bounded operator is bounded by the
@@ -361,7 +390,13 @@ same singular value times the norm of the left factor.
 Deviation: The approximation-number index starts at zero. -/
 theorem approximationNumber_mul_le_left (A B : H →L[ℂ] H) (hA : IsCompactOperator A)
     (n : ℕ) (hn : (n : Cardinal) < Module.rank ℂ H) :
-    approximationNumber (B * A) n ≤ approximationNumber A n * ‖B‖ := by sorry
+    approximationNumber (B * A) n ≤ approximationNumber A n * ‖B‖ :=
+  approximationNumber_mul_le_of_rank_le A B (op := fun S ↦ B * S)
+    (fun S ↦ by
+      change Module.rank ℂ (B.toLinearMap ∘ₗ S.toLinearMap).range ≤ _
+      rw [LinearMap.range_comp]
+      exact rank_map_le _ _)
+    (fun S ↦ by rw [← mul_sub, mul_comm ‖S - A‖]; exact norm_mul_le _ _)
 
 end SingularValues
 
