@@ -1,0 +1,9 @@
+appA #264 regulatorParallelotope_cover, #265 regulatorParallelotope_disjoint (released unbuilt, look short): follow from ZSpan.exist_unique_vadd_mem_fundamentalDomain and ZSpan.vadd_mem_fundamentalDomain once the image of the log embedding is shown to equal the integer span of the parallelotope's basis (Module.Basis.ofZLatticeBasis_span + unfolding Units.unitLattice).
+ch02 #1288 homogeneousAdelicTheta_isLinear: released; instance AddCommMonoid/Module ℂ on SchwartzBruhat (Multiplicative 𝔸[F]) times out in Sec2b (see issue comment). Avoid `change`/`rw` on terms using that addition.
+appC AVOID #561, #429, #430, #434 and anything assuming `ApproxProp` (Sec3a nuclearTrace lemmas): the ascription to PrecompactConvergenceCLM does not change the topology used by closure/DenseRange, so these state operator-norm density (false in infinite dimensions). Reported on #561; integrator decides.
+appD #1508, #1509, #1515: proofs compiled in a scratch copy, posted on the issues, uncommitted in /home/agent/wt/hunt/appd-4 (branch hunt/appd-4; finished hunter's). Only need full build + checks + PR.
+appD #1784 bruhatCompactSupportToModulatedExponentialDecay_apply: rfl works from a scratch file importing Sec3b, but inside Sec3b.lean elaboration exceeds 100 s (instance stacking on WithGeneratingSeminorms). Possible fix: state a helper in a later file? (cannot move the theorem). Low priority.
+appD SKIP for now (depend on open lemmas): #1517 needs #2093 (later file); #822 needs #818; #1710 needs #1718.
+appA SKIP (deep): #300, #668 need linear independence of S-unit logs (S-unit theorem); #1755, #1756, #2078, #2079 need standard character trivial on the diagonal field.
+appC SKIP: #564 (sum of nuclear operators needs a common disc, not short); #572, #573 (left factor not injective).
+ch05 short-looking (from first ch05 hunter): #2356 mem_meromorphicWithPoleBound_zero_iff, #2355 meromorphicContinuationWithPoleBound_closed, #2363 sLocalIdelicOrderBound_rat_archimedean.

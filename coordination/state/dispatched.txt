@@ -1,0 +1,16 @@
+RiemannMasullo/AppC_LCTVS/Sec2a_part2.lean::tensorDualOperator_tmul
+RiemannMasullo/AppC_LCTVS/Sec2a_part2.lean::inductiveTensorMap_tmul
+RiemannMasullo/AppC_LCTVS/Sec4.lean::toPettisWeakCompletion_natural
+RiemannMasullo/AppC_LCTVS/Sec4.lean::toPettisWeakCompletion_eq_inclusionInDoubleDual
+RiemannMasullo/AppD_SchwartzBruhat/Sec1a.lean::elementarySchwartz_withSeminorms
+RiemannMasullo/AppD_SchwartzBruhat/Sec1a.lean::rapidDecaySequence_withSeminorms
+RiemannMasullo/AppD_SchwartzBruhat/Sec1d.lean::sIdeleClassInsertion_unique
+RiemannMasullo/AppD_SchwartzBruhat/Sec2a.lean::IsModulation.normTwistHypotheses
+RiemannMasullo/AppC_LCTVS/Sec4.lean::hasPettisIntegral_pettisIntegral
+RiemannMasullo/AppD_SchwartzBruhat/Sec1b.lean::mem_bruhatContDiffSubmodule_iff
+RiemannMasullo/AppD_SchwartzBruhat/Sec1c.lean::bruhatDiffWord_singleton
+RiemannMasullo/AppD_SchwartzBruhat/Sec3a.lean::modulatedExponentialDecayTwist_apply
+RiemannMasullo/Ch09_HardySobolev/Sec1.lean::weightedSobolev_complete
+RiemannMasullo/AppA_AlgebraicNT/Sec2.lean::rationalAdeleEmbedding_spec
+RiemannMasullo/AppC_LCTVS/Sec3a.lean::continuous_tensorToFiniteRank_opNorm
+RiemannMasullo/AppD_SchwartzBruhat/Sec1b.lean::BruhatStructuralPair.quotient_mk_eq_one

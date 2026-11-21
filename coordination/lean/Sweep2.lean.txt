@@ -1,0 +1,9 @@
+module
+
+public import Mathlib.Tactic.FunProp
+public section
+syntax "sweepxtac" : tactic
+macro_rules | `(tactic| sweepxtac) => `(tactic| first
+    | ((exact?); done; trace "SWEEP:exact?"))
+macro "sweepxtac" : term => `(by sweepxtac)
+end

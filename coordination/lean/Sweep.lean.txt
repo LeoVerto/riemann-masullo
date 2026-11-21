@@ -1,0 +1,42 @@
+module
+
+public import Mathlib.Tactic.FunProp
+public import Mathlib.Tactic.Positivity
+public import Mathlib.Tactic.Continuity
+public import Mathlib.Tactic.Measurability
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.Tauto
+public import Mathlib.Tactic.NormNum
+public import Mathlib.Tactic.Ring
+public import Aesop
+
+public section
+
+syntax "sweeptac" : tactic
+macro_rules | `(tactic| sweeptac) => `(tactic| first
+    | ((rfl); done; trace "SWEEP:rfl")
+    | ((infer_instance); done; trace "SWEEP:infer_instance")
+    | ((exact inferInstance); done; trace "SWEEP:exact inferInstance")
+    | ((trivial); done; trace "SWEEP:trivial")
+    | ((assumption); done; trace "SWEEP:assumption")
+    | ((decide); done; trace "SWEEP:decide")
+    | ((norm_num); done; trace "SWEEP:norm_num")
+    | ((simp); done; trace "SWEEP:simp")
+    | ((simp_all); done; trace "SWEEP:simp_all")
+    | ((fun_prop); done; trace "SWEEP:fun_prop")
+    | ((positivity); done; trace "SWEEP:positivity")
+    | ((continuity); done; trace "SWEEP:continuity")
+    | ((measurability); done; trace "SWEEP:measurability")
+    | ((omega); done; trace "SWEEP:omega")
+    | ((linarith); done; trace "SWEEP:linarith")
+    | ((ring); done; trace "SWEEP:ring")
+    | ((tauto); done; trace "SWEEP:tauto")
+    | ((aesop); done; trace "SWEEP:aesop"))
+syntax "sweepxtac" : tactic
+macro_rules | `(tactic| sweepxtac) => `(tactic| first
+    | sweeptac
+    | ((exact?); done; trace "SWEEP:exact?"))
+macro "sweeptac" : term => `(by sweeptac)
+macro "sweepxtac" : term => `(by sweepxtac)
+
+end
