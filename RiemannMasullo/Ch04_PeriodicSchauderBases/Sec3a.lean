@@ -47,7 +47,8 @@ theorem regularL2_haar_regular : ν.Regular := by sorry
 
 /-- Paper: Lemma 4.3.1.3, p. 175. Haar measure is Radon, expressed by inner
 regularity by compact sets together with finiteness on compact sets. -/
-theorem regularL2_haar_radon : ν.InnerRegular ∧ IsFiniteMeasureOnCompacts ν := by sorry
+theorem regularL2_haar_radon : ν.InnerRegular ∧ IsFiniteMeasureOnCompacts ν :=
+  ⟨inferInstance, inferInstance⟩
 
 /-- Paper: Lemma 4.3.1.3, p. 175. Haar measure on the second-countable group is
 sigma-finite. -/
