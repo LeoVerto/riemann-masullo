@@ -2128,7 +2128,25 @@ theorem tensorToFiniteRank_tmul (φ : StrongDual ℂ E) (y : F) (x : E) :
 
 /-- Paper: (C.2.4.6), p. 689. The canonical map from the dual tensor is injective. -/
 theorem tensorToFiniteRank_injective :
-    Function.Injective (tensorToFiniteRank (E := E) (F := F)) := by sorry
+    Function.Injective (tensorToFiniteRank (E := E) (F := F)) := by
+  let b := Module.Free.chooseBasis ℂ F
+  -- Coordinates of the dual factor along a basis of the target.
+  let e : StrongDual ℂ E ⊗[ℂ] F ≃ₗ[ℂ] (Module.Free.ChooseBasisIndex ℂ F →₀ StrongDual ℂ E) :=
+    (TensorProduct.congr (LinearEquiv.refl ℂ (StrongDual ℂ E)) b.repr).trans
+      (TensorProduct.finsuppScalarRight ℂ ℂ (StrongDual ℂ E) _)
+  have key (z : StrongDual ℂ E ⊗[ℂ] F) (i) (x : E) :
+      e z i x = b.repr (tensorToFiniteRank z x) i := by
+    induction z using TensorProduct.inductionOn with
+    | tmul φ y =>
+      simp [e, TensorProduct.finsuppScalarRight_apply_tmul_apply, tensorToFiniteRank_tmul,
+        mul_comm]
+    | add z w hz hw =>
+      simp only [map_add, Finsupp.add_apply, ContinuousLinearMap.add_apply] at hz hw ⊢
+      rw [hz, hw]
+  intro z w h
+  apply e.injective
+  ext i x
+  rw [key, key, h]
 
 end Approximation
 
@@ -2144,7 +2162,30 @@ theorem id_mem_closure_finiteRank_iff_dense :
       closure (range (tensorToFiniteRank (E := E) (F := E) :
         StrongDual ℂ E ⊗[ℂ] E → PrecompactConvergenceCLM E E)) ↔
     DenseRange (tensorToFiniteRank (E := E) (F := E) :
-      StrongDual ℂ E ⊗[ℂ] E → PrecompactConvergenceCLM E E) := by sorry
+      StrongDual ℂ E ⊗[ℂ] E → PrecompactConvergenceCLM E E) := by
+  refine ⟨fun h A ↦ ?_, fun h ↦ h _⟩
+  -- As elaborated, both sides use the bounded convergence topology of `E →L[ℂ] E`.
+  let post : (E →L[ℂ] E) →L[ℂ] (E →L[ℂ] E) := ContinuousLinearMap.postcomp E A
+  let map := TensorProduct.map (LinearMap.id : StrongDual ℂ E →ₗ[ℂ] StrongDual ℂ E) A.toLinearMap
+  have hmap (z : StrongDual ℂ E ⊗[ℂ] E) :
+      post (tensorToFiniteRank z) = tensorToFiniteRank (map z) := by
+    induction z using TensorProduct.inductionOn with
+    | tmul φ y =>
+      ext x
+      change A (tensorToFiniteRank (φ ⊗ₜ[ℂ] y) x) = tensorToFiniteRank (map (φ ⊗ₜ[ℂ] y)) x
+      simp [map, tensorToFiniteRank_tmul]
+    | add z w hz hw => rw [map_add, map_add, map_add, hz, hw, map_add]
+  have hsub : post '' range (tensorToFiniteRank (E := E) (F := E) :
+      StrongDual ℂ E ⊗[ℂ] E → PrecompactConvergenceCLM E E) ⊆
+      range (tensorToFiniteRank (E := E) (F := E) :
+        StrongDual ℂ E ⊗[ℂ] E → PrecompactConvergenceCLM E E) := by
+    rintro _ ⟨_, ⟨z, rfl⟩, rfl⟩
+    exact ⟨map z, (hmap z).symm⟩
+  have hA : post (ContinuousLinearMap.id ℂ E) = A := by
+    ext x
+    rfl
+  rw [← hA]
+  exact closure_mono hsub (image_closure_subset_closure_image post.continuous (mem_image_of_mem _ h))
 
 /-- Paper: Lemma C.2.4.15(2)–(3), p. 689. Density of finite-rank maps for the
 precompact convergence topology on endomorphisms is equivalent to the corresponding
