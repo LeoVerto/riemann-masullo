@@ -867,7 +867,8 @@ def completedProjectiveTensorToOperators :
 /-- Paper: (C.3.1.2), p. 693. On the image of an algebraic tensor the extended
 map agrees with the original finite-rank map. -/
 theorem completedProjectiveTensorToOperators_coe (z : ProjectiveTensor (StrongDual ℂ E) F) :
-    completedProjectiveTensorToOperators z = tensorToFiniteRank z := by sorry
+    completedProjectiveTensorToOperators z = tensorToFiniteRank z :=
+  ContinuousLinearMap.fromCompletion_apply_coe _ z
 
 /-- Paper: §C.3.1, p. 693. Nuclear operators between Banach spaces are the
 image of the completed projective tensor. -/
@@ -1101,7 +1102,13 @@ theorem norm_hilbertTrace_le (T : nuclearEndomorphisms H) :
 /-- Paper: Lemma C.3.4.4(4), p. 698. The canonical image of the algebraic tensor
 of the dual and the Hilbert space consists of nuclear operators. -/
 theorem tensorToFiniteRank_mem_nuclearEndomorphisms (z : StrongDual ℂ H ⊗[ℂ] H) :
-    tensorToFiniteRank z ∈ nuclearEndomorphisms H := by sorry
+    tensorToFiniteRank z ∈ nuclearEndomorphisms H := by
+  induction z using TensorProduct.inductionOn with
+  | tmul φ y =>
+    convert smulRight_mem_nuclearEndomorphisms φ y using 1
+    ext x
+    exact tensorToFiniteRank_tmul φ y x
+  | add z w hz hw => rw [map_add]; exact add_mem hz hw
 
 /-- Paper: Lemma C.3.4.4(4), p. 698. Finite-rank operators from the canonical
 tensor map approximate every nuclear endomorphism in trace norm. -/
