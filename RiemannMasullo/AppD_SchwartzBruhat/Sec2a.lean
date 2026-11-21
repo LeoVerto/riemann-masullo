@@ -28,7 +28,8 @@ def IsModulation (m : G →ₜ* ℝ≥0ˣ) : Prop :=
 /-- Paper: Definition D.2.1.1, p. 793. A modulation satisfies the properness
 and nontriviality hypotheses of the norm-twist constructions in §3.1. -/
 theorem IsModulation.normTwistHypotheses {m : G →ₜ* ℝ≥0ˣ} (hm : IsModulation m) :
-    IsProperMap m.toMonoidHom ∧ ∃ g, m.toMonoidHom g ≠ 1 := by sorry
+    IsProperMap m.toMonoidHom ∧ ∃ g, m.toMonoidHom g ≠ 1 :=
+  hm
 
 /-- Paper: Remark D.2.1.2, p. 793. The idele class norm is a surjective
 modulation of the global idele class group. -/

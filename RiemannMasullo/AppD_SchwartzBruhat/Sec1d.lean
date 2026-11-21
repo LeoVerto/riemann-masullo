@@ -123,7 +123,8 @@ theorem sIdeleClassInsertion_unique :
     ∀ j : SIdeleClassGroup F S →* C[F],
       (∀ u : (integralAdelesOutside F S)ˣ,
         j (QuotientGroup.mk u) = QuotientGroup.mk (integralIdeleInsertion F S u)) →
-      j = sIdeleClassInsertion F S := by sorry
+      j = sIdeleClassInsertion F S :=
+  ⟨fun _ ↦ rfl, fun _ hj ↦ QuotientGroup.monoidHom_ext _ (MonoidHom.ext hj)⟩
 
 /-- Paper: Lemma D.1.10.1(3), p. 784. The induced map of class groups is
 continuous, injective and open. -/

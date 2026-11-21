@@ -1018,7 +1018,8 @@ theorem rapidDecaySequenceSeminorm_zero (s : RapidDecaySequence r) :
 /-- Paper: Remark D.1.3.6, p. 753. The weighted sums generate the topology
 and give a Fréchet space. -/
 theorem rapidDecaySequence_withSeminorms :
-    WithSeminorms (E := RapidDecaySequence r) rapidDecaySequenceSeminorm := by sorry
+    WithSeminorms (E := RapidDecaySequence r) rapidDecaySequenceSeminorm :=
+  withGeneratingSeminorms_spec _ _
 
 /-- Paper: Remark D.1.3.6, p. 753. The rapidly decreasing sequence space is Fréchet. -/
 theorem rapidDecaySequence_isFrechet : IsFrechetTVS (RapidDecaySequence r) := by sorry
