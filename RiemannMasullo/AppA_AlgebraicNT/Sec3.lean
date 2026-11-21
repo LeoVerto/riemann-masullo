@@ -3806,19 +3806,22 @@ def normOneIdeleClassTamagawaMeasure : Measure C₁[F] :=
 satisfy Weil's formula with counting measure on the principal ideles. -/
 theorem ideleClassTamagawaMeasure_isWeil :
     IsWeilQuotientMeasure P[F] (multiplicativeTamagawaMeasure F)
-      Measure.count (ideleClassTamagawaMeasure F) := by sorry
+      Measure.count (ideleClassTamagawaMeasure F) :=
+  (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.1
 
 /-- Paper: Definition A.3.2.1, p. 560. The norm-one idele classes have the
 mass in (A.3.2.1), expressed with Mathlib's regulator and class number. -/
 theorem normOneIdeleClassTamagawaMeasure_volume :
-    normOneIdeleClassTamagawaMeasure F univ = classVolume(F) := by sorry
+    normOneIdeleClassTamagawaMeasure F univ = classVolume(F) :=
+  (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.2.2.1
 
 /-- Paper: Definition A.3.2.1, pp. 559–560. The class and norm-one class measures
 satisfy Weil's formula with `dt/t` on the norm quotient. -/
 theorem normOneIdeleClassTamagawaMeasure_isWeil :
     IsWeilQuotientMeasure C₁[F] (ideleClassTamagawaMeasure F)
       (normOneIdeleClassTamagawaMeasure F)
-      (positiveRealHaar.comap (QuotientGroup.kerLift (ideleClassNorm F))) := by sorry
+      (positiveRealHaar.comap (QuotientGroup.kerLift (ideleClassNorm F))) :=
+  (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.2.2.2
 
 /-- Paper: Definition A.3.2.2(1), p. 560. The multiplicative measure at an infinite
 place is the additive measure weighted by the reciprocal normalized absolute value. -/
@@ -3953,7 +3956,8 @@ satisfies Weil's formula with `dt/t` on the norm quotient. -/
 theorem sNormOneIdeleTamagawaMeasure_isWeil :
     IsWeilQuotientMeasure Nₛ (sMultiplicativeTamagawaMeasure F S)
       (sNormOneIdeleTamagawaMeasure F S)
-      (positiveRealHaar.comap (QuotientGroup.kerLift (sIdeleNorm F S))) := by sorry
+      (positiveRealHaar.comap (QuotientGroup.kerLift (sIdeleNorm F S))) :=
+  (sNormOneIdeleTamagawaMeasure_existsUnique F S).exists.choose_spec.2.2
 
 -- TODO(paper-gap): Definition A.3.4.1(3)(2)–(3) prescribes a measure on the
 -- local S-ideles but takes the quotient of the larger group in (A.1.5.7).
