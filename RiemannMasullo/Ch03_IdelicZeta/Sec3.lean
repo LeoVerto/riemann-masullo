@@ -123,7 +123,14 @@ theorem sLocalIdelicZetaIntegral_integrable (f : ℬ(Aₛ)) (c : Xₛ) (hc : c �
 is the test function times the S-idelic norm. -/
 theorem sLocalIdelicZetaIntegral_norm (f : ℬ(Aₛ)) :
     sLocalIdelicZetaIntegral f (chartₛ((1 : PontryaginDual Jₛ)) 1) =
-      ∫ g : Iₛ, f (Multiplicative.ofAdd g.val) * modℂ[sIdeleNorm F S, g] ∂μₛ := by sorry
+      ∫ g : Iₛ, f (Multiplicative.ofAdd g.val) * modℂ[sIdeleNorm F S, g] ∂μₛ := by
+  unfold sLocalIdelicZetaIntegral
+  congr 1
+  funext g
+  congr 1
+  change (((1 : PontryaginDual Jₛ) (classOf g) : Circle) : ℂ) *
+    (modℂ[mₛ, classOf g]) ^ (1 : ℂ) = _
+  rw [Complex.cpow_one, sIdeleQuotientNorm_mk, PontryaginDual.one_apply, Circle.coe_one, one_mul]
 
 /-- Paper: Theorem 3.3.1.1(1) and Remark 3.3.1.2, p. 129. Closed norm-band
 truncations of the zeta integral converge uniformly on compact subsets.
@@ -433,7 +440,9 @@ local notation "μJ₁" => sLocalNormOneQuotientMeasure F S
 section pushes the product with dt/t to the quotient Tamagawa measure. -/
 theorem sLocalNormOneQuotientMeasure_normProduct :
     (μJ₁).IsHaarMeasure ∧ ∀ τ : ℝ≥0ˣ →ₜ* Iₛ, RightInverse τ (sIdeleNorm F S) →
-      ((μJ₁).prod positiveRealHaar).map (normProduct(τ)) = μJ := by sorry
+      ((μJ₁).prod positiveRealHaar).map (normProduct(τ)) = μJ :=
+  have h := (sLocalNormOneQuotientMeasure_existsUnique (F := F) (S := S)).exists.choose_spec
+  ⟨h.1, h.2.2⟩
 
 section Homogeneous
 
