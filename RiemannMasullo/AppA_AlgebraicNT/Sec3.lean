@@ -774,7 +774,59 @@ the p-adic character has the phase opposite to the real exponential of that frac
 Deviation: the sign, as in `padicStandardCharacter`. -/
 theorem padicStandardCharacter_div_pow (a : ℤ) (n : ℕ) :
     padicStandardCharacter p ((a : ℚ_[p]) / (p : ℚ_[p]) ^ n) =
-      Circle.exp (-(2 * Real.pi * ((a : ℝ) / (p : ℝ) ^ n))) := by sorry
+      Circle.exp (-(2 * Real.pi * ((a : ℝ) / (p : ℝ) ^ n))) := by
+  have hp0 : (p : ℚ_[p]) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
+  have hpR : (p : ℝ) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
+  set x : ℚ_[p] := (a : ℚ_[p]) / (p : ℚ_[p]) ^ n with hx
+  set m := (-x.valuation).toNat with hm
+  -- The cleared element `p ^ m * x` is an integer `b` with `b / p ^ m = a / p ^ n`.
+  obtain ⟨b, hb, hbR⟩ : ∃ b : ℤ, (p : ℚ_[p]) ^ m * x = b ∧
+      (b : ℝ) / (p : ℝ) ^ m = (a : ℝ) / (p : ℝ) ^ n := by
+    rcases le_or_gt n m with h | h
+    · obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le h
+      refine ⟨a * p ^ k, ?_, ?_⟩
+      · rw [hx, hk, pow_add]
+        push_cast
+        field_simp
+      · rw [hk, pow_add]
+        push_cast
+        field_simp
+    · obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le h.le
+      have hint := padicStandardCharacter_integral p x
+      have hxk : (p : ℚ_[p]) ^ m * x = (a : ℚ_[p]) / (p : ℚ_[p]) ^ k := by
+        rw [hx, hk, pow_add]
+        field_simp
+      rw [← hm, hxk, norm_div, div_le_one (norm_pos_iff.mpr (pow_ne_zero _ hp0)), Padic.norm_p_pow] at hint
+      obtain ⟨c, rfl⟩ := (Padic.norm_int_le_pow_iff_dvd a k).mp hint
+      refine ⟨c, ?_, ?_⟩
+      · rw [hxk]
+        push_cast
+        field_simp
+      · rw [hk, pow_add]
+        push_cast
+        field_simp
+  have hA : (⟨(p : ℚ_[p]) ^ m * x, padicStandardCharacter_integral p x⟩ : ℤ_[p]) = (b : ℤ_[p]) :=
+    Subtype.ext (by
+      change (p : ℚ_[p]) ^ m * x = ((b : ℤ_[p]) : ℚ_[p])
+      rw [hb]
+      simp)
+  have hval : (((PadicInt.toZModPow m (b : ℤ_[p])).val : ℕ) : ℝ) = ((b % (p ^ m : ℕ) : ℤ) : ℝ) := by
+    rw [map_intCast]
+    have := NeZero.of_pos (pow_pos (Fact.out : p.Prime).pos m)
+    exact_mod_cast ZMod.val_intCast (n := p ^ m) b
+  have hdiv := Int.emod_add_mul_ediv b (p ^ m : ℕ)
+  change Circle.exp (-(2 * Real.pi * ((PadicInt.toZModPow m
+    (⟨(p : ℚ_[p]) ^ m * x, padicStandardCharacter_integral p x⟩ : ℤ_[p])).val : ℝ) /
+      (p : ℝ) ^ m)) = _
+  rw [hA, hval, Circle.exp_eq_exp]
+  refine ⟨b / (p ^ m : ℕ), ?_⟩
+  rw [← hbR]
+  have hdivR : ((b % (p ^ m : ℕ) : ℤ) : ℝ) = b - (p : ℝ) ^ m * ((b / (p ^ m : ℕ) : ℤ) : ℝ) := by
+    rw [eq_sub_iff_add_eq]
+    exact_mod_cast hdiv
+  rw [hdivR]
+  field_simp
+  ring
 
 local notation "ℤₚ" => Metric.closedBall (0 : ℚ_[p]) 1
 
