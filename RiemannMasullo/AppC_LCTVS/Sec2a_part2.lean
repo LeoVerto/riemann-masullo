@@ -3590,7 +3590,45 @@ variable (E F : Type*) [AddCommGroup E] [Module ℂ E] [TopologicalSpace E]
 /-- Paper: §C.2.3.2, p. 679. The identity from the projective to the injective
 tensor product is continuous. -/
 theorem continuous_projectiveTensor_to_injectiveTensor :
-    @Continuous (ProjectiveTensor E F) (InjectiveTensor E F) _ _ id := by sorry
+    @Continuous (ProjectiveTensor E F) (InjectiveTensor E F) _ _ id := by
+  have := PolynormableSpace.isTopologicalAddGroup ℂ E
+  have := PolynormableSpace.isTopologicalAddGroup ℂ F
+  have hinj := withGeneratingSeminorms_spec (E ⊗[ℂ] F)
+    (fun UV : {U : Set E // U ∈ 𝓝 0} × {V : Set F // V ∈ 𝓝 0} ↦
+      injectiveTensorSeminorm UV.1 UV.2)
+  have hproj := withGeneratingSeminorms_spec (E ⊗[ℂ] F)
+    (fun p : {p : Seminorm ℂ (E ⊗[ℂ] F) //
+      ContinuousAt (fun v : E × F ↦ p (v.1 ⊗ₜ[ℂ] v.2)) 0} ↦ p.val)
+  refine hinj.continuous_of_continuous_comp
+    (LinearMap.id : ProjectiveTensor E F →ₗ[ℂ] InjectiveTensor E F) fun UV ↦ ?_
+  have key : ContinuousAt (fun v : E × F ↦ injectiveTensorSeminorm UV.1 UV.2 (v.1 ⊗ₜ[ℂ] v.2)) 0 := by
+    have h0 : injectiveTensorSeminorm UV.1 UV.2 ((0 : E × F).1 ⊗ₜ[ℂ] (0 : E × F).2) = 0 := by
+      simp
+    rw [ContinuousAt, h0]
+    refine tendsto_order.2 ⟨fun a ha ↦ Eventually.of_forall fun v ↦ ha.trans_le (apply_nonneg _ _), fun a ha ↦ ?_⟩
+    let c : ℂ := ((2 / a : ℝ) : ℂ)
+    have hA : {x : E | c • x ∈ UV.1.val} ∈ 𝓝 (0 : E) :=
+      (continuous_const_smul c).continuousAt.preimage_mem_nhds (by simpa using UV.1.property)
+    rw [nhds_prod_eq]
+    refine Filter.mem_of_superset (Filter.prod_mem_prod hA UV.2.property) ?_
+    rintro ⟨x, y⟩ ⟨hx, hy⟩
+    show injectiveTensorSeminorm UV.1 UV.2 (x ⊗ₜ[ℂ] y) < a
+    have hle : injectiveTensorSeminorm UV.1 UV.2 (x ⊗ₜ[ℂ] y) ≤ a / 2 := by
+      refine (injectiveTensorSeminorm_le_iff UV.1 UV.2 _ _).2 fun φ hφ ψ hψ ↦ ?_
+      have h1 : ‖φ (c • x)‖ ≤ 1 := (StrongDual.mem_polar_iff ℂ _).1 hφ _ hx
+      have h2 : ‖ψ y‖ ≤ 1 := (StrongDual.mem_polar_iff ℂ _).1 hψ _ hy
+      have hc : ‖c‖ = 2 / a := by simp [c, abs_of_pos ha]
+      rw [tensorDualForm_tmul, norm_mul]
+      rw [map_smul, smul_eq_mul, norm_mul, hc] at h1
+      have : ‖φ x‖ ≤ a / 2 := by
+        have : 2 / a * ‖φ x‖ ≤ 1 := h1
+        rw [div_mul_eq_mul_div, div_le_iff₀ ha] at this
+        linarith
+      calc ‖φ x‖ * ‖ψ y‖ ≤ a / 2 * 1 := mul_le_mul this h2 (norm_nonneg _) (by positivity)
+        _ = a / 2 := mul_one _
+    linarith
+  exact hproj.continuous_seminorm ⟨injectiveTensorSeminorm UV.1 UV.2, key⟩
+
 
 -- TODO(later): needs §C.2.4 for equality when either factor is nuclear.
 

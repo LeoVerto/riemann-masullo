@@ -4146,7 +4146,29 @@ locally convex topology, which is complete by Proposition C.2.5.1(3). -/
 theorem finestLocallyConvex_inductiveTensor (hE : Module.rank ℂ E ≤ ℵ₀)
     (hF : Module.rank ℂ F ≤ ℵ₀) :
     (inferInstance : TopologicalSpace (InductiveTensor (FinestLocallyConvex E) (FinestLocallyConvex F))) =
-      (inferInstance : TopologicalSpace (FinestLocallyConvex (E ⊗[ℂ] F))) := by sorry
+      (inferInstance : TopologicalSpace (FinestLocallyConvex (E ⊗[ℂ] F))) := by
+  have hsp := withGeneratingSeminorms_spec (E ⊗[ℂ] F)
+    (fun p : {p : Seminorm ℂ (E ⊗[ℂ] F) //
+      (∀ x : FinestLocallyConvex E, Continuous (fun y : FinestLocallyConvex F ↦ p (x ⊗ₜ[ℂ] y))) ∧
+      (∀ y : FinestLocallyConvex F, Continuous (fun x : FinestLocallyConvex E ↦ p (x ⊗ₜ[ℂ] y)))} ↦
+        p.val)
+  have hfin := finestLocallyConvex_withSeminorms (E ⊗[ℂ] F)
+  have := hsp.isTopologicalAddGroup
+  have := hfin.isTopologicalAddGroup
+  have h1 : @Continuous (FinestLocallyConvex (E ⊗[ℂ] F))
+      (InductiveTensor (FinestLocallyConvex E) (FinestLocallyConvex F)) _ _ id :=
+    hsp.continuous_of_continuous_comp (LinearMap.id : FinestLocallyConvex (E ⊗[ℂ] F) →ₗ[ℂ] _)
+      fun p ↦ hfin.continuous_seminorm p.val
+  have h2 : @Continuous (InductiveTensor (FinestLocallyConvex E) (FinestLocallyConvex F))
+      (FinestLocallyConvex (E ⊗[ℂ] F)) _ _ id := by
+    refine hfin.continuous_of_continuous_comp
+      (LinearMap.id : InductiveTensor (FinestLocallyConvex E) (FinestLocallyConvex F) →ₗ[ℂ] _)
+      fun q ↦ hsp.continuous_seminorm ⟨q, fun x ↦ ?_, fun y ↦ ?_⟩
+    · exact (finestLocallyConvex_withSeminorms F).continuous_seminorm
+        (q.comp (TensorProduct.mk ℂ E F x))
+    · exact (finestLocallyConvex_withSeminorms E).continuous_seminorm
+        (q.comp ((TensorProduct.mk ℂ E F).flip y))
+  exact le_antisymm (continuous_id_iff_le.1 h2) (continuous_id_iff_le.1 h1)
 
 end FinestLocallyConvex
 
