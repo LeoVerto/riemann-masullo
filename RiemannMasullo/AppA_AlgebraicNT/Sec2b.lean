@@ -2347,7 +2347,99 @@ theorem sIdeleLog_sum (g : 𝕀ₛ) :
 exactly on torsion units. -/
 theorem sIdeleLog_unit_eq_zero (u : Oₛ(F, S)ˣ) :
     sIdeleLog F S (unitAtS u) = 0 ↔ u ∈ CommGroup.torsion Oₛ(F, S)ˣ := by
-  sorry
+  have hw (w : InfinitePlace F) : ‖(unitAtS u).val.1 w‖ = w (u.val.val : F) := by
+    change ‖algebraMap F w.Completion (u.val.val : F)‖ = _
+    rw [AbsoluteValue.Completion.algebraMap_def, WithAbs.algebraMap_right_apply,
+      Algebra.algebraMap_self_apply]
+    exact AbsoluteValue.Completion.norm_coe (v := w.1) _
+  have hv (v : S) : ‖(unitAtS u).val.2 v‖ = ‖(u.val.val : v.val.adicCompletion F)‖ := rfl
+  have hx0 : (u.val.val : F) ≠ 0 := fun h ↦ u.ne_zero (Subtype.ext h)
+  have hnormpos (w : InfinitePlace F) : 0 < ‖(unitAtS u).val.1 w‖ := by
+    rw [hw]; exact w.pos_iff.mpr hx0
+  have hnormpos' (v : S) : 0 < ‖(unitAtS u).val.2 v‖ := by
+    rw [hv]
+    exact norm_pos_iff.mpr ((map_ne_zero (algebraMap F (v.val.adicCompletion F))).mpr hx0)
+  constructor
+  · intro h
+    have h1 (w : InfinitePlace F) : w (u.val.val : F) = 1 := by
+      have := congrFun h (Sum.inl w)
+      simp only [sIdeleLog, Sum.elim_inl, Pi.zero_apply] at this
+      rw [← hw]
+      rcases mul_eq_zero.mp this with h0 | h0
+      · exact absurd h0 (by exact_mod_cast w.mult_ne_zero)
+      · exact Real.eq_one_of_pos_of_log_eq_zero (hnormpos w) h0
+    have h2 (v : S) : v.val.valuation F (u.val.val : F) = 1 := by
+      have := congrFun h (Sum.inr v)
+      simp only [sIdeleLog, Sum.elim_inr, Pi.zero_apply] at this
+      have hn : ‖(u.val.val : v.val.adicCompletion F)‖ = 1 :=
+        Real.eq_one_of_pos_of_log_eq_zero (hv v ▸ hnormpos' v) this
+      rw [Valued.toNormedField.norm_eq_one_iff,
+        HeightOneSpectrum.valuedAdicCompletion_eq_valuation'] at hn
+      exact hn
+    have hle (y : Oₛ(F, S)ˣ) (hy : ∀ v : S, v.val.valuation F (y.val.val : F) = 1) (v : Primes(F)) :
+        v.valuation F (y.val.val : F) ≤ 1 := by
+      by_cases hvS : v ∈ S
+      · exact (hy ⟨v, hvS⟩).le
+      · exact y.val.prop v hvS
+    have h2' (v : S) : v.val.valuation F (u⁻¹.val.val : F) = 1 := by
+      have : (u⁻¹.val.val : F) = (u.val.val : F)⁻¹ := by
+        have := congrArg (fun z : Oₛ(F, S) ↦ (z.val : F)) u.inv_val
+        have h' := congrArg (fun z : Oₛ(F, S) ↦ (z.val : F)) u.val_inv
+        simp only [OneMemClass.coe_one] at h'
+        exact eq_inv_of_mul_eq_one_right h'
+      rw [this, map_inv₀, h2, inv_one]
+    obtain ⟨r, hr⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one F (u.val.val : F)
+      (hle u h2)
+    obtain ⟨r', hr'⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one F (u⁻¹.val.val : F)
+      (hle u⁻¹ h2')
+    let w : (𝓞 F)ˣ :=
+      { val := r
+        inv := r'
+        val_inv := by
+          apply RingOfIntegers.ext
+          have h' := congrArg (fun z : Oₛ(F, S) ↦ (z.val : F)) u.val_inv
+          simp only [OneMemClass.coe_one] at h'
+          change (r : F) * (r' : F) = 1
+          rw [show (r : F) = u.val.val from hr, show (r' : F) = u⁻¹.val.val from hr']
+          exact h'
+        inv_val := by
+          apply RingOfIntegers.ext
+          have h' := congrArg (fun z : Oₛ(F, S) ↦ (z.val : F)) u.inv_val
+          simp only [OneMemClass.coe_one] at h'
+          change (r' : F) * (r : F) = 1
+          rw [show (r : F) = u.val.val from hr, show (r' : F) = u⁻¹.val.val from hr']
+          exact h' }
+    have hwt : w ∈ Units.torsion F := by
+      rw [NumberField.Units.mem_torsion]
+      intro pl
+      rw [← h1 pl, ← hr]
+    have hmap : Units.map (algebraMap (𝓞 F) Oₛ(F, S)).toMonoidHom w = u := by
+      ext
+      exact hr
+    rw [← hmap]
+    exact (CommGroup.mem_torsion _).mpr (MonoidHom.isOfFinOrder _ ((CommGroup.mem_torsion _).mp hwt))
+  · intro h
+    obtain ⟨n, hn, hun⟩ := isOfFinOrder_iff_pow_eq_one.mp ((CommGroup.mem_torsion _).mp h)
+    have hg : (unitAtS u) ^ n = 1 := by rw [← map_pow, hun, map_one]
+    have hpow (y : ℝ) (hy : 0 < y) (hy1 : y ^ n = 1) : Real.log y = 0 := by
+      rw [pow_eq_one_iff_of_nonneg hy.le hn.ne'] at hy1
+      rw [hy1, Real.log_one]
+    funext i
+    rcases i with w | v
+    · have h0 : ((unitAtS u).val.1 w) ^ n = 1 := by
+        have := congrArg (fun z : (SAdeleRing F S)ˣ ↦ z.val.1 w) hg
+        simp only [Units.val_pow_eq_pow_val, Units.val_one] at this
+        exact this
+      have h1 : ‖(unitAtS u).val.1 w‖ ^ n = 1 := by rw [← norm_pow, h0, norm_one]
+      simp only [sIdeleLog, Sum.elim_inl, Pi.zero_apply]
+      rw [hpow _ (hnormpos w) h1, mul_zero]
+    · have h0 : ((unitAtS u).val.2 v) ^ n = 1 := by
+        have := congrArg (fun z : (SAdeleRing F S)ˣ ↦ z.val.2 v) hg
+        simp only [Units.val_pow_eq_pow_val, Units.val_one] at this
+        exact this
+      have h1 : ‖(unitAtS u).val.2 v‖ ^ n = 1 := by rw [← norm_pow, h0, norm_one]
+      simp only [sIdeleLog, Sum.elim_inr, Pi.zero_apply]
+      exact hpow _ (hnormpos' v) h1
 
 /-- Paper: §A.2.4.2, p. 554. The roots of unity in the ordinary units map onto
 the full torsion subgroup of the S-units, so its order is independent of S. -/
