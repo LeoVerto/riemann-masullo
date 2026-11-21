@@ -2561,6 +2561,92 @@ theorem adelicTheta_decay_large (f : ℬ[F]) (N : ℕ) :
   exact (Summable.tsum_le_tsum (fun ξ => hbound ξ t ht k hk)
     (hs.mul_right _) hu).trans (le_max_left _ _)
 
+/-- Multiplying an idele by a principal idele permutes the terms of the absolute
+theta series. -/
+private theorem normSum_mul_principal (f : ℬ[F]) (x : 𝕀[F]) (η : Fˣ) :
+    ∑' ξ : Fˣ, ‖f (Multiplicative.ofAdd ((x * IdeleGroup.unitEmbedding (𝓞 F) F η).val *
+        algebraMap F 𝔸[F] (ξ : F)))‖ =
+      ∑' ξ : Fˣ, ‖f (Multiplicative.ofAdd (x.val * algebraMap F 𝔸[F] (ξ : F)))‖ := by
+  refine Eq.trans ?_ ((Equiv.mulLeft η).tsum_eq
+    (fun ξ : Fˣ ↦ ‖f (Multiplicative.ofAdd (x.val * algebraMap F 𝔸[F] (ξ : F)))‖))
+  refine tsum_congr fun ξ ↦ ?_
+  simp only [Equiv.coe_mulLeft, Units.val_mul, map_mul, mul_assoc]
+  rfl
+
+/-- Paper: Theorem 2.2.3.4(1), p. 83. The series of absolute values of the theta
+terms decays faster than any inverse power of the idelic norm as that norm tends to
+infinity.
+Deviation: The bound is for the series of absolute values, at every idele of norm at
+least one. Theorem 3.2.2.1(1), p. 124, needs it for absolute convergence. -/
+theorem adelicTheta_normSum_decay_large (f : ℬ[F]) (N : ℕ) :
+    ∃ C : ℝ, 0 < C ∧ ∀ g : 𝕀[F], 1 ≤ ((ideleNorm F g : ℝ≥0) : ℝ) →
+      ∑' ξ : Fˣ, ‖f (Multiplicative.ofAdd (g.val * algebraMap F 𝔸[F] (ξ : F)))‖ ≤
+        C * ((((ideleNorm F g : ℝ≥0) : ℝ)) ^ N)⁻¹ := by
+  obtain ⟨K, hK, hRep⟩ := exists_compact_idele_representatives (F := F)
+  let point (ξ : Fˣ) (t : ℝ≥0ˣ) (k : 𝕀[F]) :=
+    Multiplicative.ofAdd ((canonicalIdeleNormSection F t * k).val * algebraMap F 𝔸[F] (ξ : F))
+  let P (φ : Multiplicative 𝔸[F] → ℂ) := ∃ u : Fˣ → ℝ, Summable u ∧
+    ∀ (ξ : Fˣ) (t : ℝ≥0ˣ), 1 ≤ (t.val : ℝ) → ∀ k ∈ K,
+      ‖φ (point ξ t k)‖ * (t.val : ℝ) ^ N ≤ u ξ
+  have hzero : P 0 := ⟨0, summable_zero, fun _ _ _ _ _ => by simp⟩
+  have hadd (φ ψ : Multiplicative 𝔸[F] → ℂ) : P φ → P ψ → P (φ + ψ) := by
+    rintro ⟨u, hu, hφ⟩ ⟨v, hv, hψ⟩
+    refine ⟨u + v, hu.add hv, fun ξ t ht k hk => ?_⟩
+    change ‖φ (point ξ t k) + ψ (point ξ t k)‖ * (t.val : ℝ) ^ N ≤ u ξ + v ξ
+    calc
+      _ ≤ (‖φ (point ξ t k)‖ + ‖ψ (point ξ t k)‖) * (t.val : ℝ) ^ N :=
+        mul_le_mul_of_nonneg_right (norm_add_le _ _) (by positivity)
+      _ ≤ _ := by rw [add_mul]; exact add_le_add (hφ ξ t ht k hk) (hψ ξ t ht k hk)
+  have hP : P (show schwartzBruhatSubmodule (Multiplicative 𝔸[F]) from f).val := by
+    refine Submodule.iSup_induction (motive := P) _ f.property ?_ hzero hadd
+    intro a φ hφ
+    refine Submodule.iSup_induction (motive := P) _ hφ ?_ hzero hadd
+    intro e ψ hψ
+    obtain ⟨s, rfl⟩ := LinearMap.mem_range.mp hψ
+    exact realization_normSection_summable_bound a e s K hK N
+  obtain ⟨u, hu, hbound⟩ := hP
+  refine ⟨max (∑' ξ, u ξ) 1, zero_lt_one.trans_le (le_max_right _ _), ?_⟩
+  intro g hg
+  let t := ideleNorm F g
+  let a := canonicalIdeleNormSection F t
+  let q := QuotientGroup.mk' (IdeleGroup.principalSubgroup (𝓞 F) F)
+  have hker : q (a⁻¹ * g) ∈ (ideleClassNorm F).ker := by
+    change ideleNorm F (a⁻¹ * g) = 1
+    rw [map_mul, map_inv, canonicalIdeleNormSection_rightInverse F t]
+    exact inv_mul_cancel t
+  obtain ⟨k, hk, hq⟩ := hRep (q (a⁻¹ * g)) hker
+  obtain ⟨η, hη⟩ := QuotientGroup.eq.mp hq
+  have hg' : g = a * k * IdeleGroup.unitEmbedding (𝓞 F) F η := by
+    rw [hη]
+    group
+  have hs : Summable (fun ξ => ‖f (point ξ t k)‖) := by
+    simpa only [point, add_zero] using
+      ((adelicAverage_summableUniformlyOn f {(a * k, 0)} isCompact_singleton).summable rfl)
+  have hsum : (∑' ξ : Fˣ, ‖f (Multiplicative.ofAdd (g.val * algebraMap F 𝔸[F] (ξ : F)))‖) =
+      ∑' ξ, ‖f (point ξ t k)‖ := by
+    conv_lhs => rw [hg']
+    exact normSum_mul_principal f (a * k) η
+  rw [hsum]
+  change (∑' ξ, ‖f (point ξ t k)‖) ≤ max (∑' ξ, u ξ) 1 * ((t.val : ℝ) ^ N)⁻¹
+  have ht : 1 ≤ (t.val : ℝ) := hg
+  rw [← div_eq_mul_inv, le_div_iff₀ (pow_pos (zero_lt_one.trans_le ht) N)]
+  rw [← tsum_mul_right]
+  exact (Summable.tsum_le_tsum (fun ξ => hbound ξ t ht k hk)
+    (hs.mul_right _) hu).trans (le_max_left _ _)
+
+/-- Paper: Theorem 2.2.3.4(2), p. 83. The series of absolute values of the theta
+terms grows at most like the inverse of the idelic norm as that norm tends to zero.
+Deviation: The paper bounds theta itself, through Poisson summation, and the proof of
+Theorem 3.2.2.1(1), p. 126, uses an Euler product. Here the bound is for the series
+of absolute values, which Poisson summation does not control. It is a lattice point
+count: for a representative `a k` of `g` with `a` the canonical norm section and `k` in
+a fixed compact set, the nonzero `ξ` in a fixed fractional ideal with archimedean size
+at most `R` number at most a constant times `(1 + R |g|^(1/d))^d / |g|`. -/
+theorem adelicTheta_normSum_le_small (f : ℬ[F]) :
+    ∃ C : ℝ, 0 < C ∧ ∀ g : 𝕀[F], ((ideleNorm F g : ℝ≥0) : ℝ) ≤ 1 →
+      ∑' ξ : Fˣ, ‖f (Multiplicative.ofAdd (g.val * algebraMap F 𝔸[F] (ξ : F)))‖ ≤
+        C * (((ideleNorm F g : ℝ≥0) : ℝ))⁻¹ := by sorry
+
 /-- Paper: Theorem 2.2.3.4(2), p. 83. After subtracting the explicit polar
 terms, theta decays faster than any power of the norm as it tends to zero. -/
 theorem adelicTheta_decay_small (f : ℬ[F]) (N : ℕ) :
