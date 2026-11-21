@@ -44,7 +44,27 @@ Deviation: These are the closure fields for the submodule of regular restriction
 theorem meromorphicContinuationWithPoleBound_closed :
     let admissible := HasMeromorphicContinuationWithPoleBound chart orderBound
     admissible 0 ∧ (∀ u v, admissible u → admissible v → admissible (u + v)) ∧
-      (∀ (a : ℂ) u, admissible u → admissible (a • u)) := by sorry
+      (∀ (a : ℂ) u, admissible u → admissible (a • u)) := by
+  refine ⟨⟨0, fun _ ↦ rfl, fun c ↦ ?_⟩, ?_, ?_⟩
+  · refine ⟨analyticAt_const.meromorphicAt, ?_, fun _ ↦ analyticAt_const⟩
+    exact le_top.trans_eq (meromorphicOrderAt_eq_top_iff.2
+      (Filter.Eventually.of_forall fun _ ↦ rfl)).symm
+  · rintro u v ⟨Zu, hu, hZu⟩ ⟨Zv, hv, hZv⟩
+    refine ⟨Zu + Zv, fun c ↦ by simp [hu, hv], fun c ↦ ?_⟩
+    obtain ⟨mu, ou, au⟩ := hZu c
+    obtain ⟨mv, ov, av⟩ := hZv c
+    refine ⟨mu.add mv, ?_, fun h ↦ (au h).add (av h)⟩
+    exact (le_min ou ov).trans (meromorphicOrderAt_add mu mv)
+  · rintro a u ⟨Z, hu, hZ⟩
+    refine ⟨a • Z, fun c ↦ by simp [hu], fun c ↦ ?_⟩
+    obtain ⟨m, o, an⟩ := hZ c
+    refine ⟨m.const_smul a, ?_, fun h ↦ (an h).const_smul⟩
+    show orderBound c ≤ meromorphicOrderAt (a • fun z ↦ Z (chart c z)) 0
+    by_cases ha : a = 0
+    · subst ha
+      exact le_top.trans_eq (meromorphicOrderAt_eq_top_iff.2
+        (Filter.Eventually.of_forall fun _ ↦ zero_smul ℂ _)).symm
+    · rwa [meromorphicOrderAt_const_smul_eq_meromorphicOrderAt ha]
 
 /-- Paper: Definition 5.1.1.1(1)–(2), p. 223.
 Meromorphic functions with bounded poles form a complex vector space with the
@@ -64,7 +84,15 @@ Deviation: This checks the target in the case where no poles are allowed. -/
 theorem mem_meromorphicWithPoleBound_zero_iff
     (u : C({c : X // 0 ≤ (0 : WithTop ℤ)}, ℂ)) :
     u ∈ meromorphicWithPoleBound chart (fun _ ↦ 0) ↔
-      ∀ c : X, AnalyticAt ℂ (fun z ↦ u ⟨chart c z, le_rfl⟩) 0 := by sorry
+      ∀ c : X, AnalyticAt ℂ (fun z ↦ u ⟨chart c z, le_rfl⟩) 0 := by
+  constructor
+  · rintro ⟨Z, hZ, h⟩ c
+    have hZ' : Z = fun x ↦ u ⟨x, le_rfl⟩ := funext fun x ↦ hZ ⟨x, le_rfl⟩
+    subst hZ'
+    exact (h c).2.2 le_rfl
+  · intro h
+    refine ⟨fun x ↦ u ⟨x, le_rfl⟩, fun _ ↦ rfl, fun c ↦ ?_⟩
+    exact ⟨(h c).meromorphicAt, (h c).meromorphicOrderAt_nonneg, fun _ ↦ h c⟩
 
 end MeromorphicTarget
 
