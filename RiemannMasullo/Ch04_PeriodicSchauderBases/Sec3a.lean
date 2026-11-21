@@ -51,7 +51,7 @@ theorem regularL2_haar_radon : ν.InnerRegular ∧ IsFiniteMeasureOnCompacts ν 
 
 /-- Paper: Lemma 4.3.1.3, p. 175. Haar measure on the second-countable group is
 sigma-finite. -/
-theorem regularL2_haar_sigmaFinite : SigmaFinite ν := by sorry
+theorem regularL2_haar_sigmaFinite : SigmaFinite ν := by infer_instance
 
 /-- Paper: Remark 4.3.1.4, p. 175. A continuous compactly supported function
 is square-integrable. -/
