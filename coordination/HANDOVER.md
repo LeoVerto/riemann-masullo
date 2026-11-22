@@ -72,7 +72,7 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
   (`fork`). It must be a CLASSIC token (repo, workflow, read:org); check with `tokencheck.sh`.
 - **Upstream posting:** ask the user before posting anything new. Standing exceptions: normal
   Claiming/Releasing; sieve hints on open `sweep` issues; extensions of #1288, #561 and #3230;
-  paper findings that the Opus evaluator confirmed (`FINDINGS.md`). **Never raise BLOCKERS §0**
+  paper findings that the Fable evaluator confirmed (`FINDINGS.md`). **Never raise BLOCKERS §0**
   (Main.lean integration is wave 4+, by the project's choice).
 - **Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main** (`git show origin/main:<file>`)
   at session start and when they change (HOURLY.md step 0); HUNTER.md carries their rules (gaps,
@@ -176,7 +176,7 @@ Launch prompts: HOURLY.md "Launching agents".
 | `.agent/agents/*.md` (snapshot `agents/`) | Subagent type definitions: model, effort, tools, and which brief to read. |
 | `HOURLY.md` | The hourly check's instructions, read by the cron on every tick. |
 | `FABLE.md` | Fable consultant brief: route from a stuck packet, no builds or PRs. |
-| `FINDINGS.md`, `findings.txt` | Opus findings-evaluator brief and its queue. |
+| `FINDINGS.md`, `findings.txt` | Fable findings-evaluator brief (Opus until 2026-11-22 ~21:40Z, user) and its queue. |
 
 State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims.txt`, `hunters.txt`
 (agent log), `hunted.txt` (launch log), `leads.txt` (leads), `escalations.txt` (escalation queue, claims kept), `findings.txt`

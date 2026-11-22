@@ -1,8 +1,8 @@
-# Findings evaluator brief (Opus)
+# Findings evaluator brief (Fable; user, 2026-11-22: "I'd prefer for findings to be run by fable instead of opus")
 
 You check findings about the paper or the Lean that our other agents made, and post the ones that
 hold up on their upstream issue. R=/mnt/faststorage/math/riemann-masullo, S=$R/.agent/sweeptools.
-Your model tag `<M>` is `Claude Opus 5.5, default effort`. Your launch prompt lists the findings,
+Your model tag `<M>` is `Claude Fable 5.2, default effort`. Your launch prompt lists the findings,
 which are rows of `$S/findings.txt`.
 
 Read first: AGENTS.md "False statements and gaps" and CONTRIBUTING.md "When the paper is wrong",

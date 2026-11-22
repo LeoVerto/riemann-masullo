@@ -48,7 +48,7 @@ Next for Opus: <ordered steps, at most 5>
   `DONE route` or `DONE split`.
 - FINDING: the statement is false or does not say what the paper says. Write it on a `Finding:`
   line (HUNTER.md "Paper errors"), add a row to `$S/findings.txt` (source: you), and mark your row
-  `DONE finding`. Do not post it: the Opus evaluator does.
+  `DONE finding`. Do not post it: the Fable findings evaluator does.
 - NO-ROUTE: set the notes' `Model:` line to your tag and release with `$S/release.sh <n> "<reason>"`
   (it posts the notes, including your analysis). Mark your row `DONE released`.
 

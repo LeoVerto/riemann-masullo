@@ -32,7 +32,7 @@ Once, before the first row: `git -C $R show origin/main:ERRATA.md > /tmp/errata-
    - **5:** deep (analysis, convergence, existence of non-trivial objects) or unclear.
 
    Also flag `SUSPECT` when the statement looks false, vacuous or mistranscribed. Say why in a few
-   words. SUSPECT is a lead, not a finding: the coordinator queues it for the Opus evaluator, who checks it
+   words. SUSPECT is a lead, not a finding: the coordinator queues it for the Fable evaluator, who checks it
    before anything is posted.
 
 ## Output

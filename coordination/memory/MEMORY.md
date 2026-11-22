@@ -13,9 +13,9 @@
 - [Read docs from origin/main](read-docs-origin-main.md) — AGENTS/CONTRIBUTING/ERRATA via git show origin/main; HOURLY step 0
 - [One PR per file](one-pr-per-file.md) — every hunter/siever PR covers one Lean file
 - [Nagger out of session](nagger-out-of-session.md) — one long-running Haiku loop; everyone waits in the FOREGROUND
-- [Paper findings via Opus](paper-findings-opus.md) — one Opus evaluator checks findings before posting (FINDINGS.md)
+- [Paper findings via Fable](paper-findings-opus.md) — one Fable evaluator (was Opus) checks findings before posting (FINDINGS.md)
 - [Subagent types](custom-subagents.md) — definitions in .agent/agents, used from the next session; edits need a restart
-- [Subagent models](subagent-model-effort.md) — Sonnet medium (4 PRs / ~3 h), Opus default, Haiku triage/nagger, Fable consultant
+- [Subagent models](subagent-model-effort.md) — Sonnet medium (4 PRs / ~3 h), Opus default, Haiku triage/nagger, Fable consultant + findings
 - [Subagent resume cost](subagent-resume-cost.md) — after a halt start fresh agents from notes; never resume long transcripts
 - [GitHub token scope](github-token-scope.md) — token only for LeoVerto fork and mccorvie upstream; classic token
 - [Sandbox quirks](riemann-masullo-sandbox-quirks.md) — pointer to HANDOVER Environment/Lessons; key reminders

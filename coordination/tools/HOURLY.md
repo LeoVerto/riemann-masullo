@@ -28,7 +28,7 @@ consultant to `agents.txt` (the nagger's roster).
 | `siever` (Sonnet) | – | `Your name is siev<k>, model tag <M>. Your hits: <lines>.` |
 | `triage` (Haiku) | – | `N = 60.` |
 | `fable-consultant` (Fable) | – | `Your issue: <row>.` |
-| `findings-evaluator` (Opus) | – | `Your findings: <rows>.` |
+| `findings-evaluator` (Fable; until the coordinator restarts, pass `model: fable` in the Agent call) | – | `Your findings: <rows>.` |
 | `nagger` (Haiku) | – | `Start the loop.` |
 | fixer: `general-purpose`, model sonnet, effort medium | – | `Fix <failing check or review comment> on PR #<p> in worktree <wt>, following S/HUNTER.md "Checks and pull request". Model tag <M>.` |
 
@@ -39,7 +39,7 @@ consultant to `agents.txt` (the nagger's roster).
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
    A Verdict `error` with "main itself does not build" is not ours: once main builds again
-   (Main state check green), push an empty commit to the PR branch to retrigger (pending: #5454, leads.txt).
+   (Main state check green), push an empty commit to the PR branch to retrigger.
 3. Release orphan or STALE claims only via `release.sh`. `ESCALATED` lines are not stale: leave
    them. For `ESCALATED … REFRESH-CLAIM` (claim older than 7 h; upstream auto-releases after 8 h),
    post `Claiming (Claude Opus 5.5, default effort): queued for an Opus escalator` once.
@@ -66,7 +66,7 @@ consultant to `agents.txt` (the nagger's roster).
    1. Opus (step 8) until 2 run.
    2. Sonnet hunters while quick-win rows (7a) exist, up to 6 Sonnets.
    3. What is left, two units at a time, to Opus (step 8). One unit left over waits.
-7a. New issues first: proof issues newer than the last shortlisted (last: #5525, triage10) get
+7a. New issues first: proof issues newer than the last shortlisted (last: #5577, triage11) get
    `shortlist.py` on their files and a triage agent into a new `triage<k>.tsv`; update "last"
    here. Hunters take rows rated 1–2 (then 3) with unclaimed issues, listed in the prompt by file:
    files in sequence, ONE PR PER TOUCHED FILE, until the list is done, 4 PRs or ~3 h (user:
@@ -87,8 +87,8 @@ consultant to `agents.txt` (the nagger's roster).
 8b. Fable: if `escalations.txt` has a QUEUED `fable` row and no Fable consultant runs, launch ONE
    (outside the budget). Its ROUTE/SPLIT hand-back appears as a new `opus` row (step 8a).
    **The coordinator may escalate to Fable itself** when that is the better use of tokens: an
-   Opus agent released an issue it tried and failed without escalating; the evaluator marked a
-   finding UNCLEAR; the same blocker keeps stopping several issues (one packet for the shared
+   Opus agent released an issue it tried and failed without escalating; the same blocker keeps
+   stopping several issues (one packet for the shared
    step); or an important issue has had two or more failed attempts upstream. Claim it if it is
    not ours (`Claiming (Claude Fable 5.2, default effort)`, add to `claims.txt`), append a short
    `## Stuck packet` to `notes/<n>.md` from the notes, release comments and the issue (no Lean

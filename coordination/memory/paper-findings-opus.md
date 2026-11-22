@@ -1,11 +1,11 @@
 ---
 name: paper-findings-opus
-description: Paper findings are checked by one Opus evaluator before they are raised upstream
+description: Paper findings are checked by one Fable evaluator (was Opus) before they are raised upstream
 metadata:
   type: feedback
 ---
 
-The user, 2026-11-22 ~16:00Z: "Paper findings should be evaluated by Opus and then raised."
+The user, 2026-11-22 ~16:00Z: "Paper findings should be evaluated by Opus and then raised."; ~21:40Z: "I'd prefer for findings to be run by fable instead of opus" (supersedes the model choice).
 
 **Why:** unchecked findings upstream would cost the integrator time and our credibility.
 
