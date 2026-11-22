@@ -61,7 +61,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
      `escalate.sh`, keeping our claim; an Opus escalation prover (HUNTER.md "Escalators") takes the
      queued rows of `escalations.txt`, one file per prover, once our Sonnet has left that file. A
      slot with nothing to escalate stays empty.
-  3. **2 Opus hunters** on **any** open unclaimed proof issue (CRITICAL_PROVER.md; not
+  3. **1 Opus hunter** (user, 2026-11-22 ~16:20Z: "Let's stick with one opus hunter for now"; was 2) on **any** open unclaimed proof issue (CRITICAL_PROVER.md; not
      `gap`/`refutation`/ERRATA/`TODO(paper-gap)`, not sweep-held), preferring triage rows rated
      3–4 that no Sonnet holds. No cone remapping ("the cone doesn't matter at this point").
   4. **1 Fable consultant at a time** (user, 2026-11-22 ~16:00Z, Fable allowance; outside the 8

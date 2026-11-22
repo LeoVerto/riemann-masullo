@@ -7,7 +7,7 @@ The cron prompt is only: `Read /mnt/faststorage/math/riemann-masullo/.agent/swee
 S=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools.
 
 Coordinator only; CPU is cheap, tokens are scarce. Work autonomously, ask nothing, and post nothing
-new upstream beyond normal Claiming/Releasing. STAFFING (user): always 4 Sonnet hunters, 2 Opus hunters and 2 Opus escalators. We claim every
+new upstream beyond normal Claiming/Releasing. STAFFING (user): always 4 Sonnet hunters, 1 Opus hunter (user, 2026-11-22 ~16:20Z: "stick with one opus hunter for now") and 2 Opus escalators. We claim every
 issue we work on or have queued for one of our agents.
 
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
@@ -55,7 +55,7 @@ issue we work on or have queued for one of our agents.
    `## Stuck packet` to `notes/<n>.md` from the notes, release comments and the issue (no Lean
    runs: leave "Goal at the stuck point" as `to compute`), then run
    `escalate.sh <n> "<reason>" --to fable`. One Fable consultant at a time still applies.
-9. Keep 2 Opus hunters (`critical/CRITICAL_PROVER.md`, tag "Claude Opus 5.5, default effort") on
+9. Keep 1 Opus hunter (user, ~16:20Z; was 2) (`critical/CRITICAL_PROVER.md`, tag "Claude Opus 5.5, default effort") on
    any open unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held), preferring
    triage rows rated 3–4 that no Sonnet holds, never in a file another of our agents works in.
    Record in `hunted.txt`, add to `agents.txt`.

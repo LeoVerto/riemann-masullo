@@ -1,6 +1,6 @@
 ---
 name: quick-wins-mode
-description: Quick-wins mode (renamed from "low-hanging mode", 2026-11-22) - since ~16:00Z always 4 Sonnet hunters, 2 Opus hunters (any open issue), 2 Opus escalators (stuck Sonnet issues)
+description: Quick-wins mode (renamed from "low-hanging mode", 2026-11-22) - since ~16:00Z always 4 Sonnet hunters, 1 Opus hunter (any open issue; user cut it from 2 at ~16:20Z), 2 Opus escalators (stuck Sonnet issues)
 metadata:
   type: feedback
 ---
@@ -19,3 +19,4 @@ The user's instructions, 2026-11-22:
 3. Opus hunters on any open unclaimed issue ([[critical-path-workstream]]), without asking.
 4. Superseded cap: the user, 2026-11-22 ~16:00Z, after the token allowance increased: "we can now always keep two Opus hunters running plus 4 Sonnets and two Opus escalators". Keep those slots filled at every check: 4 Sonnet hunters (steps 1), 2 Opus escalators (step 2; empty if nothing to escalate), 2 Opus hunters on any open issue (step 3 no longer waits for quick wins to run out; prefer rows rated 3–4). The "Opus hunter" = CRITICAL_PROVER.md brief is my reading.
 Back to Sonnets as soon as new issues bring quick wins. Related: [[subagent-model-effort]], [[low-hanging-sweep]].
+5. Current cap (user, 2026-11-22 ~16:20Z): "Let's stick with one opus hunter for now". So 4 Sonnet hunters, 1 Opus hunter, 2 Opus escalators. Do not refill a second Opus hunter slot until the user raises it again.
