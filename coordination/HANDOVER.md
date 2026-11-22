@@ -54,15 +54,18 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   relay short reports. Do not call `advisor` from the coordinator: it is for subagents.
 - **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning.
   Agents wait on builds with one blocking wait, never polling turns. Keep wake-ups sparse.
-- **Quick-wins mode** (since 04:40Z, amended 06:05Z, 07:30Z, 08:30Z):
-  1. Sonnet hunters on quick wins first: 2–3 at once, rows rated 1–2, then 3.
-  2. **Escalation:** issues a Sonnet released as *stuck* (tried and failed, not merely unattempted)
-     go to an Opus escalation prover (HUNTER.md brief, Opus tag), one file per prover, once our
-     Sonnet has left that file.
-  3. With no quick wins and no escalations, ONE Opus prover on **any** open unclaimed proof issue
-     (CRITICAL_PROVER.md; not `gap`/`refutation`/ERRATA/`TODO(paper-gap)`, not sweep-held). No
-     cone remapping ("the cone doesn't matter at this point"). Do not ask before resuming Opus.
-  4. At most 2 Opus agents at once (coordinator's assumption).
+- **Staffing (user, 2026-11-22 ~16:30Z, after the token allowance increased):** "we can now
+  always keep two Opus hunters running plus 4 Sonnets and two Opus escalators". Keep these slots
+  filled at every check (quick-wins mode now runs alongside Opus, not before it):
+  1. **4 Sonnet hunters** on quick wins: triage rows rated 1–2, then 3 (HUNTER.md).
+  2. **2 Opus escalators:** issues a Sonnet released as *stuck* (tried and failed, not merely
+     unattempted) go to an Opus escalation prover (HUNTER.md brief, Opus tag), one file per prover,
+     once our Sonnet has left that file. A slot with nothing to escalate stays empty.
+  3. **2 Opus hunters** on **any** open unclaimed proof issue (CRITICAL_PROVER.md; not
+     `gap`/`refutation`/ERRATA/`TODO(paper-gap)`, not sweep-held), preferring triage rows rated
+     3–4 that no Sonnet holds. No cone remapping ("the cone doesn't matter at this point").
+  No two agents share a file. Interpretation of "Opus hunters" (CRITICAL_PROVER.md brief) is the
+  coordinator's; confirm with the user if in doubt.
 - **Claim what we work on or have queued.** Escalated issues are re-claimed at once as
   `Claiming (Claude Opus 5.5, default effort)`, noting they are queued, and listed in the leads.txt
   ESCALATION QUEUE. Stale-claim releases skip that queue. Upstream auto-releases a claim with no PR
@@ -97,8 +100,11 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 
 - Repo `/mnt/faststorage/math/riemann-masullo` (writable, ~65 GB free; its parent is not writable).
   The overlay root (~16 GB) does not survive a sandbox recreation.
-- 16 GB RAM, 24 cores. **RAM is the limit:** one prover, one hunter or siever, and the sieve is the
-  ceiling. memguard kills (rc 137) are cheap; an OOM of the host is not.
+- 16 GB RAM, 24 cores. **RAM is the limit.** The old ceiling was one prover, one hunter or siever,
+  and the sieve; the 8-agent staffing above is untested at that RAM. Agents build only their module
+  while working, the sieve waits for >6 GB free, and memguard kills the newest Lean below 1000 MB
+  (cheap, rc 137). The hourly check watches `memguard.log` (HOURLY.md step 5). An OOM of the host
+  is not cheap.
 - elan in `~/.elan`; `/etc/sandbox-persistent.sh` sets its PATH and `LAKE_ARTIFACT_CACHE=true`,
   `LAKE_CACHE_DIR=<repo>/.lake/artifact-cache`, `LAKE_RESTORE_ARTIFACTS=true` (tested: restores
   leave real local `.olean`s; concurrent builds are fine).

@@ -7,7 +7,7 @@ metadata:
 
 Started 2026-11-21 ~17:00Z at the user's request: an Opus mapper built an "anchored cone" of sorries behind the paper's endgame, and one Opus prover worked per issue. Files: `.agent/sweeptools/critical/` (CRITICAL_PROVER.md brief, QUEUE.md candidate routes, BLOCKERS.md, graph.tsv, status.txt results).
 
-**Current rule (user, 2026-11-22 ~07:30Z):** "The cone doesn't matter at this point ... Just pick any open issue for Opus." An Opus prover takes any open, unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held). No remapping. It runs only per [[quick-wins-mode]], i.e. when quick wins and escalations are out. Launch: "Read S/critical/CRITICAL_PROVER.md and follow it. Your issue is #<n>. Your model tag <M> is Claude Opus 5.5, default effort." Use model opus with no effort override, worktree wt/crit-<n>, branch crit/<n>.
+**Current rule (user, 2026-11-22 ~07:30Z):** "The cone doesn't matter at this point ... Just pick any open issue for Opus." An Opus prover takes any open, unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held). No remapping. Since ~16:30Z two such Opus hunters run at all times ([[quick-wins-mode]]). Launch: "Read S/critical/CRITICAL_PROVER.md and follow it. Your issue is #<n>. Your model tag <M> is Claude Opus 5.5, default effort." Use model opus with no effort override, worktree wt/crit-<n>, branch crit/<n>.
 
 Findings:
 - Main.lean's own cone is empty (it imports only Statements). **Never raise this upstream** (BLOCKERS §0): the user says Main.lean integration is wave 4 or later, by the project coordinator's choice.

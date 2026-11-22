@@ -1,6 +1,6 @@
 ---
 name: quick-wins-mode
-description: Quick-wins mode (renamed from "low-hanging mode" by the user, 2026-11-22) - Sonnet hunters on quick wins first, Opus escalation for stuck Sonnet issues, else one Opus on any open issue; max 2 Opus; no asking
+description: Quick-wins mode (renamed from "low-hanging mode", 2026-11-22) - since ~16:30Z always 4 Sonnet hunters, 2 Opus hunters (any open issue), 2 Opus escalators (stuck Sonnet issues)
 metadata:
   type: feedback
 ---
@@ -14,8 +14,8 @@ The user's instructions, 2026-11-22:
 **Why:** fresh sections carry many easy sanity lemmas, while the hard tails are held by upstream sweepers. Opus usage is the scarce budget.
 
 **How to apply (in this order):**
-1. Every check looks for new proof issues first: shortlist.py, then Haiku triage (TRIAGE.md), then 2–3 Sonnet hunters on rows rated 1–2 (then 3). One file per hunter, no overlap (claims.txt).
+1. Every check looks for new proof issues first: shortlist.py, then Haiku triage (TRIAGE.md), then 4 Sonnet hunters on rows rated 1–2 (then 3). One file per hunter, no overlap (claims.txt).
 2. Issues a Sonnet released as *stuck* (tried and failed) go to an Opus escalation prover. It uses the HUNTER.md brief with the Opus tag, one file per prover, after our Sonnet left that file. Re-claim the issue for Opus at once ([[claims-notes-attribution]]). The queue lives in leads.txt "ESCALATION QUEUE".
-3. With no quick wins and no escalations: ONE Opus prover on any open unclaimed issue ([[critical-path-workstream]]), without asking.
-4. At most 2 Opus agents at once (my assumption, not the user's).
+3. Opus hunters on any open unclaimed issue ([[critical-path-workstream]]), without asking.
+4. Superseded cap: the user, 2026-11-22 ~16:30Z, after the token allowance increased: "we can now always keep two Opus hunters running plus 4 Sonnets and two Opus escalators". Keep those slots filled at every check: 4 Sonnet hunters (steps 1), 2 Opus escalators (step 2; empty if nothing to escalate), 2 Opus hunters on any open issue (step 3 no longer waits for quick wins to run out; prefer rows rated 3–4). The "Opus hunter" = CRITICAL_PROVER.md brief is my reading.
 Back to Sonnets as soon as new issues bring quick wins. Related: [[subagent-model-effort]], [[low-hanging-sweep]].

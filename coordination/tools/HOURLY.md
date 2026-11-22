@@ -7,7 +7,7 @@ The cron prompt is only: `Read /mnt/faststorage/math/riemann-masullo/.agent/swee
 S=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools.
 
 Coordinator only; CPU is cheap, tokens are scarce. Work autonomously, ask nothing, and post nothing
-new upstream beyond normal Claiming/Releasing. QUICK-WINS MODE: Sonnet hunters first. We claim every
+new upstream beyond normal Claiming/Releasing. STAFFING (user): always 4 Sonnet hunters, 2 Opus hunters and 2 Opus escalators. We claim every
 issue we work on or have queued for one of our agents.
 
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
@@ -24,12 +24,15 @@ issue we work on or have queued for one of our agents.
    `pgrep -f nag-wait.sh` finds nothing while agents run, relaunch the nagger once (model haiku):
    "Follow the brief S/NAGGER.md exactly. It is a long-running loop: keep looping in this single
    turn and do not stop or write a final answer until its stop condition holds."
-5. Services: warm, watchdog, memguard, sieve (restart commands in HANDOVER startup step 3).
+5. Services: warm, watchdog, memguard, sieve (restart commands in HANDOVER startup step 3). RAM:
+   count memguard kills of agent builds (not sieve runs) in `memguard.log` over the last hour. If
+   there are more than 3, launch no new agents this tick and say so in the report; tell the user if
+   it repeats.
 6. READY or HINT lines in `== sieve`: launch ONE siever (SIEVER.md) unless one runs. No blind
    hunters.
 7. New issues first: proof issues newer than the last shortlisted (last: #4616) get
    `shortlist.py` on their files and a Haiku triage (TRIAGE.md) into a new `triage<k>.tsv`; update
-   "last" here. Keep 2–3 Sonnet hunters (HUNTER.md, tag "Claude Sonnet 5.5, effort medium") on rows
+   "last" here. Keep 4 Sonnet hunters (HUNTER.md, tag "Claude Sonnet 5.5, effort medium") on rows
    rated 1–2 (then 3) with unclaimed issues: one file per hunter, ONE PR PER TOUCHED FILE, each
    issue listed in its prompt, no overlap (`claims.txt`, `hunters.txt`), no file crowded by 2–3
    other claimants or open PRs. Add each new hunter to `agents.txt`.
@@ -37,8 +40,10 @@ issue we work on or have queued for one of our agents.
    by others) go to Opus. Re-claim each at once if still free (`Claiming (Claude Opus 5.5, default
    effort)`, noting it is queued for an Opus prover), add it to `claims.txt` and the ESCALATION
    QUEUE, and launch one Opus escalation prover per file once our Sonnet has left it (HUNTER.md
-   brief + the issue's notes and release comments; report `notes/report-esc-<file>.md`). Max 2 Opus.
-9. No quick wins and no escalations: ONE Opus prover on any open unclaimed proof issue
-   (`critical/CRITICAL_PROVER.md`; not gap/refutation/ERRATA/paper-gap, not sweep-held). Record in
-   `hunted.txt`, add to `agents.txt`.
+   brief + the issue's notes and release comments; report `notes/report-esc-<file>.md`). Up to 2
+   escalators; a slot with nothing to escalate stays empty.
+9. Keep 2 Opus hunters (`critical/CRITICAL_PROVER.md`, tag "Claude Opus 5.5, default effort") on
+   any open unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held), preferring
+   triage rows rated 3–4 that no Sonnet holds, never in a file another of our agents works in.
+   Record in `hunted.txt`, add to `agents.txt`.
 10. Report in one or two lines.

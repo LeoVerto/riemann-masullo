@@ -74,7 +74,8 @@ a little thought. Skip anything deep.
   .agent/X.lean`; `lake lean` fails on a `module` file itself. **Never `lake env lean`**: it skips
   the lakefile options (`autoImplicit`, `maxSynthPendingDepth`, a slow linter turned off).
 - One full `lake build` (under `timeout 2400`) before each PR. Never run two builds in one
-  worktree, and run only one `lake build` at a time (RAM is shared, 16 GB).
+  worktree, and run only one `lake build` of your own at a time (RAM is shared, 16 GB, by up to
+  eight agents and the sieve: prefer module builds, and run the full build only once).
 - Wait on a build with ONE blocking command: foreground with a long tool timeout, background with
   the completion notification, or `$S/build.sh <wt>` followed by one background
   `until [ -e <wt>/.agent/build.exit ]; do sleep 20; done` (log in `<wt>/.agent/build.log`). Never
