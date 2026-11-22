@@ -17,3 +17,4 @@ Current facts (compacted 2026-11-22):
 - Time zones: the shell's TZ is CET (date, status.sh and logs are UTC+1); CronCreate uses UTC.
 
 Related: [[state-in-dot-agent]], [[github-token-scope]], [[low-hanging-sweep]].
+- **CPU contention with 7–8 agents (2026-11-22 17:25Z, user reported subagent timeouts):** load ~19/24 cores; module builds took 3x longer than HUNTER.md's old `timeout 300`. Fix: warm.sh and sieve.sh run at nice 19 (`renice` is not installed; use `nice -n 19` at start, or Python `os.setpriority` on their process group), and HUNTER.md now uses 900 s module builds, 300 s probes, 3600 s full builds in the background, retry once on a timeout under load. One Bash call caps at 600 s.

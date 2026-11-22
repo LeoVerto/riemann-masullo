@@ -37,3 +37,5 @@ crit1526 (finished 11:24Z: PR #5045 PROVED #1526 AppD Sec3a; sorryAx inherited f
 16:10Z new coordinator: crit2526 (Opus, #2526 SPLIT plan), esc-sec5 (Opus, Ch05 Sec5 #4408 #4420 #4423 #4429 #4431 #4409 #4411), esc-sec4 (Opus, Ch05 Sec4 #4344 #4352 #4356 #4338), w16 (Sonnet, #4535 Ch07 Sec2); Haiku triage 7a-7d on 240 new rows (issues >4616)
 w16 (finished 16:05Z: released #4535, core of Thm 7.2.1.1 + depends on sorried sLocalPrincipalPartCoeff_ne_zero_imp_pole; rate 4-5)
 16:07Z triage7a-d done (19 rows rated 1-2, SUSPECT #5108 queued to findings). Launched w17 Ch11 Sec1b, w18 Ch10 Sec4a (not #5248, FleckiBunti), w19 Ch10 Sec3, w20 Ch10 Sec4b #5298 + Ch07 Sec5 #5131
+w20 (finished 16:26Z: PR #5355 proves #5298 Ch10 Sec4b, PR #5356 proves #5131 Ch07 Sec5)
+16:27Z CPU load: warm+sieve at nice 19, HUNTER.md timeouts 900/300/3600; w21 Ch07 Sec4 #5091 #5108; Haiku triage 7e 7f (last 182 rows)

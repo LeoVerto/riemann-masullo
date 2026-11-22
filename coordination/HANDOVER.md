@@ -114,8 +114,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 2. **Token:** `S/tokencheck.sh` must print `TOKEN OK`. On `TOKEN FAIL` ask the user to run
    `sbx secret set github --sandbox riemann-masullo-faststorage -t <classic token>`.
 3. **Services:** start any missing one with
-   `cd S && setsid nohup ./<name>.sh >> <name>.log 2>&1 < /dev/null &` for warm, watchdog, memguard
-   and sieve (sieve details in `SIEVE.md`). Check that `warm.log` says "ready" at a recent main. The
+   `cd S && setsid nohup ./<name>.sh >> <name>.log 2>&1 < /dev/null &` for watchdog and memguard, and the same with `nice -n 19` before `./<name>.sh` for warm and sieve (user, 2026-11-22 17:25Z: agents hit timeouts under CPU load; the services must yield; sieve details in `SIEVE.md`). Check that `warm.log` says "ready" at a recent main. The
    watchdog's auto-resume uses a hard-coded old `SESSION`: leave `no-resume` in place unless you
    restart it with `SESSION=<your id>`.
 4. **One hourly check:** `CronList` first (duplicates have happened), then create it with the

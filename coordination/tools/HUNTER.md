@@ -92,11 +92,14 @@ a little thought. Skip anything deep.
 - After the PR is open, remove its issues from `claims.txt` and delete their `notes/<n>.md`.
 
 ## Builds and processes
-- Build only your module while working: `timeout 300 lake build <Module>` (single modules normally
-  take 1–5 min). Scratch files under `.agent/` that import it run with `timeout … lake lean
+- Build only your module while working: `timeout 900 lake build <Module>` (single modules take
+  1–5 min on an idle machine, up to 3x longer with eight agents building; user, 2026-11-22). Run
+  any build or probe longer than ~8 min through `$S/build.sh` or in the background: one Bash call
+  is capped at 600 s. A timeout under load is not evidence the proof is slow: retry once with
+  double the timeout before recording it as a failure. Scratch files under `.agent/` that import it run with `timeout … lake lean
   .agent/X.lean`; `lake lean` fails on a `module` file itself. **Never `lake env lean`**: it skips
   the lakefile options (`autoImplicit`, `maxSynthPendingDepth`, a slow linter turned off).
-- One full `lake build` (under `timeout 2400`) before each PR. Never run two builds in one
+- One full `lake build` (under `timeout 3600`, in the background) before each PR. Never run two builds in one
   worktree, and run only one `lake build` of your own at a time (RAM is shared, 16 GB, by up to
   eight agents and the sieve: prefer module builds, and run the full build only once).
 - Wait on a build with ONE blocking command: foreground with a long tool timeout, background with
@@ -140,7 +143,7 @@ a little thought. Skip anything deep.
   it (a killed 90-min build became ~2 min; crit/1526, #5045).
 - `+`, `-`, `•` on `SchwartzBruhat` / `ModulatedExponentialDecay` values and `Lβ` coercions: most
   reported timeouts (#1288) were the `lake env lean` artifact. If in doubt, probe the bare statement
-  with a `sorry` body under `timeout 120 lake lean .agent/Probe.lean` and skip it if that does not
+  with a `sorry` body under `timeout 300 lake lean .agent/Probe.lean` and skip it if that does not
   finish. Known workarounds: `(someLinearMap).map_add f f'`; `Eq.trans ?_ (integral_add ..)` where
   `rw [← integral_add ..]` times out.
 - **Keep the file fast** (CONTRIBUTING "Keep the file fast"): time your module before and after
