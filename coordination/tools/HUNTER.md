@@ -92,21 +92,28 @@ a little thought. Skip anything deep.
 - After the PR is open, remove its issues from `claims.txt` and delete their `notes/<n>.md`.
 
 ## Builds and processes
-- Build only your module while working: `timeout 900 lake build <Module>` (single modules take
-  1–5 min on an idle machine, up to 3x longer with eight agents building; user, 2026-11-22). Run
-  any build or probe longer than ~8 min through `$S/build.sh` or in the background: one Bash call
-  is capped at 600 s. A timeout under load is not evidence the proof is slow: retry once with
-  double the timeout before recording it as a failure. Scratch files under `.agent/` that import it run with `timeout … lake lean
-  .agent/X.lean`; `lake lean` fails on a `module` file itself. **Never `lake env lean`**: it skips
-  the lakefile options (`autoImplicit`, `maxSynthPendingDepth`, a slow linter turned off).
-- One full `lake build` (under `timeout 3600`, in the background) before each PR. Never run two builds in one
-  worktree, and run only one `lake build` of your own at a time (RAM is shared, 16 GB, by up to
-  eight agents and the sieve: prefer module builds, and run the full build only once).
-- Wait on a build with ONE blocking command: foreground with a long tool timeout, background with
-  the completion notification, or `$S/build.sh <wt>` followed by one background
-  `until [ -e <wt>/.agent/build.exit ]; do sleep 20; done` (log in `<wt>/.agent/build.log`). Never
-  poll in repeated turns, and never wait with `pgrep`/`pkill` on `lake` or `lean` (other agents and
-  services build too).
+- Build only your module while working. Single modules take 1–5 min on an idle machine, up to 3x
+  longer with eight agents building (2026-11-22). Scratch files under `.agent/` that import it run
+  with `timeout … lake lean .agent/X.lean`; `lake lean` fails on a `module` file itself. **Never
+  `lake env lean`**: it skips the lakefile options (`autoImplicit`, `maxSynthPendingDepth`, a slow
+  linter turned off). A timeout under load is not evidence the proof is slow: retry once with
+  double the time before recording it as a failure.
+- One full `lake build` before each PR. Never run two builds in one worktree, and run only one
+  `lake build` of your own at a time (RAM is shared, 16 GB, by up to eight agents and the sieve:
+  prefer module builds, and run the full build only once).
+- **Wait in the FOREGROUND, never with `run_in_background`** (user, 2026-11-22): an agent that ends
+  its turn to wait gets resumed by any message and then reports to the sender, not the coordinator,
+  and every pause pings the coordinator. One Bash call is capped at 600 s, so:
+  - Up to ~9 min: run it directly, `timeout 540 lake build <Module>` (or `timeout 300 lake lean
+    .agent/Probe.lean` for a probe).
+  - Longer (slow modules under load, the full build): start it detached and return at once,
+    `BUILD_TIMEOUT=<s> setsid nohup $S/build.sh <wt> [<Module>] >/dev/null 2>&1 &` (900 for a
+    module, 3600 for the full build; log in `<wt>/.agent/build.log`, status in
+    `<wt>/.agent/build.exit`, 124 = timeout), then wait in the foreground with
+    `timeout 590 bash -c 'until [ -e <wt>/.agent/build.exit ]; do sleep 20; done'`, repeating that
+    same call (one cheap tool call per ~10 min) until the file exists. Do not end your turn while
+    a build runs.
+  - Never wait with `pgrep`/`pkill` on `lake` or `lean` (other agents and services build too).
 - Never pipe `lake build` into `head` (the build outlives the pipe); redirect to a log and read the
   log. If chapter index modules fail with "Too many open files", build them one at a time and
   re-run.

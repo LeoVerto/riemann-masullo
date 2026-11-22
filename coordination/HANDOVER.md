@@ -33,7 +33,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   relay short reports. The `advisor` tool is turned off (user, 2026-11-22); escalation goes
   through `escalate.sh` and the Fable consultant instead.
 - **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning.
-  Agents wait on builds with one blocking wait, never polling turns. Keep wake-ups sparse.
+  Agents wait on builds in the foreground (never `run_in_background`, user 2026-11-22), never polling turns. Keep wake-ups sparse.
 - **Staffing (user, 2026-11-22 ~16:00Z, after the token allowance increased):** "we can now
   always keep two Opus hunters running plus 4 Sonnets and two Opus escalators". Keep these slots
   filled at every check (quick-wins mode now runs alongside Opus, not before it):
@@ -210,8 +210,9 @@ State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims
   re-run them. Issues of merged PRs stay open until the merger runs `issues.py --apply`; they are
   not orphans.
 - **A nagger SendMessage to an agent that is waiting on background work resumes it, and it then
-  reports to the nagger, not the coordinator** (esc-sec5, 2026-11-22 ~17:50Z). Track such agents
-  through `notes/report-<name>.md`, their PR and `claims.txt` in the hourly check.
+  reports to the nagger, not the coordinator** (esc-sec5, 2026-11-22 ~17:50Z). Hence the user's
+  rule: all agents and the nagger wait in the FOREGROUND (HUNTER.md "Builds and processes"); a
+  coordinator message to an idle agent routes it back to the coordinator.
 - Never `pgrep`/`pkill -f` a pattern from your own command line; kill only PIDs you started.
 
 ## Upstream reports (integrator decides)
