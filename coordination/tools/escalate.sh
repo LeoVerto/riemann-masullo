@@ -8,18 +8,20 @@
 #   --to fable: an Opus agent is stuck; a Fable consultant reads the "## Stuck packet" in the notes
 #               and writes a route (FABLE.md); then an Opus escalator implements it (--to opus again).
 # Use release.sh instead when the issue was merely not attempted or someone else holds it.
+#   --to refute: the Fable findings evaluator confirmed a false statement and wrote a "## Refutation
+#               sketch"; an Opus escalator hands in the Lean refutation (HUNTER.md "Refutations").
 #   --prior: the coordinator queues an issue with earlier work (resumable.sh) after re-claiming it.
 #            A missing notes/<issue>.md is restored from the newest notes/released/<issue>-*.md,
 #            or, if only others tried it, seeded with a stub that points to prior.sh.
 set -u
 T=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools
-n=${1:?usage: escalate.sh <issue> "<reason>" [--to opus|fable] [--prior]}; reason=${2:?give a one-line reason}
+n=${1:?usage: escalate.sh <issue> "<reason>" [--to opus|fable|refute] [--prior]}; reason=${2:?give a one-line reason}
 level=opus; prior=0; shift 2
 while [ $# -gt 0 ]; do
-  case $1 in --to) level=${2:?--to needs opus or fable}; shift 2;; --prior) prior=1; shift;;
+  case $1 in --to) level=${2:?--to needs opus, fable or refute}; shift 2;; --prior) prior=1; shift;;
     *) echo "escalate: unknown argument $1"; exit 1;; esac
 done
-case $level in opus|fable) ;; *) echo "escalate: unknown level $level"; exit 1;; esac
+case $level in opus|fable|refute) ;; *) echo "escalate: unknown level $level"; exit 1;; esac
 N=$T/notes/$n.md; Q=$T/escalations.txt
 if [ $prior = 1 ] && [ ! -s "$N" ]; then
   old=$(ls "$T"/notes/released/"$n"-*.md 2>/dev/null | sort | tail -1)
@@ -30,6 +32,9 @@ fi
 [ -s "$N" ] || { echo "escalate #$n: notes/$n.md missing or empty; write it first"; exit 1; }
 if [ $level = fable ] && ! grep -q '^## Stuck packet' "$N"; then
   echo "escalate #$n: add a '## Stuck packet' section to notes/$n.md first (HUNTER.md 'Stuck packet')"; exit 1
+fi
+if [ $level = refute ] && ! grep -q '^## Refutation sketch' "$N"; then
+  echo "escalate #$n: add a '## Refutation sketch' section to notes/$n.md first (FINDINGS.md)"; exit 1
 fi
 grep -qx "$n" "$T/claims.txt" || { echo "escalate #$n: not in claims.txt (claim lost?); tell the coordinator"; exit 1; }
 grep -qE "^$n $level [^ ]+ [^ ]+ (QUEUED|TAKEN)" "$Q" 2>/dev/null && { echo "escalate #$n: already queued for $level"; exit 0; }

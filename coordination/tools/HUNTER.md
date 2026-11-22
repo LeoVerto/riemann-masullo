@@ -232,8 +232,9 @@ declarations do not collide with the sweeper's).
 ## Paper errors, gaps, ERRATA (AGENTS "False statements and gaps", CONTRIBUTING "When the paper is wrong"; binding)
 - `grep` ERRATA.md (origin/main) for the declaration name. If it is listed as false, imprecise or a
   placeholder, skip it unless the entry says what to do.
-- Skip `gap` issues and declarations with a `Gap:` docstring line. `refutation` issues (prove
-  `¬ Printed.<name>` in a `Sec<N>_Printed.lean`) are fair game if short. Read any nearby
+- Skip `gap` issues and declarations with a `Gap:` docstring line. `refutation` issues are proof
+  issues like any other (user, 2026-11-22): the `Printed.<name>_false` sorry is already on main;
+  prove it in place and hand in with `Closes #<n>`. Read any nearby
   `TODO(paper-gap)` first: it often explains why the obvious route fails.
 - Never change a statement, never prove something else in its place, and never leave a `sorry`
   inside a larger proof. A split states the missing piece as its own named theorem with a
@@ -253,6 +254,26 @@ declarations do not collide with the sweeper's).
   Do not post it yourself: the coordinator queues it in `$S/findings.txt`, and a Fable evaluator
   (`$S/FINDINGS.md`) checks it against the page image and posts it on the issue if it holds.
   "I could not prove it" is not a finding.
+- **Refutations** (`refute` rows in `escalations.txt`, queued by the Fable findings evaluator;
+  user, 2026-11-22): the statement is false and the finding is already posted on the issue.
+  - Start from `## Refutation sketch` in `notes/<n>.md` and the finding comment it links.
+  - Write `RiemannMasullo/<Chapter>/<section file>_Printed.lean` (e.g. `Sec4a.lean` → `Sec4a_Printed.lean`).
+    If it is missing, create it on the model of `AppA_AlgebraicNT/Sec1_Printed.lean`: same header,
+    it imports the section file, and nothing imports it. AGENTS.md "False statements and gaps" is
+    binding.
+  - `def Printed.<name> : Prop` is the Lean statement exactly, with all its variables bound by `∀`.
+    Compare it with the issue's statement symbol by symbol, then with the page image. Docstring:
+    `Paper: <item>, p. <page>.` and that this is the claim as printed, false by `Printed.<name>_false`.
+  - `theorem Printed.<name>_false : ¬ Printed.<name>`, fully proved, no `sorry`. Name every instance.
+  - Never touch the section file, the original statement or its `sorry`.
+  - Checks as for any PR. The signature compare may only add the two declarations, plus private
+    helpers in the `_Printed` file.
+  - PR title `Refute <name> (Paper <item>, p. <page>)`. Body: `Refs #<n>` (not `Closes`: the
+    integrator checks the `Printed` proposition against the page, decides and closes), the finding
+    URL, the axioms output and `Prover: <M>`. One PR per `_Printed` file.
+  - If the negation does not go through: no PR, and never a `sorry`'d `_false` (that is the
+    integrator's). Add what failed to the notes and run `$S/release.sh <n> "Lean refutation not
+    completed; the finding stands: <url>"`.
 
 ## Checks and pull request
 - **Checks before each PR:** full `lake build`, `scripts/lint.sh`, and

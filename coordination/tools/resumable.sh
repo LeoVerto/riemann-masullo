@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # resumable.sh [max]: open, unclaimed proof issues with prior work to build on: ours (a released
 # note or Releasing comment that says more than "not started" / "went idle") or anyone else's
-# (a Releasing comment with a real write-up). Skipped: gap/refutation/blocked/stuck labels, files held by
+# (a Releasing comment with a real write-up). Skipped: gap/blocked/stuck labels, files held by
 # an open sweep issue, issues in claims.txt or queued in escalations.txt, issues whose latest
 # Claiming/Releasing comment is someone else's claim. This is HOURLY.md step 8b: re-claim, queue
 # with escalate.sh. Columns: issue, file, source (ours:<model> or the other author), summary,
@@ -46,7 +46,7 @@ def substantive_note(path):
 rows = []
 for it in items:
     n = str(it["number"]); labels = {l["name"] for l in it["labels"]}
-    if labels & {"gap", "refutation", "blocked", "stuck"} or n in claims or n in queued: continue
+    if labels & {"gap", "blocked", "stuck"} or n in claims or n in queued: continue
     m = re.search(r"<!-- sorry: ([^ :]+)", it.get("body") or "")
     path = m.group(1) if m else "-"
     if path != "-" and f"`{path.removeprefix('RiemannMasullo/')}`" in sweep_titles: continue

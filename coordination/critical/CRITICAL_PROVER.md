@@ -9,7 +9,7 @@ model tag `<M>` is `Claude Opus 5.5, default effort`.
 origin/main, token check, pre-claim checks, claims and notes, builds and memguard, elaboration
 traps, sweepers, helper placement, paper errors and gaps, checks, PR format, constraints, report
 file. The issue is not chosen by any critical-path ranking: it is any open, unclaimed proof issue
-(the coordinator checked that it is not `gap`/`refutation`, not in ERRATA, not sweep-held).
+(the coordinator checked that it is not `gap`, not in ERRATA, not sweep-held).
 
 ## What success looks like
 Exactly what `prompts/prover.md` asks for: either a complete proof, or a split into smaller

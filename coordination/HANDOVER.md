@@ -69,8 +69,12 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
   under the worktree lock, so they cannot race.
 - **Slow types (#5398):** agents get the trap and upstream's fixes (HUNTER.md "Elaboration
   traps"); `trap5398.py` flags at-risk issues in `prior.sh` and the hunters' lists.
-- **Refutation is upstream's** (user, 2026-11-22: "Leave refutation to upstream, we just report
-  our findings for now"): no PRs with `Printed.*`/`_false` (FINDINGS.md).
+- **Refutations** (user, 2026-11-22, reversing "leave refutation to upstream"): the Fable findings
+  evaluator decides whether a confirmed false statement is refutable in Lean ("I trust it to make
+  the call"), posts the finding first, writes a `## Refutation sketch` and queues a `refute` row; an
+  Opus escalator hands in `Printed.<name>` + `_false` in `<section>_Printed.lean` with `Refs #n`
+  (FINDINGS.md, HUNTER.md "Refutations", HOURLY 8a). `refutation`-labelled proof issues are
+  ordinary work for our agents (prove the `_false` sorry, `Closes #n`).
 - **Collaborative, not a race.** No pre-proving of sorries without an issue (the sieve may compute
   hits on CPU only). Do not race other contributors or upstream sweepers; help on held files with
   hints. Step back when someone else claimed first.

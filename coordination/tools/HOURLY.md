@@ -80,14 +80,14 @@ consultant to `agents.txt` (the nagger's roster).
    claimants or open PRs.
 8. Opus work: each Opus that step 7 allows takes the first of these that exists (user,
    2026-11-22: escalation and prior work before any fresh issue).
-   a. Escalator: the oldest file with QUEUED `opus` rows in `S/escalations.txt` that our Sonnet has
-      left and no escalator holds; one file each. Never re-claim an issue `escalate.sh` queued.
+   a. Escalator: the oldest file with QUEUED `opus` or `refute` rows in `S/escalations.txt` that our
+      Sonnet has left and no escalator holds; one file each (`refute` rows: HUNTER.md "Refutations"). Never re-claim an issue `escalate.sh` queued.
    b. Prior work, ours and others': `resumable.sh` lists open unclaimed issues with earlier
       attempts, ours first, by file. Skip rows whose agents.txt agent still runs. Take a file's
       rows together, only when the escalator launches this tick: post `Claiming (Claude Opus 5.5, default effort): continuing an earlier
       attempt` on each, add them to `claims.txt`, and run `escalate.sh <n> "continuing prior
       work: <source> <summary>" --prior`. They are now a.
-   c. Last resort, an Opus hunter: any open unclaimed proof issue (not stuck/gap/refutation/ERRATA/
+   c. Last resort, an Opus hunter: any open unclaimed proof issue (not stuck/gap/ERRATA/
       paper-gap, not sweep-held), preferring triage rows rated 3–4 that no Sonnet holds, never in a
       file another of our agents works in. Record in `hunted.txt`.
 8b. Fable: if `escalations.txt` has a QUEUED `fable` row and no Fable consultant runs, launch ONE
@@ -102,5 +102,6 @@ consultant to `agents.txt` (the nagger's roster).
    `escalate.sh <n> "<reason>" --to fable`.
 9. Findings: add every `Finding:` line from new reports and every SUSPECT triage row to
    `S/findings.txt` as QUEUED. If QUEUED rows exist and no evaluator runs, launch ONE findings
-   evaluator (outside the budget); it posts confirmed findings itself.
+   evaluator (outside the budget); it posts confirmed findings itself, and queues a `refute` row
+   (step 8a) for a finding it judges refutable in Lean.
 10. Report in one or two lines.
