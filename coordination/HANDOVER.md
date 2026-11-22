@@ -12,14 +12,17 @@ The folders here (`tools/`, `state/`, `critical/`, `sieve/`, `memory/`, `lean/`)
 them. `/home/agent/{sweeptools,wt}` are compatibility symlinks, and they are lost when the sandbox
 is recreated.
 
-## PAUSE in effect (2026-11-22 04:35Z until the usage reset at 05:40Z)
+## LOW-HANGING MODE (user instruction, 2026-11-22 04:40Z)
 
-- The user is near the usage limit. **Start no new Opus agents before 05:40Z.** The running #3484
-  Opus prover may finish.
-- Sonnet agents run on usage credits (user-approved).
-- The hourly cron is deleted. A one-shot cron (05:45Z, session-only) re-creates it from the "Hourly
-  check" section below, runs one check, and allows Opus provers again. If the session died, do
-  this by hand after 05:40Z.
+- **Run several Sonnet agents on quick wins and start NO Opus agents** until the problem space
+  changes again (no quick wins left, or a new chapter needs mapping). Ask the user before
+  returning to Opus. The #3484 Opus prover that was already running may finish.
+- **Every check looks for new proof issues first.** Run the quick-win loop (shortlist, Haiku
+  triage, Sonnet hunters), aiming for 2–3 Sonnet hunters at once while leads last, with no issue
+  overlap between them (`claims.txt`). Use rated-3 rows once the rows rated 1–2 run out.
+- Sonnet agents run on usage credits (user-approved). The usage pause ended at the 05:40Z reset;
+  a one-shot cron at 05:45Z (session-only) re-creates the hourly check below. If the session
+  died, do that by hand.
 
 ## Standing instructions from the user
 
@@ -29,7 +32,8 @@ is recreated.
   `exact?` runs, over agent reasoning. Agents wait on builds with one blocking wait, not polling.
 - **Models:**
   - Hunters, sievers and fixers run on Sonnet at effort medium, until 4 PRs or about 3 h.
-  - Critical-path provers run on Opus with no effort override, one issue each.
+  - Critical-path provers run on Opus with no effort override, one issue each, but are
+    **suspended in low-hanging mode** (see above).
   - The `advisor` tool is for subagents to escalate to; the coordinator does not call it.
 - **Attribution:** claims read `Claiming (<M>)`. PR bodies carry `Prover: <M>` above the 🤖 line.
   <M> is e.g. `Claude Sonnet 5.5, effort medium` or `Claude Opus 5.5, default effort`.
@@ -92,7 +96,9 @@ is recreated.
 4. **One hourly check.** Run `CronList` first, because duplicates happen. Then create it at minute
    17 with the prompt in "Hourly check" below.
 5. **Relaunch work:**
-   - Critical-path prover: one Opus agent ("Critical path" below).
+   - Critical-path prover: one Opus agent ("Critical path" below), but **not in low-hanging
+     mode**.
+   - 2–3 Sonnet hunters on triaged quick wins (quick-win loop under "State at handoff").
    - A siever when the sieve shows READY or HINT lines.
    - Hunters only on concrete leads.
 
@@ -107,6 +113,13 @@ is recreated.
   pass with `simp [defs]`).
   - First PR: #4323 (four sanity lemmas, Ch07 Sec1b).
   - Its claims are in `claims.txt`. Its report includes how accurate the triage was.
+- **Sonnet hunter `hunt/w4`** (started 04:42Z) on the rated-3 rows: #4050 #4051 (Ch07 Sec1b),
+  #4185 #4189 (Ch05 Sec3a), #4214 #4215 (Ch05 Sec3b). After those it takes the rows rated 1–2 in
+  Ch06 Sec1 from `shortlist/triage2.tsv`.
+- **Haiku triage** (started 04:42Z) of the 42 untriaged rows with issues
+  (`shortlist/untriaged.tsv`: Ch06 Sec1 18, Ch07 Sec1a 2, Sec1b 22), written to
+  `shortlist/triage2.tsv`. Its rated 1–2 rows **outside Ch06 Sec1** are free for the next
+  Sonnet hunter.
 - **The sieve v2:**
   - Its queue ranks files with open issues first (Ch07 Sec1a, Sec1b, Ch05 Sec2b, Sec3a, Sec3b),
     then the slow Ch06 Sec1, which takes >60 min per run and gets at most 2 chunks per cycle.
@@ -114,7 +127,8 @@ is recreated.
   - Retries rc 124/137, then splits. A completed pass shows rc 1.
 
 **New issues dropped ~04:05Z:** 176 proof issues #4034–#4213 (Ch07 Sec1a 8, Sec1b 38, Ch05 Sec2b 52,
-Sec3a 59, Sec3b 18), plus #4033 (AppD Sec1c). Ch06 had none yet. `shortlist.py` was re-run on
+Sec3a 59, Sec3b 18), plus #4033 (AppD Sec1c). Ch06 Sec1 issues (#4264–#4279) appeared by 04:40Z;
+Ch06 Sec2 has none yet (no pre-proving). `shortlist.py` was re-run on
 these files (223 rows, 182 with an issue), and Haiku rated the top 49 (`shortlist/triage.tsv`).
 Rows rated 3 are the next candidates for Sonnet hunters if the w3 ratings prove accurate.
 
@@ -239,11 +253,13 @@ S=<repo>/.agent/sweeptools.`
 4. Relay finished agents in one line each.
 5. Services: warm, watchdog, memguard and sieve.
 6. If READY or HINT lines appear, launch ONE siever unless one is running. No blind hunters.
-   When `shortlist/triage.tsv` has fresh rows rated 1–2 with unclaimed issues, launch a Sonnet
-   hunter on exactly those.
-7. Keep at most 1 Opus critical prover, picking from cone sorries outside held files; record
-   launches in `hunted.txt`.
-8. Report in one or two lines.
+7. **New issues first (low-hanging mode).** Check for proof issues newer than the last
+   shortlist. If there are any, run `shortlist.py` and a Haiku triage of the untriaged rows.
+   Keep 2–3 Sonnet hunters running on rows rated 1–2 (then 3) with unclaimed issues, each
+   listed explicitly in its prompt, no overlap.
+8. **No Opus** while low-hanging mode is in effect. Ask the user before resuming one Opus
+   critical prover (cone sorries outside held files, recorded in `hunted.txt`).
+9. Report in one or two lines.
 
 ## Infrastructure (`<repo>/.agent/sweeptools`; copies in `tools/`)
 
