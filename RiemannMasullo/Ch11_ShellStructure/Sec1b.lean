@@ -56,11 +56,26 @@ abbrev SLocalCarvingIndex (S : Finset V) := {T : Finset V // Disjoint S T}
 /-- Paper: (11.1.2.1), p. 480. A finite set occurs as an index exactly when
 each of its places is outside the base set. -/
 theorem exists_sLocalCarvingIndex_iff (S T : Finset V) :
-    (∃ i : SLocalCarvingIndex (F := F) S, i.val = T) ↔ ∀ v ∈ T, v ∉ S := by sorry
+    (∃ i : SLocalCarvingIndex (F := F) S, i.val = T) ↔ ∀ v ∈ T, v ∉ S := by
+  constructor
+  · rintro ⟨⟨T', h⟩, rfl⟩ v hv hS
+    exact Finset.disjoint_left.1 h hS hv
+  · intro h
+    exact ⟨⟨T, Finset.disjoint_left.2 fun v hS hT ↦ h v hT hS⟩, rfl⟩
 
 /-- Paper: (11.1.2.1), p. 480. There are countably many finite-place indices. -/
 theorem countable_sLocalCarvingIndex (S : Finset V) :
-    Countable (SLocalCarvingIndex (F := F) S) := by sorry
+    Countable (SLocalCarvingIndex (F := F) S) := by
+  have hR : Countable (𝓞 F) := (RingOfIntegers.basis F).repr.injective.countable
+  have hV : Countable V := by
+    have hfg : ∀ I : Ideal (𝓞 F), ∃ s : Finset (𝓞 F), Ideal.span (s : Set (𝓞 F)) = I :=
+      fun I ↦ (IsNoetherian.noetherian I)
+    choose g hg using hfg
+    have hinj : Injective (fun v : V ↦ g v.asIdeal) := fun a b h ↦
+      HeightOneSpectrum.ext (by rw [← hg a.asIdeal, ← hg b.asIdeal]; exact congrArg _ (congrArg _ h))
+    exact hinj.countable
+  unfold SLocalCarvingIndex
+  infer_instance
 
 variable (F) in
 /-- Paper: Theorem 11.1.2.1, p. 480. The zero-line ambient space is weighted L²
@@ -83,13 +98,20 @@ def sLocalCarvingBand (twoSided : Bool) (Λ : ℝ) : Set ℝ :=
 
 /-- Paper: (11.1.2.3), p. 480. Both cutoff bands are Borel. -/
 theorem measurableSet_sLocalCarvingBand (twoSided : Bool) (Λ : ℝ) :
-    MeasurableSet (sLocalCarvingBand twoSided Λ) := by sorry
+    MeasurableSet (sLocalCarvingBand twoSided Λ) := by
+  unfold sLocalCarvingBand
+  split_ifs
+  · exact measurableSet_Icc
+  · exact measurableSet_Ici
 
 /-- Paper: (11.1.2.3), p. 480. The half-line retains norm one at radius two
 and the bounded band excludes norm three.
 Deviation: Sanity check distinguishing the two cutoffs. -/
 theorem sLocalCarvingBand_radius_two :
-    (1 : ℝ) ∈ sLocalCarvingBand false 2 ∧ (3 : ℝ) ∉ sLocalCarvingBand true 2 := by sorry
+    (1 : ℝ) ∈ sLocalCarvingBand false 2 ∧ (3 : ℝ) ∉ sLocalCarvingBand true 2 := by
+  simp only [sLocalCarvingBand, ite_true, ite_false, Bool.false_eq_true, mem_Ici, mem_Icc, not_and,
+    not_le]
+  constructor <;> norm_num
 
 /-- Paper: (11.1.2.3), p. 480. Homogeneous theta of an adelic test with both
 polar values zero is in weighted L² on the zero line. -/
@@ -118,7 +140,8 @@ homogeneous polar-free theta image.
 Deviation: Sanity check for the uncut stage. -/
 theorem sLocalUncutCarving_empty (s : ℝ) (ω : PontryaginDual C₁) :
     sLocalUncutCarving s ω ∅ =
-      (Submodule.span ℂ (range (fun f : ℬ₀ ↦ θ(s, ω, f)))).topologicalClosure := by sorry
+      (Submodule.span ℂ (range (fun f : ℬ₀ ↦ θ(s, ω, f)))).topologicalClosure := by
+  sorry
 
 /-- Paper: (11.1.2.5), p. 480. Before any prime condition the uncut stage is the
 norm-one isotype of the global theta completion from Definition 10.1.1.1. -/
@@ -141,10 +164,24 @@ theorem sLocalCutoffCarving_le_cutoffIsotype (s : ℝ) (hs : 0 ≤ s) (ω : Pont
     (T : Finset V) (J : Set ℝ) (hJ : MeasurableSet J) :
     sLocalCutoffCarving s ω T J hJ ≤ (Wω(s, hs, ω)).map (M(s, J, hJ)).toLinearMap := by sorry
 
+private theorem hardySobolevCutoff_univ_aux {A : Type*} [MeasurableSpace A] {μ : Measure A}
+    (U : Set A) (hU : MeasurableSet U) (hUu : U = univ) (f : Lp ℂ 2 μ) :
+    hardySobolevCutoff hU f = f := by
+  subst hUu
+  refine Lp.ext ?_
+  unfold hardySobolevCutoff
+  filter_upwards [MemLp.coeFn_toLp ((Lp.memLp f).indicator hU.nullMeasurableSet)] with x hx
+  rw [hx]
+  simp
+
 /-- Paper: (11.1.2.3), p. 480. The full norm band leaves the uncut stage unchanged.
 Deviation: Sanity check for the cutoff-stage definition. -/
 theorem sLocalCutoffCarving_univ (s : ℝ) (ω : PontryaginDual C₁) (T : Finset V) :
-    sLocalCutoffCarving s ω T univ MeasurableSet.univ = sLocalUncutCarving s ω T := by sorry
+    sLocalCutoffCarving s ω T univ MeasurableSet.univ = sLocalUncutCarving s ω T := by
+  have h : ∀ x : W(s), M(s, univ, MeasurableSet.univ) x = x := fun x ↦
+    (modulatedAbsoluteCutoffOperator_eq_hardySobolevCutoff m𝔽 (ν(s)) univ MeasurableSet.univ x).trans
+      (hardySobolevCutoff_univ_aux _ _ (preimage_univ) x)
+  simp only [sLocalCutoffCarving, sLocalUncutCarving, h]
 
 /-- Paper: (11.1.2.4), p. 480. The cofinal limit is the intersection of all
 finite-place cutoff stages outside the base set. -/
@@ -249,7 +286,12 @@ def sLocalCarvingIdeleTest (S : Finset V) (f : ℬₛ(S)) : I𝔽 → ℂ :=
 is one.
 Deviation: Sanity check for extension by the outside unit factor. -/
 theorem sLocalCarvingIdeleTest_one (S : Finset V) (f : ℬₛ(S)) :
-    sLocalCarvingIdeleTest S f 1 = f (Multiplicative.ofAdd 1) := by sorry
+    sLocalCarvingIdeleTest S f 1 = f (Multiplicative.ofAdd 1) := by
+  have h1 : (1 : I𝔽) ∈ {g : I𝔽 | ∀ v ∉ S, Valued.v (g.val.2 v) = 1} := fun v _ ↦ by
+    show Valued.v (1 : v.adicCompletion F) = 1
+    exact map_one _
+  rw [sLocalCarvingIdeleTest, Set.indicator_of_mem h1]
+  simp
 
 /-- Paper: (11.1.2.7), p. 480. The raw theta generator sums the extended local
 test over nonzero principal multiples of an idele representing the class. -/
