@@ -207,6 +207,18 @@ claim a whole file's remaining sorries, and they claim fast.
 Sec1a/1b are stated but had no proof issues yet. The sieve pre-computes hits on CPU only;
 hand-ins happen at a normal pace once the issues exist.
 
+### Update 2026-11-22 ~07:20Z: quick wins exhausted, ONE Opus prover running
+- w6 PR #4439 (Ch05 Sec3a: #4133 #4142 #4173; released #4121 #4122, quotient-map elaboration
+  timeout); w9 PR #4472 (Ch05 Sec5: #4383 #4384; 7 Sec5 issues held by factory-davidgu);
+  w11 found Ch06 Sec3 quick wins (#4445 #4452 #4453) claimed by CalebAlbers (PR #4474).
+- Running: w8 (Ch05 Sec4), w10 (Ch05 Sec5 rated-3 + Ch06 Sec2 #4313/#4314), **crit/1526 (Opus)**.
+- Old critical queue fully closed upstream. Sonnet remap wrote a new `critical/QUEUE.md` (12 entries;
+  old kept as `QUEUE-2026-11-21.md`): #1526, #2526, #2667, #4070(+#4072), #3895, ... Cone 91 sorries,
+  21 eligible. Pipeline caveats: mapper scripts hardcode `wt/crit-map` (path edits not saved),
+  `anchors.py` still treats Ch5.2–8 as undigested (cone is a lower bound), `emit.py` doesn't apply
+  claim/ERRATA/paper-gap exclusions. Fix before the next remap (Sonnet job).
+- Next Opus item after #1526: next QUEUE entry, one at a time; back to Sonnets when new issues bring quick wins.
+
 ## Workstreams
 
 ### 1. Critical path (`critical/`)

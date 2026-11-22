@@ -27,4 +27,7 @@ appB (2026-11-22 ~03:50Z): all unclaimed Sec4b/Sec5/Sec6 issues deep (distributi
 Unassigned rated-3 leads: Ch06 Sec1 #4285 #4286 #4287 (triage3b); give to w4 or the next hunter [assigned to w7]
 05:48Z Ch05 Sec5 (triage4b): 1-2: #4383 #4406 #4382 #4413 #4392 #4401 #4422 #4384 #4407 | 3: #4411 #4408 #4409 #4423 #4431 #4420 #4429 | SUSPECT globalThetaTranspose_range, globalHomogeneousThetaTranspose_range (range vs closure, not posted) [assigned to w9]
 06:00Z #4255 sLocalArchimedeanPoleMultiplicity_eq_sum: w5 says likely unprovable as stated (sum of min 0 order = -card needs simple poles); statement-level only, no counterexample; not posted, unclaimed
-06:00Z Ch06 Sec2 #4313 (Haar translation, not short) #4314 unattempted by w5
+06:00Z Ch06 Sec2 #4313 (Haar translation, not short) #4314 unattempted by w5 [assigned to w10]
+06:20Z Ch05 Sec5 rated-3 unattempted: #4409 #4411 #4420 #4423 #4429 #4431 (factory-davidgu holds 7 others in Sec5) [assigned to w10]
+06:45Z Ch06 Sec3 (triage5): only 3 quick wins (#4445 #4452 #4453) [assigned to w11]; rest rated 4-5 or ERRATA/GAP. Quick wins now exhausted after w8/w10/w11 -> next free slot: one Opus critical prover (user rule)
+06:46Z quick wins exhausted (w11 found Ch06 Sec3 claimed by CalebAlbers). Old critical QUEUE.md fully closed upstream -> Sonnet remap (crit/remap) running; then ONE Opus critical prover on its top item (user rule)

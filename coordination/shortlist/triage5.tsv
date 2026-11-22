@@ -1,0 +1,20 @@
+rating	file:line	decl	issue	note
+-	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:140	homogeneousTheta_classMellin_eq_mass_mul	4448	ERRATA (F79)
+2	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:191	globalPolarFreeThetaSpace_mk_eq_iff	4452	Submodule.Quotient.eq; mem_comap; map_sub; sub_eq_zero
+-	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:219	globalConverse_nontrivial_exact	4454	ERRATA (F78) and GAP (TODO line 211)
+4	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:227	globalConverse_normTwist_exact	4455	needs residue map construction and open quotient facts
+-	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:249	globalConverse_normTwist_meromorphic_exact	4456	ERRATA (F81) and GAP (TODO line 235)
+5	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:156	globalConverse_nontrivial	4449	needs Mellin embedding and Bergman ideal range
+2	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:60	finiteHeckeEulerFactor_inv_eq_phase	4445	unfold finiteHeckeEulerFactor; if_pos; inv_inv; ht; cpow_add
+-	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:333	globalPrincipalValueConverse_nontrivial_exact	4459	ERRATA (F78) and GAP (TODO line 324)
+-	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:174	globalConverse_normTwist	4451	ERRATA (I198, I203)
+5	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:299	globalPrincipalValueConverse_nontrivial	4457	needs closed embedding onto Bergman ideal
+4	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:165	globalConverse_existsUnique_normTwist	4450	needs unitary characters trivial on C1 factor through norm
+-	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:75	sLocalHeckeL_poleOrder_eq	4446	ERRATA (I201)
+-	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:316	globalPrincipalValueConverse_normTwist	4458	ERRATA (F82)
+2	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:206	mem_globalPolarFreeThetaSubmodule	4453	unfold globalPolarFreeThetaSubmodule; Submodule.mem_map; mem_adelePolarSubspace
+4	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:109	heckeEulerProductOutside_eq_finite	4447	needs identification of completed L with finite L times removed factors
+-	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:375	globalPrincipalValueConverse_normTwist_divided_exact	4462	ERRATA (F84)
+4	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:364	globalPrincipalValueConverse_mellin	4461	needs Euler product identity for PV on Mellin side
+-	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:347	globalPrincipalValueConverse_normTwist_residues	4460	ERRATA (F83)
+4	RiemannMasullo/Ch06_LocalGlobal/Sec3.lean:47	unramifiedHeckeCharacter_existsUnique_phase	4444	needs unramified local structure and phase reduction

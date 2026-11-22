@@ -42,3 +42,5 @@ crit  2026-11-22T03:17Z  crit/2663 finished: PR #4021 (proved modulo AppD exists
 triage  2026-11-22T04:22Z  haiku triage N=60 on new issues (Ch07 Sec1a/1b, Ch05 Sec2b/3a/3b; 176 issues #4034-#4213)
 w3  2026-11-22T04:23Z  hunt/w3 started (sonnet medium) on 12 Haiku-triaged quick wins (#4042 #4043 #4066 #4068 #4076 #4144 #4166 #4179 #4187 #4195 #4213 #4080)
 3484 opus SPLIT -> PR #4375 (agent stopped after hand-in; low-hanging mode)
+remap 2026-11-22T06:46Z Sonnet critical-queue refresh started (old QUEUE all closed upstream)
+crit  2026-11-22T06:51Z  queue remapped (Sonnet; 12 entries, cone 91, 21 eligible; mapper path edits unsaved, anchors.py treats Ch5.2-8 undigested); crit/1526 started (opus, quick wins exhausted per user rule)

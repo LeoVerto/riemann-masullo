@@ -14,3 +14,8 @@ w7 (finished 05:29Z: PR #4440 closes #4264 #4265 #4273 #4275 #4280 #4285 #4286 #
 w8 (running 05:48Z: triage4a Ch05 Sec4 #4336 #4347 #4355 #4338 #4353 +3s #4344 #4352 #4356)
 w5 (finished 06:00Z: PR #4434 Ch05 Sec3b closes #4239 #4194 #4224 #4229 #4231 #4254; PR #4466 Ch06 Sec2 closes #4309 #4312; released #4304 (choose_spec build blowup >25min); #4221 troyjlee, #4310 johndcobb; #4313 #4314 not attempted)
 w9 (running 06:00Z: triage4b Ch05 Sec5 #4383 #4406 #4382 #4413 #4392 #4401 #4422 #4384 #4407 +3s #4411 #4408 #4409 #4423 #4431 #4420 #4429)
+w9 (finished 06:20Z: PR #4472 Ch05 Sec5 closes #4383 #4384; #4382 #4392 #4401 #4406 #4407 #4413 #4422 claimed by factory-davidgu (prover/4413); released #4408 (choose_spec build blowup 13min); #4409 (adele Fourier dilation lemma private in Ch02 Sec2a) #4411 #4420 #4423 #4429 #4431 not attempted)
+w10 (running 06:21Z: Ch05 Sec5 #4411 #4420 #4423 #4429 #4431 #4409; then Ch06 Sec2 #4314 #4313, separate PR)
+w6 (finished 06:43Z: PR #4439 Ch05 Sec3a closes #4133 #4142 #4173; released #4121 #4122 Sec2b (quotient-map step runs away / isDefEq timeout; helpers in notes); #4154 #4155 #4164 #4085 #4093 #4083 #4087 claimed by others)
+w11 (running 06:45Z: triage5 Ch06 Sec3 #4445 #4452 #4453)
+w11 (finished 06:45Z: nothing done; #4445 #4452 #4453 claimed by CalebAlbers 06:07Z, PR #4474)
