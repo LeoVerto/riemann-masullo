@@ -2,8 +2,10 @@ module
 
 public import RiemannMasullo.Ch10_TraceSpectral.Sec2
 import all RiemannMasullo.Ch10_TraceSpectral.Sec1
+import Mathlib.Analysis.SpecialFunctions.Complex.Analytic
 
 import all RiemannMasullo.Ch07_SchauderBasesZeta.Sec1b
+public import RiemannMasullo.Ch11_ShellStructure.Sec1b
 
 /-! # Orbital Markushevich bases on the 0-line
 
@@ -52,11 +54,6 @@ local notation "q(" v ")" => (Ideal.absNorm (HeightOneSpectrum.asIdeal v))
 
 -- (11.2.0.1) is spectralSobolevPairing at the interval [0, 0].
 -- (11.2.0.2) recalls the quotient operator globalThetaPrincipalValue.
-
-/-- Paper: (11.2.0.2), p. 484. The global principal value preserves the two
-vanishing conditions on adelic tests, so it acts on the polar-free theta space. -/
-theorem adelePrincipalValue_mem_polarSubspace (S : Finset V) (f : ℬ₀) :
-    adelePrincipalValue F S f.val ∈ adelePolarSubspace F := by sorry
 
 local notation "pvTest(" S ", " f ")" =>
   (⟨adelePrincipalValue F S (f : ℬ₀).val, adelePrincipalValue_mem_polarSubspace S f⟩ : ℬ₀)
@@ -111,6 +108,107 @@ Deviation: The inverse on its range can be discontinuous. -/
 theorem globalThetaSobolevPrincipalValue_injective (S : Finset V) (a : ℝ) {s : ℝ}
     (hs : 0 ≤ s) : Injective (P(S, a, hs)) := by sorry
 
+private theorem globalThetaSobolevPrincipalValue_equivariant_val_eq {A B : Type*}
+    (θ : A → B) (pv : A → A) {x x' y y' : A} (hx : x = x') (hy : y = y')
+    (h : θ (pv x') = θ y') : θ (pv x) = θ y := by
+  subst hx hy
+  exact h
+
+private theorem globalThetaSobolevPrincipalValue_equivariant_ker_eq {R M N : Type*}
+    {instR : CommRing R} {instM : AddCommGroup M} {instModM : Module R M}
+    {instN : AddCommGroup N} {instModN : Module R N}
+    {θ : @LinearMap R R _ _ (RingHom.id R) M N instM.toAddCommMonoid instN.toAddCommMonoid
+      instModM instModN}
+    {x y : M}
+    (h : @Submodule.Quotient.mk R M instR.toRing instM instModM (LinearMap.ker θ) x =
+         @Submodule.Quotient.mk R M instR.toRing instM instModM (LinearMap.ker θ) y) :
+    θ x = θ y := by
+  let _ := instR; let _ := instM; let _ := instModM; let _ := instN; let _ := instModN
+  rw [Submodule.Quotient.eq, LinearMap.mem_ker, map_sub, sub_eq_zero] at h
+  exact h
+
+private theorem globalThetaSobolevPrincipalValue_equivariant_hcomm (S : Finset V) (hn : S.Nonempty)
+    (g : IdeleGroup (𝓞 F) F) (f f₁ f₂ : ℬ₀)
+    (hf₁ : f₁.val = schwartzBruhatUnitTranslate g f.val)
+    (hf₂ : f₂.val = schwartzBruhatUnitTranslate g (adelePrincipalValue F S f.val)) :
+    theta(pvTest(S, f₁)) = theta(f₂) :=
+  (globalPolarFreeThetaSpace_mk_eq_iff (pvTest(S, f₁)) f₂).mpr
+    (globalThetaSobolevPrincipalValue_equivariant_val_eq
+      (adelicThetaLinearMap F) (adelePrincipalValue F S) hf₁ hf₂
+      (globalThetaSobolevPrincipalValue_equivariant_ker_eq
+        (globalThetaPrincipalValue_equivariant hn g f.val)))
+
+private theorem globalThetaSobolevPrincipalValue_equivariant_val_eq_empty {α B : Type*}
+    (S₀ S : α) (hS : S = S₀) (pv : α → B → B) (hpv : ∀ x, pv S₀ x = x) (tr : B → B)
+    {f f₁ f₂ : B} (hf₁ : f₁ = tr f) (hf₂ : f₂ = tr (pv S f)) :
+    pv S f₁ = f₂ := by
+  subst hS
+  rw [hpv, hf₁, hf₂, hpv]
+
+private theorem globalThetaSobolevPrincipalValue_equivariant_id_apply {M : Type*}
+    {instM : AddCommMonoid M} {instMod : @Module ℂ M _ instM}
+    {f : @LinearMap ℂ ℂ _ _ (RingHom.id ℂ) M M instM instM instMod instMod}
+    (hf : f = @LinearMap.id ℂ M _ instM instMod) (x : M) : f x = x := by
+  subst hf
+  rfl
+
+private theorem globalThetaSobolevPrincipalValue_equivariant_conj_id {A B C ι : Type*}
+    [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B] [AddCommGroup C] [Module ℂ C]
+    [TopologicalSpace C] (p : SeminormFamily ℂ (TensorProduct ℂ A B) ι)
+    (e : WithGeneratingSeminorms (TensorProduct ℂ A B) p ≃L[ℂ] C) (g : A →ₗ[ℂ] A)
+    (h : B →ₗ[ℂ] B) (hg : g = LinearMap.id) (hh : h = LinearMap.id) :
+    e.toLinearMap.comp ((TensorProduct.map g h).comp e.symm.toLinearMap) = LinearMap.id := by
+  subst hg hh
+  rw [TensorProduct.map_id]
+  ext x
+  exact e.apply_symm_apply x
+
+private theorem globalThetaSobolevPrincipalValue_equivariant_hcomm_empty
+    (S : Finset V) (hn : ¬ S.Nonempty) (g : IdeleGroup (𝓞 F) F)
+    (f f₁ f₂ : ℬ₀)
+    (hf₁ : f₁.val = schwartzBruhatUnitTranslate g f.val)
+    (hf₂ : f₂.val = schwartzBruhatUnitTranslate g (adelePrincipalValue F S f.val)) :
+    theta(pvTest(S, f₁)) = theta(f₂) := by
+  have key : ∀ h : (w : (∅ : Finset V)) →
+      SchwartzBruhat (Multiplicative (w.val.adicCompletion F)) →ₗ[ℂ]
+        SchwartzBruhat (Multiplicative (w.val.adicCompletion F)),
+      PiTensorProduct.map (R := ℂ) h = LinearMap.id := fun h ↦ by
+    rw [show h = fun _ ↦ LinearMap.id from funext fun w ↦ absurd w.2 (Finset.notMem_empty _)]
+    exact PiTensorProduct.map_id
+  have hP : sAdelePrincipalValue F (Finset.Subset.refl (∅ : Finset V)) = LinearMap.id := by
+    unfold sAdelePrincipalValue
+    exact globalThetaSobolevPrincipalValue_equivariant_conj_id _ _ _ _ rfl (key _)
+  have hA : adelePrincipalValue F ∅ = LinearMap.id := by
+    unfold adelePrincipalValue
+    exact globalThetaSobolevPrincipalValue_equivariant_conj_id _ _ _ _ hP rfl
+  exact congrArg (fun h : ℬ₀ ↦ theta(h))
+    (Subtype.ext (globalThetaSobolevPrincipalValue_equivariant_val_eq_empty ∅ S
+      (Finset.not_nonempty_iff_eq_empty.mp hn)
+      (fun T x ↦ adelePrincipalValue F T x)
+      (globalThetaSobolevPrincipalValue_equivariant_id_apply hA)
+      (fun x ↦ schwartzBruhatUnitTranslate g x) hf₁ hf₂))
+
+private theorem globalThetaSobolevPrincipalValue_equivariant_aux
+    {C B X Y Z : Type*} [TopologicalSpace Z] [T2Space Z]
+    (val : X → B) (j : Y → Z) (q : X → Y) (hi : DenseRange fun x ↦ j (q x))
+    (P : Z → Z) (R : C → Z → Z) (hP : Continuous P) (k g' : C) (hg : g' = k)
+    (hR : Continuous (R g'))
+    (pv : X → X) (hPapp : ∀ x, P (j (q x)) = j (q (pv x)))
+    {smul : ℝ → Z → Z} (c : ℝ) (hc : c = 1)
+    (tr : B → B)
+    (hRtr : ∀ x : X, ∃ x' : X, val x' = tr (val x) ∧ R g' (j (q x)) = smul c (j (q x')))
+    (hone : ∀ z : Z, smul 1 z = z)
+    (hcomm : ∀ (f f₁ f₂ : X), val f₁ = tr (val f) → val f₂ = tr (val (pv f)) →
+      q (pv f₁) = q f₂)
+    (u : Z) :
+    P (R k u) = R k (P u) := by
+  subst hg
+  refine congrFun (hi.equalizer (hP.comp hR) (hR.comp hP) (funext fun x ↦ ?_)) u
+  obtain ⟨x₁, hx₁, h1⟩ := hRtr x
+  obtain ⟨x₂, hx₂, h2⟩ := hRtr (pv x)
+  dsimp only [Function.comp_apply]
+  rw [h1, hc, hone, hPapp, hPapp, h2, hc, hone, hcomm x x₁ x₂ hx₁ hx₂]
+
 /-- Paper: Proposition 11.2.0.1(2), pp. 484–485. The extension commutes with
 norm-one translations and hence preserves all norm-one isotypes.
 Deviation: This compatibility is stated separately from closed range and holds
@@ -118,7 +216,32 @@ without the lower bound on the degree. -/
 theorem globalThetaSobolevPrincipalValue_equivariant (S : Finset V) (a : ℝ)
     {s : ℝ} (hs : 0 ≤ s) (k : C₁) (u : H(a, hs)) :
     let R := (exists_globalThetaSobolevAction (F := F) a hI hs).choose
-    P(S, a, hs) (R k.val u) = R k.val (P(S, a, hs) u) := by sorry
+    P(S, a, hs) (R k.val u) = R k.val (P(S, a, hs) u) := by
+  intro R
+  have hq : Surjective (fun f : ℬ₀ ↦ theta(f)) := Submodule.mkQ_surjective
+    ((LinearMap.ker (adelicThetaLinearMap F)).comap (adelePolarSubspace F).subtype)
+  have hdense : DenseRange (fun f : ℬ₀ ↦ j(a, hs) (theta(f))) :=
+    (globalThetaSobolev_dense (F := F) a hI hs).comp hq.denseRange (j(a, hs)).continuous
+  refine Exists.elim (QuotientGroup.mk_surjective k.val) fun g hg ↦ ?_
+  have hc : (((m𝔽 (QuotientGroup.mk g)).val : ℝ) ^ (-a) : ℝ) = 1 := by
+    have hk : ideleClassNorm F k.val = 1 := k.property
+    change ((ideleClassNorm F (QuotientGroup.mk g)).val : ℝ) ^ (-a) = 1
+    rw [hg, hk]
+    simp
+  exact globalThetaSobolevPrincipalValue_equivariant_aux Subtype.val (j(a, hs))
+    (fun f : ℬ₀ ↦ theta(f)) hdense
+    (P(S, a, hs)) (fun c v ↦ R c v) (P(S, a, hs)).continuous k.val (QuotientGroup.mk g) hg
+    (R (QuotientGroup.mk g)).continuous
+    (fun f ↦ pvTest(S, f)) (globalThetaSobolevPrincipalValue_apply S a hs)
+    _ hc
+    (fun f' ↦ schwartzBruhatUnitTranslate g f')
+    ((exists_globalThetaSobolevAction (F := F) a hI hs).choose_spec.2.2 g)
+    (fun z ↦ one_smul ℝ z)
+    (if hn : S.Nonempty then
+      globalThetaSobolevPrincipalValue_equivariant_hcomm S hn g
+    else
+      globalThetaSobolevPrincipalValue_equivariant_hcomm_empty S hn g)
+    u
 
 /-- Paper: Proof of Proposition 11.2.0.1, pp. 484–485. At an unramified
 singleton place, the 0-line extension is the difference with the uniformizer translate.
@@ -232,11 +355,45 @@ abbrev OrbitalJetIndex (χ : PontryaginDual C𝔽) (S : Finset V) (s : ℝ) :=
   {j : ℝ × ℕ //
     j.2 < spectralBoundaryMultiplicity s (orbitalEulerMultiplicity χ S (frequency(j.1)))}
 
+private theorem OrbitalJetIndex.isZero_analyticAt (χ : PontryaginDual C𝔽) (S : Finset V)
+    (z : ℂ) : AnalyticAt ℂ (reciprocalPartialHeckeEulerProduct χ S) z := by
+  have h : ∀ v ∈ S, AnalyticAt ℂ (fun s ↦ (finiteHeckeEulerFactor χ v s)⁻¹) z := by
+    intro v _
+    have hq : (Ideal.absNorm v.asIdeal : ℂ) ∈ Complex.slitPlane :=
+      Complex.natCast_mem_slitPlane.mpr ((Ideal.absNorm_eq_zero_iff).not.mpr v.ne_bot)
+    classical
+    by_cases hv : (ideleClassNormTwist χ 0).IsUnramifiedAt v
+    · have : (fun s ↦ (finiteHeckeEulerFactor χ v s)⁻¹) = fun s ↦
+          1 - (ideleClassNormTwist χ 0).localValue v * (Ideal.absNorm v.asIdeal : ℂ) ^ (-s) := by
+        funext s
+        rw [finiteHeckeEulerFactor, ite_eq_left hv, inv_inv]
+      rw [this]
+      exact analyticAt_const.sub
+        (analyticAt_const.mul (AnalyticAt.cpow analyticAt_const analyticAt_id.neg hq))
+    · have : (fun s ↦ (finiteHeckeEulerFactor χ v s)⁻¹) = fun _ ↦ 1 := by
+        funext s
+        rw [finiteHeckeEulerFactor, ite_eq_right hv, inv_one]
+      rw [this]
+      exact analyticAt_const
+  have := Finset.analyticAt_prod S h
+  convert this using 1
+  funext s
+  simp [reciprocalPartialHeckeEulerProduct]
+
+private theorem OrbitalJetIndex.isZero_of_order_pos {f : ℂ → ℂ} {z : ℂ} (hf : AnalyticAt ℂ f z)
+    (h : 0 < (meromorphicOrderAt f z).untop₀.toNat) : f z = 0 := by
+  by_contra hz
+  have h0 : analyticOrderAt f z = 0 := hf.analyticOrderAt_eq_zero.mpr hz
+  rw [hf.meromorphicOrderAt_eq, h0] at h
+  simp at h
+
 /-- Paper: Theorem 11.2.0.2(1)–(2), p. 485. An admitted jet has a zero of the
 reciprocal Euler product at its ordinate. -/
 theorem OrbitalJetIndex.isZero {χ : PontryaginDual C𝔽} {S : Finset V} {s : ℝ}
     (j : OrbitalJetIndex χ S s) :
-    reciprocalPartialHeckeEulerProduct χ S (frequency(j.val.1)) = 0 := by sorry
+    reciprocalPartialHeckeEulerProduct χ S (frequency(j.val.1)) = 0 :=
+  OrbitalJetIndex.isZero_of_order_pos (OrbitalJetIndex.isZero_analyticAt χ S _)
+    (Nat.zero_lt_of_lt (lt_of_lt_of_le j.property (min_le_left _ _)))
 
 /-- Paper: Theorem 11.2.0.2 and (11.2.0.5), p. 485. Each admitted jet gives a
 reciprocal-weight Sobolev vector.
