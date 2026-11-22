@@ -21,7 +21,12 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   nice 19). **Claims are kept; do not release them** (user, 17:55Z: "we're continuing soon"; `claims.txt`); upstream auto-releases claims with no PR after 8 h,
   so re-launch or refresh before ~01:00Z on 2026-11-23.
 - **Resume these from notes (fresh agents, never resume transcripts):**
-  - crit2526 (Opus hunter) #2526, notes/2526.md, wt/crit-2526.
+  - crit2526 (Opus hunter) #2526: SPLIT nearly done, uncommitted edit to Sec4.lean in wt/crit-2526
+    (backup `.agent/Sec4.v4.lean`). Proved: `infiniteLocalIdelicZFunction_unitTranslate`,
+    `infiniteLocalEulerFactor_twist_ne_zero`; sorried helpers: uniqueness, Z/L family, Z(Gaussian)=L.
+    Only the main theorem's body times out (heartbeats at Sec4:3430) in module mode; the same
+    assembly passes in a non-module probe. Next: close it with one term from a generic assembly
+    lemma, then full build, lint, signatures, PR (body ready in `.agent/PRBODY.md`; notes/2526.md).
   - esc-sec5 (Opus escalator) Ch05 Sec5: **#4408 #4411 #4420 #4423 #4429 #4431 PROVED**, committed
     f0a3c40 on local branch hunt/esc-sec5-1 (wt/esc-sec5, not pushed, no PR); #4409 checks clean,
     uncommitted edit on top. To hand in one PR for all seven: module build, full `lake build`,

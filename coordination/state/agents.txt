@@ -1,2 +1,1 @@
 # running hunters: name agentId start_epoch issues...  (coordinator maintains; remove a line when the hunter finishes)
-crit2526 a993320c057140eec 1795363470 2526
