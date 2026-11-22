@@ -49,10 +49,11 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 ## Standing instructions from the user
 
 - **Coordinator only.** No proofs, builds or long log reads in the main session; delegate and
-  relay short reports. Do not call `advisor` from the coordinator: it is for subagents.
+  relay short reports. The `advisor` tool is turned off (user, 2026-11-22); escalation goes
+  through `escalate.sh` and the Fable consultant instead.
 - **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning.
   Agents wait on builds with one blocking wait, never polling turns. Keep wake-ups sparse.
-- **Staffing (user, 2026-11-22 ~16:30Z, after the token allowance increased):** "we can now
+- **Staffing (user, 2026-11-22 ~16:00Z, after the token allowance increased):** "we can now
   always keep two Opus hunters running plus 4 Sonnets and two Opus escalators". Keep these slots
   filled at every check (quick-wins mode now runs alongside Opus, not before it):
   1. **4 Sonnet hunters** on quick wins: triage rows rated 1–2, then 3 (HUNTER.md).
@@ -63,9 +64,19 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   3. **2 Opus hunters** on **any** open unclaimed proof issue (CRITICAL_PROVER.md; not
      `gap`/`refutation`/ERRATA/`TODO(paper-gap)`, not sweep-held), preferring triage rows rated
      3–4 that no Sonnet holds. No cone remapping ("the cone doesn't matter at this point").
+  4. **1 Fable consultant at a time** (user, 2026-11-22 ~16:00Z, Fable allowance; outside the 8
+     slots): issues an Opus agent tried and failed go `--to fable` with a stuck packet
+     (HUNTER.md). The consultant (`FABLE.md`, model fable) reads only the packet, may probe a
+     skeleton with `lake lean`, and writes a `## Fable route` (ROUTE / SPLIT / FINDING /
+     NO-ROUTE). ROUTE and SPLIT go back to an Opus escalator; the claim stays ours throughout.
+     Fable is not used as an advisor: that would send the whole 100–200k-token transcript per call.
+     **The coordinator can escalate to Fable directly** when needed (Opus gave up without
+     escalating, an UNCLEAR finding, a blocker shared by several issues, repeated failed attempts
+     upstream): it writes a short packet from the notes, with no Lean runs, and uses the same
+     `escalate.sh --to fable` (HOURLY.md step 8b).
   No two agents share a file. Interpretation of "Opus hunters" (CRITICAL_PROVER.md brief) is the
   coordinator's; confirm with the user if in doubt.
-- **Claim what we work on or have queued.** Escalation keeps the claim (user, 2026-11-22 ~17:00Z:
+- **Claim what we work on or have queued.** Escalation keeps the claim (user, 2026-11-22 ~16:00Z:
   no release and re-claim when an issue moves from Sonnet to Opus): `escalate.sh` posts nothing,
   leaves the issue in `claims.txt` and queues it in `escalations.txt`; `status.sh` shows it as
   ESCALATED, not STALE. Upstream auto-releases a claim with no PR after 8 h, so a queued claim
@@ -85,7 +96,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   (`fork`). It must be a CLASSIC token (repo, workflow, read:org); check with `tokencheck.sh`.
 - **Upstream posting:** ask the user before posting anything new. Standing exceptions: normal
   Claiming/Releasing; sieve hints on open `sweep` issues; extensions of #1288, #561 and #3230;
-  **paper findings that an Opus evaluator has confirmed** (user, 2026-11-22 ~16:45Z: "Paper
+  **paper findings that an Opus evaluator has confirmed** (user, 2026-11-22 ~16:00Z: "Paper
   findings should be evaluated by Opus and then raised"; `FINDINGS.md`, queue `findings.txt`).
   **Never raise BLOCKERS §0** (Main.lean integration is wave 4+, by the project's choice).
 - **Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main** (`git show origin/main:<file>`)
@@ -179,7 +190,7 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
 | `status.sh` | RAM, disk, token, cache, PR verdicts, claims, orphan and stale claims, warm base, label census, `== sieve`. |
 | `cleanup.sh` | Removes worktrees whose PR merged. |
 | `tokencheck.sh` | Classic token with the right scopes? Step 0 of every brief. |
-| `escalate.sh <n> "<reason>"` | Hands a stuck issue to the Opus escalators without releasing it: no comment, stays in `claims.txt`, row in `escalations.txt`, note appended. |
+| `escalate.sh <n> "<reason>"` | Hands a stuck issue to the next tier (`--to opus` default, `--to fable` with a stuck packet) without releasing it: no comment, stays in `claims.txt`, row in `escalations.txt`, note appended. |
 | `release.sh <n> "<reason>"` | Posts `Releasing (<M>): reason` plus `notes/<n>.md`, updates `claims.txt`, archives to `notes/released/`. |
 | `watchdog.sh` | When every transcript has been idle for 20 min, releases all claims via `release.sh`; auto-resume after 2 h is disabled by `no-resume`. |
 | `memguard.sh` | Below 1000 MB available (`LOW`), kills the newest sieve Lean process, otherwise the newest Lean process. |
@@ -188,6 +199,7 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
 | `nag-wait.sh`, `notes-stale.sh`, `NAGGER.md` | Notes nagger. |
 | `HUNTER.md`, `SIEVER.md`, `critical/CRITICAL_PROVER.md` | Agent briefs; HUNTER.md holds the rules shared by all three. |
 | `HOURLY.md` | The hourly check's instructions, read by the cron on every tick. |
+| `FABLE.md` | Fable consultant brief: route from a stuck packet, no builds or PRs. |
 | `FINDINGS.md`, `findings.txt` | Opus findings-evaluator brief and its queue. |
 
 State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims.txt`, `hunters.txt`

@@ -9,4 +9,4 @@ The user (2026-11-21, campaign takeover): "use Sonnet medium for them" and "Keep
 
 **Why:** usage budget (see [[subagent-resume-cost]]) and fewer coordinator wake-ups.
 
-**How to apply:** hunters, sievers and fixers use `model: "sonnet"`, `effort: "medium"` and run until their list is done, 4 PRs, or about 3 h. Opus provers and escalations use model opus with no effort override ([[quick-wins-mode]]). The user approved Haiku for triage and the notes nagger. Related: [[low-hanging-sweep]].
+**How to apply:** hunters, sievers and fixers use `model: "sonnet"`, `effort: "medium"` and run until their list is done, 4 PRs, or about 3 h. Opus provers and escalations use model opus with no effort override ([[quick-wins-mode]]). The user approved Haiku for triage and the notes nagger. Fable (model fable, no effort override) only as the one-at-a-time consultant of [[escalation-ladder]]. Related: [[low-hanging-sweep]].

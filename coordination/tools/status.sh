@@ -42,7 +42,7 @@ for n in $(sort -u $T/claims.txt); do
   [ "$st" = closed ] && { echo "CLOSED #$n (remove from claims.txt)"; continue; }
   [ -n "$t" ] || { echo "NO-CLAIM-COMMENT #$n"; continue; }
   age=$(( (now - $(date -d "$t" +%s)) / 60 ))
-  if grep -q "^$n " $T/escalations.txt 2>/dev/null; then
+  if grep -qE "^$n [a-z]+ [^ ]+ [^ ]+ (QUEUED|TAKEN)" $T/escalations.txt 2>/dev/null; then
     # escalated with the claim kept: not stale; refresh it before upstream's 8 h auto-release
     if [ $age -gt 420 ]; then echo "ESCALATED #$n REFRESH-CLAIM (last claim ${age}m ago)"; else echo "ESCALATED #$n (claim ${age}m old)"; fi
     continue

@@ -39,8 +39,8 @@ a little thought. Skip anything deep.
    `git fetch` fails with "cannot lock ref", another agent is fetching: retry.
 5. **Prove.** Throw automation at each goal before reasoning (`exact?`, `apply?`, `aesop`, `simp?`,
    `fun_prop`, `positivity`, `norm_num`, `omega`, `linarith`, `nlinarith`, under `timeout`). If an
-   issue is harder than it looked, release it rather than sink time. If you have an `advisor` tool,
-   call it when stuck or before releasing an issue that looked short.
+   issue is harder than it looked, release it rather than sink time. If you tried and failed,
+   escalate instead of releasing (see "Claims, notes, release"): Sonnet to Opus, Opus to Fable.
 6. **Hand in, one PR per touched Lean file.** All issues you did in one file go in one PR, with one
    `Closes #<n>` per proof; a batch spanning files gives one PR per file (helpers and imports go
    with the file that needs them). Checks and PR format are below.
@@ -70,10 +70,25 @@ a little thought. Skip anything deep.
   someone else holds it, or the finding route below). It posts `Releasing (<M>): …` with your
   notes, removes the claim from `claims.txt` and archives the notes. Update the notes first.
 - **Escalators** (Opus agents given escalated issues): the claim is already ours, so post no
-  `Claiming`. Mark the row `TAKEN <your name> <UTC>` in `escalations.txt`, change the `Model:` line
+  `Claiming`. If the notes have a `## Fable route`, implement that route first. Mark the row `TAKEN <your name> <UTC>` in `escalations.txt`, change the `Model:` line
   of `notes/<n>.md` to your tag, and read the Sonnet's notes before anything else. In the PR body
   write `Prover: <M> (continuing an attempt by <Sonnet tag>)`. When done, mark the row `DONE <PR url>`
   or release with `release.sh` (which then posts your notes).
+- **Stuck packet** (Opus agents, before escalating to Fable): append to `notes/<n>.md`, at most
+  ~150 lines, so a fresh Fable consultant can work from it alone (it does not see your transcript):
+  ```
+  ## Stuck packet
+  Statement: `<decl>` (<file>:<line> at origin/main <sha>), verbatim
+  Goal at the stuck point: <trimmed goal state from `lake lean`, at most 40 lines>
+  Key definitions: <the 2-3 that matter, verbatim or file:line>
+  Missing: <what you believe is missing: a lemma, an instance, an estimate, a reformulation>
+  Paper: <item, page; what the printed proof does at this step>
+  Partial work: <worktree path and commit, if any; keep that worktree>
+  ```
+  The failed approaches above it (with their errors) are part of the packet. Then run
+  `$S/escalate.sh <n> "<one-line reason>" --to fable`: the claim stays ours.
+- An escalator stuck on an issue: write the stuck packet and escalate `--to fable` (only once per
+  issue; if the notes already have a `## Fable route` that also failed, release it).
 - After the PR is open, remove its issues from `claims.txt` and delete their `notes/<n>.md`.
 
 ## Builds and processes

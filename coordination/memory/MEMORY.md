@@ -3,7 +3,7 @@
 - [Low-hanging sweep](low-hanging-sweep.md) — campaign pointer: HANDOVER.md on fork branch coordination/low-hanging-campaign; halted 2026-11-22 11:32Z (spend limit)
 - [Subagent resume cost](subagent-resume-cost.md) — after a halt, start fresh agents from notes/<n>.md handoffs; never resume long transcripts
 - [Subagent model and effort](subagent-model-effort.md) — Sonnet medium until list done / 4 PRs / ~3 h; Opus no override; Haiku for triage and nagger
-- [Advisor is for subagents](advisor-for-subagents.md) — coordinator does not call advisor; Sonnet hunters escalate to it
+- [Escalation ladder](escalation-ladder.md) — Sonnet -> Opus escalator -> Fable consultant (stuck packet, route only) -> Opus; claim kept; advisor off
 - [Critical-path workstream](critical-path-workstream.md) — Opus provers on any open unclaimed issue (no cone since 07:30Z); results; never raise BLOCKERS §0
 - [Coordinator only](coordinator-only.md) — main session delegates everything; on restart, settle caching with one subagent first
 - [State lives in .agent](state-in-dot-agent.md) — sweeptools, worktrees, memory all under <repo>/.agent; memory dir is a symlink
@@ -12,7 +12,7 @@
 - [Claims, notes, attribution](claims-notes-attribution.md) — read threads first; claim worked-on and queued issues; notes/<n>.md; release.sh; tag model+effort
 - [Sieve naming](sieve-naming.md) — our tactic screen = "sieve" (sieve.sh, SIEVER.md hand-in brief), not upstream "sweeper"
 - [Collaborative, not a race](collaborative-not-race.md) — no pre-proving before issues exist; no racing others or sweepers; help via hints
-- [Quick-wins mode](quick-wins-mode.md) — always 4 Sonnet hunters + 2 Opus hunters (any open issue) + 2 Opus escalators (user, 2026-11-22 ~16:30Z)
+- [Quick-wins mode](quick-wins-mode.md) — always 4 Sonnet hunters + 2 Opus hunters (any open issue) + 2 Opus escalators (user, 2026-11-22 ~16:00Z)
 - [Read docs from origin/main](read-docs-origin-main.md) — AGENTS/CONTRIBUTING/ERRATA via git show origin/main; gap handling binds hunters
 - [One PR per file](one-pr-per-file.md) — hunter/siever PRs each cover exactly one Lean file (user, 2026-11-22)
 - [Nagger out of session](nagger-out-of-session.md) — notes nagger = one long-running Haiku loop (NAGGER.md), never cron ticks in this session

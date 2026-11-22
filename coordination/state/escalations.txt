@@ -1,2 +1,2 @@
-# Escalation queue: stuck Sonnet issues handed to Opus with the claim KEPT (escalate.sh).
-# <issue> <file> <queued UTC> <QUEUED | TAKEN <agent> <UTC> | DONE <PR url or released>> <from model>: <reason>
+# Escalation queue: stuck issues handed to the next tier with the claim KEPT (escalate.sh).
+# <issue> <level opus|fable> <file> <queued UTC> <QUEUED | TAKEN <agent> <UTC> | DONE <PR url / route / finding / released>> <from model>: <reason>

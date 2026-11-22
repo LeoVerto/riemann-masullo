@@ -5,7 +5,7 @@ metadata:
   type: feedback
 ---
 
-The user, 2026-11-22 ~16:45Z: "Paper findings should be evaluated by Opus and then raised."
+The user, 2026-11-22 ~16:00Z: "Paper findings should be evaluated by Opus and then raised."
 
 **Why:** CONTRIBUTING asks for findings on the issue (a contribution in its own right). Holding them for the user left them unreported for hours, and the independent Opus re-check keeps weak Sonnet/Haiku leads off the tracker.
 

@@ -42,6 +42,19 @@ issue we work on or have queued for one of our agents.
    'Escalators'). Your name is esc-<file>, branch prefix esc/<file>, model tag Claude Opus 5.5,
    default effort. Your escalated issues: <rows>." Report `notes/report-esc-<file>.md`. Up to 2
    escalators; a slot with nothing to escalate stays empty. Never re-claim an escalated issue.
+   Only rows with level `opus` go to escalators.
+8b. Fable: if `escalations.txt` has a QUEUED row with level `fable` and no Fable consultant runs,
+   launch ONE (model fable, outside the 8 slots): "Read S/FABLE.md and follow it. Your issue:
+   <row>." Its ROUTE/SPLIT hand-back appears as a new `opus` row for the escalators. Add it to
+   `agents.txt`.
+   **The coordinator may escalate to Fable itself** when that is the better use of tokens: an
+   Opus agent released an issue it tried and failed without escalating; the Opus evaluator marked
+   a finding UNCLEAR; the same blocker keeps stopping several issues (one packet for the shared
+   step); or an important issue has had two or more failed attempts upstream. Claim it if it is
+   not ours (`Claiming (Claude Fable 5.2, default effort)`, add to `claims.txt`), append a short
+   `## Stuck packet` to `notes/<n>.md` from the notes, release comments and the issue (no Lean
+   runs: leave "Goal at the stuck point" as `to compute`), then run
+   `escalate.sh <n> "<reason>" --to fable`. One Fable consultant at a time still applies.
 9. Keep 2 Opus hunters (`critical/CRITICAL_PROVER.md`, tag "Claude Opus 5.5, default effort") on
    any open unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held), preferring
    triage rows rated 3–4 that no Sonnet holds, never in a file another of our agents works in.

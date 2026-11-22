@@ -23,10 +23,12 @@ in your notes, release the issue, and report.
   unreleased claim, stop and report. Earlier `Releasing` comments and `$S/notes/released/<n>-*.md`
   hold previous attempts; start from them.
 - Worktree `$S/newwt.sh crit/<n> $R/.agent/wt/crit-<n>`, branch `crit/<n>`, pushed to `fork`.
-- Before committing to an approach on a deep declaration, when a proof is not converging, and
-  before releasing, call your `advisor` tool if you have one.
+- **Stuck:** before releasing an issue you tried and failed, write the stuck packet (HUNTER.md
+  "Stuck packet") and run `$S/escalate.sh <n> "<reason>" --to fable`. A Fable consultant then
+  writes a route, and an Opus escalator implements it, all under our claim. Release instead if the
+  notes already have a `## Fable route` that failed.
 - Budget: about 4 hours. When it runs out, hand in a split if it is real progress, otherwise
-  release with notes that record the approach.
+  escalate to Fable as above (or release, if a Fable route already failed).
 - When done, append one line to `$S/critical/status.txt`:
   `<n> <PROVED|SPLIT|FALSE|RELEASED|BLOCKED> <PR url or -> <one-line note>`.
 - Report: issue, outcome (proved / split into which lemmas / false / released), PR URL, and anything

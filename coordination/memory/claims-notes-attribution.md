@@ -15,7 +15,7 @@ The user, 2026-11-22:
 
 **How to apply:**
 - Tag <M> = `Claude Sonnet 5.5, effort medium` / `Claude Opus 5.5, default effort`. Claims start `Claiming (<M>)` (upstream parses only the first word). PR bodies carry `Prover: <M>` above the 🤖 line.
-- Claim every issue we work on OR have queued for one of our agents. Escalation from Sonnet to Opus KEEPS the claim (user, 2026-11-22 ~17:00Z, asked to stop the release-then-re-claim): the Sonnet runs `escalate.sh` (no comment, stays in claims.txt, row in escalations.txt); the escalator posts no Claiming. status.sh shows such issues as ESCALATED, not STALE. Only a queued claim older than 7 h gets one refresh comment, because of upstream's 8 h auto-release.
+- Claim every issue we work on OR have queued for one of our agents. Escalation from Sonnet to Opus KEEPS the claim (user, 2026-11-22 ~16:00Z, asked to stop the release-then-re-claim): the Sonnet runs `escalate.sh` (no comment, stays in claims.txt, row in escalations.txt); the escalator posts no Claiming. status.sh shows such issues as ESCALATED, not STALE. Only a queued claim older than 7 h gets one refresh comment, because of upstream's 8 h auto-release.
 - `.agent/sweeptools/notes/<n>.md` is the only handoff file: Model, Status, Failed approaches (first), Blocked by, Useful, Next idea. Update it after every build or failed approach.
 - Release ONLY via `release.sh <n> "<reason>"`: it posts the notes, updates claims.txt and archives to notes/released/. The watchdog uses it too.
 - The watchdog releases ALL claims when every session is idle, as at the usage halts (10:03Z and 12:03Z on 2026-11-22). After resuming, re-claim what the resumed agents and the escalation queue hold.
