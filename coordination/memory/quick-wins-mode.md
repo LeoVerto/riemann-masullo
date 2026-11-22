@@ -1,22 +1,17 @@
 ---
 name: quick-wins-mode
-description: Quick-wins mode (renamed from "low-hanging mode", 2026-11-22) - since ~16:00Z always 4 Sonnet hunters, 1 Opus hunter (any open issue; user cut it from 2 at ~16:20Z), 2 Opus escalators (stuck Sonnet issues)
+description: Staffing in riemann-masullo (user, 2026-11-22) - 4 Sonnet hunters on quick wins plus 3 Opus slots assigned by need, escalation first, otherwise Opus hunters
 metadata:
   type: feedback
 ---
 
-The user's instructions, 2026-11-22:
-- 04:40Z: "focus on the low-hanging fruits, i.e. back to running multiple Sonnets and no Opus until the problem space changes again."
-- ~06:05Z: "Only resume opus when you're out of low-hanging fruits."
-- ~07:30Z: "Just pick any open issue for Opus."
-- ~08:30Z: "If sonnet gets stuck on the proofs, hand them off to opus."
+Staffing rule (HOURLY.md steps 7–8):
+- **4 Sonnet hunters** on triage rows rated 1–2, then 3 (shortlist.py, Haiku triage, HUNTER.md). One file per hunter, no overlap (claims.txt).
+- **3 Opus slots, filled by need** (user, 2026-11-22 ~18:30Z: "If there's enough escalation work to be done, use them all for it, otherwise scale back escalation and use them as hunters"). At each check every free slot goes to an escalator for the oldest file with QUEUED `opus` rows in `escalations.txt` that our Sonnet has left and no escalator holds. Only when no file waits does it go to an Opus hunter (CRITICAL_PROVER.md, any open unclaimed issue, prefer rows rated 3–4). Running agents are not stopped to rebalance.
+- Fable consultant and findings evaluator run outside these slots ([[escalation-ladder]], [[paper-findings-opus]]).
 
-**Why:** fresh sections carry many easy sanity lemmas, while the hard tails are held by upstream sweepers. Opus usage is the scarce budget.
+History: 04:40Z Sonnets only; ~07:30Z "Just pick any open issue for Opus"; ~08:30Z "If sonnet gets stuck on the proofs, hand them off to opus"; ~16:00Z 2 Opus hunters + 2 escalators; ~16:20Z cut to 1 Opus hunter + 2 escalators; ~18:30Z the 3 Opus became one dynamic pool.
 
-**How to apply (in this order):**
-1. Every check looks for new proof issues first: shortlist.py, then Haiku triage (TRIAGE.md), then 4 Sonnet hunters on rows rated 1–2 (then 3). One file per hunter, no overlap (claims.txt).
-2. Issues a Sonnet is *stuck* on (tried and failed) are handed over with `escalate.sh`, which keeps our claim, to an Opus escalation prover. It uses the HUNTER.md brief with the Opus tag, one file per prover, after our Sonnet left that file. No re-claim ([[claims-notes-attribution]]). The queue lives in `.agent/sweeptools/escalations.txt`.
-3. Opus hunters on any open unclaimed issue ([[critical-path-workstream]]), without asking.
-4. Superseded cap: the user, 2026-11-22 ~16:00Z, after the token allowance increased: "we can now always keep two Opus hunters running plus 4 Sonnets and two Opus escalators". Keep those slots filled at every check: 4 Sonnet hunters (steps 1), 2 Opus escalators (step 2; empty if nothing to escalate), 2 Opus hunters on any open issue (step 3 no longer waits for quick wins to run out; prefer rows rated 3–4). The "Opus hunter" = CRITICAL_PROVER.md brief is my reading.
-Back to Sonnets as soon as new issues bring quick wins. Related: [[subagent-model-effort]], [[low-hanging-sweep]].
-5. Current cap (user, 2026-11-22 ~16:20Z): "Let's stick with one opus hunter for now". So 4 Sonnet hunters, 1 Opus hunter, 2 Opus escalators. Do not refill a second Opus hunter slot until the user raises it again.
+**Why:** fresh sections carry many easy lemmas for Sonnet. Stuck issues already hold our claim (upstream auto-releases after 8 h), so they come before fresh Opus work. Opus is the scarce budget.
+
+**How to apply:** count the slots at every check. Escalation comes first. Leave a slot idle only if neither escalation work nor a suitable open issue exists. Related: [[critical-path-workstream]], [[subagent-model-effort]], [[low-hanging-sweep]].

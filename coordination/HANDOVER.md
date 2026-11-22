@@ -16,7 +16,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 
 - **Campaign resumed ~16:05Z.** Services (warm, watchdog, memguard, sieve) restarted; `no-resume`
   kept. Hourly cron at minute 17 (job in this session). Nagger running.
-- **Running (agents.txt):** crit2526 (the one Opus hunter, #2526 SPLIT plan); esc-sec5 (Opus,
+- **Running (agents.txt):** crit2526 (Opus hunter, #2526 SPLIT plan); esc-sec5 (Opus,
   Ch05 Sec5 #4408 #4420 #4423 #4429 #4431 #4409 #4411); esc-sec4 (Opus, Ch05 Sec4 #4344 #4352 #4356
   #4338); Sonnet w17 Ch11 Sec1b, w18 Ch10 Sec4a (not #5248: FleckiBunti), w19 Ch10 Sec3, w20 Ch10
   Sec4b #5298 + Ch07 Sec5 #5131; Opus findings evaluator on #5108.
@@ -34,19 +34,20 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   through `escalate.sh` and the Fable consultant instead.
 - **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning.
   Agents wait on builds in the foreground (never `run_in_background`, user 2026-11-22), never polling turns. Keep wake-ups sparse.
-- **Staffing (user, 2026-11-22 ~16:00Z, after the token allowance increased):** "we can now
-  always keep two Opus hunters running plus 4 Sonnets and two Opus escalators". Keep these slots
-  filled at every check (quick-wins mode now runs alongside Opus, not before it):
+- **Staffing (user, 2026-11-22):** 4 Sonnet hunters plus 3 Opus slots filled by need (HOURLY.md
+  steps 7–8; ~18:30Z: "If there's enough escalation work to be done, use them all for it,
+  otherwise scale back escalation and use them as hunters"):
   1. **4 Sonnet hunters** on quick wins: triage rows rated 1–2, then 3 (HUNTER.md).
-  2. **2 Opus escalators:** a Sonnet that is *stuck* (tried and failed) hands the issue over with
-     `escalate.sh`, keeping our claim; an Opus escalation prover (HUNTER.md "Escalators") takes the
-     queued rows of `escalations.txt`, one file per prover, once our Sonnet has left that file. A
-     slot with nothing to escalate stays empty.
-  3. **1 Opus hunter** (user, 2026-11-22 ~16:20Z: "Let's stick with one opus hunter for now"; was 2) on **any** open unclaimed proof issue (CRITICAL_PROVER.md; not
+  2. **Escalators first:** a Sonnet that is *stuck* (tried and failed) hands the issue over with
+     `escalate.sh`, keeping our claim. At each check every free Opus slot goes to an escalation
+     prover (HUNTER.md "Escalators") for the oldest file with QUEUED `opus` rows in
+     `escalations.txt` that our Sonnet has left and no escalator holds; one file per prover.
+  3. **Otherwise Opus hunters** on **any** open unclaimed proof issue (CRITICAL_PROVER.md; not
      `gap`/`refutation`/ERRATA/`TODO(paper-gap)`, not sweep-held), preferring triage rows rated
      3–4 that no Sonnet holds. No cone remapping ("the cone doesn't matter at this point").
-  4. **1 Fable consultant at a time** (user, 2026-11-22 ~16:00Z, Fable allowance; outside the 8
-     slots): issues an Opus agent tried and failed go `--to fable` with a stuck packet
+     Running agents are not stopped to rebalance; the mix shifts as they finish.
+  4. **1 Fable consultant at a time** (user, 2026-11-22 ~16:00Z, Fable allowance; outside the
+     standing slots): issues an Opus agent tried and failed go `--to fable` with a stuck packet
      (HUNTER.md). The consultant (`FABLE.md`, model fable) reads only the packet, may probe a
      skeleton with `lake lean`, and writes a `## Fable route` (ROUTE / SPLIT / FINDING /
      NO-ROUTE). ROUTE and SPLIT go back to an Opus escalator; the claim stays ours throughout.
@@ -95,7 +96,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 - Repo `/mnt/faststorage/math/riemann-masullo` (writable, ~65 GB free; its parent is not writable).
   The overlay root (~16 GB) does not survive a sandbox recreation.
 - 16 GB RAM, 24 cores. **RAM is the limit.** The old ceiling was one prover, one hunter or siever,
-  and the sieve; the 8-agent staffing above is untested at that RAM. Agents build only their module
+  and the sieve; the 7-agent staffing above is untested at that RAM. Agents build only their module
   while working, the sieve waits for >6 GB free, and memguard kills the newest Lean below 1000 MB
   (cheap, rc 137). The hourly check watches `memguard.log` (HOURLY.md step 5). An OOM of the host
   is not cheap.
@@ -120,7 +121,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 4. **One hourly check:** `CronList` first (duplicates have happened), then create it with the
    one-line prompt under "Hourly check".
 5. **Relaunch:** the nagger (if any agent runs), the quick-win loop on the new issues, and
-   escalations or Opus per quick-wins mode. Never resume long dead transcripts with SendMessage
+   the 3 Opus slots per HOURLY.md step 8. Never resume long dead transcripts with SendMessage
    (an uncached replay is expensive): start fresh agents from `notes/` and `notes/released/`.
 
 ## Hourly check
@@ -155,8 +156,8 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
   hits and posts HINT hits on the sweep issue. Its yield so far is low (e.g. #4035).
 - **Findings evaluator:** agents report paper findings on a `Finding:` line; SUSPECT triage rows
   are leads. Both go to `S/findings.txt`, and one Opus evaluator at a time (`Read S/FINDINGS.md
-  and follow it. Your findings: <rows>.`, on top of the 8 standing slots) re-checks each against
-  the page image and the Lean, then posts confirmed ones on the issue (HOURLY.md step 10).
+  and follow it. Your findings: <rows>.`, on top of the standing slots) re-checks each against
+  the page image and the Lean, then posts confirmed ones on the issue (HOURLY.md step 9).
 - **Nagger:** see `NAGGER.md`; stop it with `touch S/nagger.stop`.
 - `scripts/agent.sh` does not work here: it assumes the integrator's layout and pushes to `origin`.
 
