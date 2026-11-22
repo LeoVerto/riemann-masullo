@@ -370,9 +370,192 @@ theorem mem_globalPolarFreeThetaSubmodule (ω : PontryaginDual C₁) (x : Θ(ω)
       ∃ f : ℬ, f zeroAdele = 0 ∧ adeleSchwartzFourier f zeroAdele = 0 ∧ (K(ω)).mkQ f = x := by
   simp only [globalPolarFreeThetaSubmodule, Submodule.mem_map, mem_adelePolarSubspace, and_assoc]
 
+-- Helpers for `globalConverse_nontrivial_exact`. The first four repeat private lemmas of
+-- Ch05 §5 (`globalTheta_unitTranslate_apply`, `homogeneousTheta_unitTranslate`,
+-- `adeleSchwartzFourier_zero_unitTranslate`). The main argument: for a norm-one idele `u`
+-- with `ω [u] ≠ 1`, `(1 - ω [u])⁻¹ • (τᵤ b - ω [u] • b)` lies in the homogeneous theta
+-- kernel and has the polar values of `b`; subtracting such correctors gives a continuous
+-- retraction of the test space onto the polar subspace that preserves the theta class.
+-- Elaboration note: `obtain` from `DFunLike.ne_iff.mp` or `QuotientGroup.mk_surjective`
+-- inside the main statement ran for over ten minutes, hence the explicit helpers.
+
+/-- Global theta of a unit translate is theta at the inversely translated idele class. -/
+private theorem globalConverse_nontrivial_exact_theta_translate (g : IdeleGroup (𝓞 F) F)
+    (f : ℬ) (a : C𝔽) :
+    adelicTheta (schwartzBruhatUnitTranslate g f) a =
+      adelicTheta f ((QuotientGroup.mk g)⁻¹ * a) := by
+  induction a using QuotientGroup.induction_on with | H x => ?_
+  change _ = adelicTheta f (QuotientGroup.mk (g⁻¹ * x))
+  rw [adelicTheta_mk (schwartzBruhatUnitTranslate g f) x, adelicTheta_mk f (g⁻¹ * x)]
+  exact tsum_congr fun t ↦ congrArg (fun y ↦ f (Multiplicative.ofAdd y))
+    (mul_left_comm g.inv (algebraMap F 𝔸[F] (t : F)) x.val)
+
+private theorem globalConverse_nontrivial_exact_homTheta_translate (ω : PontryaginDual C₁)
+    (g : C₁) (u : IdeleGroup (𝓞 F) F) (hu : QuotientGroup.mk u = g.val) (f : ℬ) :
+    homogeneousAdelicThetaLinearMap F ω (schwartzBruhatUnitTranslate u f) =
+      (ω g : ℂ) • homogeneousAdelicThetaLinearMap F ω f := by
+  refine ContinuousMap.ext fun x ↦ ?_
+  refine Eq.trans ?_ ((homogeneousAdelicTheta_homogeneous ω f g x).trans
+    ((ContinuousMap.smul_apply (ω g : ℂ) (homogeneousAdelicThetaLinearMap F ω f) x).trans
+      (smul_eq_mul _ _)).symm)
+  change homogeneousAdelicTheta ω (schwartzBruhatUnitTranslate u f) x =
+    homogeneousAdelicTheta ω f (g.val⁻¹ * x)
+  refine congrArg (MeasureTheory.integral _) (funext fun h ↦ ?_)
+  refine congrArg (· * (ω h : ℂ))
+    ((globalConverse_nontrivial_exact_theta_translate u f _).trans ?_)
+  rw [hu, mul_left_comm]
+
+private theorem globalConverse_nontrivial_exact_fourier_integral (u : IdeleGroup (𝓞 F) F)
+    (k : 𝔸[F] → ℂ) :
+    ∫ x, k ((↑u⁻¹ : 𝔸[F]) * x) ∂additiveTamagawaMeasure F =
+      (((ideleNorm F u).val : ℝ) : ℂ) * ∫ x, k x ∂additiveTamagawaMeasure F := by
+  let : MeasurableSpace 𝔸[F] := borel _
+  have : BorelSpace 𝔸[F] := ⟨rfl⟩
+  have hH : (additiveTamagawaMeasure F).IsAddHaarMeasure :=
+    (additiveTamagawaMeasure_existsUnique F).exists.choose_spec.1
+  let d : 𝔸[F] ≃ₜ 𝔸[F] := Homeomorph.smul (u⁻¹ : IdeleGroup (𝓞 F) F)
+  have hset (s : Set 𝔸[F]) :
+      d ⁻¹' s = (fun a : 𝔸[F] ↦ (u : 𝔸[F]) * a) '' s := by
+    ext y
+    constructor
+    · intro hy
+      exact ⟨(↑u⁻¹ : 𝔸[F]) * y, hy, Units.mul_inv_cancel_left u y⟩
+    · rintro ⟨a, ha, rfl⟩
+      change (↑u⁻¹ : 𝔸[F]) * ((u : 𝔸[F]) * a) ∈ s
+      rwa [Units.inv_mul_cancel_left]
+  have hmap : (additiveTamagawaMeasure F).map d =
+      ((ideleNorm F u).val : ENNReal) • additiveTamagawaMeasure F := by
+    refine Measure.ext fun s hs ↦ ?_
+    rw [Measure.map_apply d.continuous.measurable hs, hset s]
+    exact adeleHaar_mul_image F (additiveTamagawaMeasure F) u s hs
+  have h1 : ∫ x, k (d.toMeasurableEquiv x) ∂additiveTamagawaMeasure F =
+      ∫ y, k y ∂((additiveTamagawaMeasure F).map d.toMeasurableEquiv) :=
+    (integral_map_equiv d.toMeasurableEquiv k).symm
+  have h2 : ((additiveTamagawaMeasure F).map d.toMeasurableEquiv) =
+      ((ideleNorm F u).val : ENNReal) • additiveTamagawaMeasure F := hmap
+  rw [h2, integral_smul_measure, ENNReal.coe_toReal, Complex.real_smul] at h1
+  exact h1
+
+private theorem globalConverse_nontrivial_exact_fourier_translate (u : IdeleGroup (𝓞 F) F)
+    (f : ℬ) :
+    adeleSchwartzFourier (schwartzBruhatUnitTranslate u f) zeroAdele =
+      (((ideleNorm F u).val : ℝ) : ℂ) * adeleSchwartzFourier f zeroAdele := by
+  have hA := (adeleSchwartzFourier_apply_zero (schwartzBruhatUnitTranslate u f)).2
+  have hB := (adeleSchwartzFourier_apply_zero f).2
+  have hI := globalConverse_nontrivial_exact_fourier_integral u
+    (fun z : 𝔸[F] ↦ f (Multiplicative.ofAdd z))
+  exact hA.trans (hI.trans (congrArg _ hB.symm))
+
+private theorem globalConverse_nontrivial_exact_openQuotient {E : Type*}
+    [AddCommGroup E] [Module ℂ E] [TopologicalSpace E] [IsTopologicalAddGroup E]
+    (K Q : Submodule ℂ E) (T : E → Q) (hT : Continuous T)
+    (hTQ : ∀ p : Q, T p = p) (hK : ∀ f, (T f : E) - f ∈ K) :
+    IsOpenQuotientMap (K.mkQ.comp Q.subtype) := by
+  have hmk (f : E) : K.mkQ (T f : E) = K.mkQ f := (Submodule.Quotient.eq K).mpr (hK f)
+  have hq := K.isOpenQuotientMap_mkQ
+  refine ⟨fun x ↦ ?_, hq.continuous.comp continuous_subtype_val, fun W hU ↦ ?_⟩
+  · obtain ⟨f, rfl⟩ := K.mkQ_surjective x
+    exact ⟨T f, hmk f⟩
+  · have himg : (K.mkQ.comp Q.subtype) '' W = K.mkQ '' (T ⁻¹' W) := by
+      ext x
+      constructor
+      · rintro ⟨p, hp, rfl⟩
+        refine ⟨p, ?_, rfl⟩
+        change T p ∈ W
+        rwa [hTQ p]
+      · rintro ⟨f, hf, rfl⟩
+        exact ⟨T f, hf, hmk f⟩
+    rw [himg]
+    exact hq.isOpenMap _ (hU.preimage hT)
+
+private theorem globalConverse_nontrivial_exact_one_sub_ne {G : Type*} [Monoid G]
+    [TopologicalSpace G] (ω : PontryaginDual G) (c : G) (h : ω c ≠ (1 : PontryaginDual G) c) :
+    (1 : ℂ) - (ω c : ℂ) ≠ 0 := by
+  rw [PontryaginDual.one_apply] at h
+  intro h'
+  exact h (Circle.ext (by rw [Circle.coe_one]; linear_combination -h'))
+
+private theorem globalConverse_nontrivial_exact_norm_eq_one (u : IdeleGroup (𝓞 F) F)
+    (c : IdeleClassGroup (𝓞 F) F) (hc : ideleClassNorm F c = 1)
+    (hu : (QuotientGroup.mk u : IdeleClassGroup (𝓞 F) F) = c) : ideleNorm F u = 1 := by
+  rw [← hc, ← hu]
+  rfl
+
+private theorem globalConverse_nontrivial_exact_of_polar {E : Type*}
+    [AddCommGroup E] [Module ℂ E] [TopologicalSpace E] [IsTopologicalAddGroup E]
+    [ContinuousSMul ℂ E] (K Q : Submodule ℂ E) (pv : E →ₗ[ℂ] ℂ × ℂ) (hpv : Continuous pv)
+    (hQ : ∀ f, f ∈ Q ↔ pv f = 0) (k₁ k₂ : E) (hk₁ : k₁ ∈ K) (hk₂ : k₂ ∈ K)
+    (h₁ : pv k₁ = (1, 0)) (h₂ : pv k₂ = (0, 1)) :
+    IsOpenQuotientMap (K.mkQ.comp Q.subtype) := by
+  let T₀ : E → E := fun f ↦ f - (pv f).1 • k₁ - (pv f).2 • k₂
+  have hT₀Q (f : E) : T₀ f ∈ Q := by
+    rw [hQ]
+    simp only [T₀, map_sub, map_smul, h₁, h₂]
+    ext <;> simp
+  have hT₀c : Continuous T₀ :=
+    (continuous_id.sub ((continuous_fst.comp hpv).smul continuous_const)).sub
+      ((continuous_snd.comp hpv).smul continuous_const)
+  refine globalConverse_nontrivial_exact_openQuotient K Q (fun f ↦ ⟨T₀ f, hT₀Q f⟩)
+    (hT₀c.subtype_mk _) (fun p ↦ Subtype.ext ?_) (fun f ↦ ?_)
+  · have hp : pv p = 0 := (hQ p).mp p.2
+    change (p : E) - (pv p).1 • k₁ - (pv p).2 • k₂ = p
+    rw [hp]
+    simp
+  · change (f - (pv f).1 • k₁ - (pv f).2 • k₂) - f ∈ K
+    rw [show f - (pv f).1 • k₁ - (pv f).2 • k₂ - f = -((pv f).1 • k₁ + (pv f).2 • k₂) by abel]
+    exact K.neg_mem (K.add_mem (K.smul_mem _ hk₁) (K.smul_mem _ hk₂))
+
+private theorem globalConverse_nontrivial_exact_corrector {E M : Type*}
+    [AddCommGroup E] [Module ℂ E] [AddCommGroup M] [Module ℂ M]
+    (θ : E →ₗ[ℂ] M) (pv : E →ₗ[ℂ] ℂ × ℂ) (w : ℂ) (hw : (1 : ℂ) - w ≠ 0) (b τb : E)
+    (hθ : θ τb = w • θ b) (hpv : pv τb = pv b) :
+    (1 - w)⁻¹ • (τb - w • b) ∈ LinearMap.ker θ ∧ pv ((1 - w)⁻¹ • (τb - w • b)) = pv b := by
+  constructor
+  · rw [LinearMap.mem_ker, map_smul, map_sub, map_smul, hθ, sub_self, smul_zero]
+  · rw [map_smul, map_sub, map_smul, hpv,
+      show pv b - w • pv b = (1 - w) • pv b by rw [sub_smul, one_smul], smul_smul,
+      inv_mul_cancel₀ hw, one_smul]
+
+private theorem globalConverse_nontrivial_exact_polar_translate (u : IdeleGroup (𝓞 F) F)
+    (hnorm : ideleNorm F u = 1) (b : ℬ) :
+    adelePolarValues (F := F) (schwartzBruhatUnitTranslate u b) = adelePolarValues (F := F) b := by
+  refine Prod.ext ?_ ?_
+  · change schwartzBruhatUnitTranslate u b zeroAdele = b zeroAdele
+    rw [schwartzBruhatUnitTranslate_apply, mul_zero]
+  · change adeleSchwartzFourier (schwartzBruhatUnitTranslate u b) zeroAdele =
+      adeleSchwartzFourier b zeroAdele
+    rw [globalConverse_nontrivial_exact_fourier_translate, hnorm]
+    simp
+
+private theorem globalConverse_nontrivial_exact_exists_lift (c : IdeleClassGroup (𝓞 F) F)
+    (hc : ideleClassNorm F c = 1) :
+    ∃ u : IdeleGroup (𝓞 F) F,
+      (QuotientGroup.mk u : IdeleClassGroup (𝓞 F) F) = c ∧ ideleNorm F u = 1 := by
+  obtain ⟨u, hu⟩ := QuotientGroup.mk_surjective c
+  exact ⟨u, hu, globalConverse_nontrivial_exact_norm_eq_one u c hc hu⟩
+
+set_option linter.all false in
+private theorem globalConverse_nontrivial_exact_core (ω : PontryaginDual C₁) (c : C₁)
+    (hw : (1 : ℂ) - (ω c : ℂ) ≠ 0) (u : IdeleGroup (𝓞 F) F)
+    (hu : (QuotientGroup.mk u : IdeleClassGroup (𝓞 F) F) = c.val) (hnorm : ideleNorm F u = 1)
+    (b₁ b₂ : ℬ) (hb₁ : adelePolarValues (F := F) b₁ = (1, 0))
+    (hb₂ : adelePolarValues (F := F) b₂ = (0, 1)) :
+    IsOpenQuotientMap ((K(ω)).mkQ.comp (P).subtype) := by
+  have hθ (b : ℬ) := globalConverse_nontrivial_exact_homTheta_translate ω c u hu b
+  have hτ (b : ℬ) := globalConverse_nontrivial_exact_polar_translate u hnorm b
+  have e₁ := globalConverse_nontrivial_exact_corrector
+    (homogeneousAdelicThetaLinearMap F ω) (adelePolarValues (F := F)) (ω c : ℂ) hw b₁ _ (hθ b₁) (hτ b₁)
+  have e₂ := globalConverse_nontrivial_exact_corrector
+    (homogeneousAdelicThetaLinearMap F ω) (adelePolarValues (F := F)) (ω c : ℂ) hw b₂ _ (hθ b₂) (hτ b₂)
+  let : ContinuousSMul ℂ ℬ := (PolynormableSpace.withSeminorms ℂ ℬ).continuousSMul
+  exact globalConverse_nontrivial_exact_of_polar (K(ω)) P (adelePolarValues (F := F))
+    (adelePolarValues_continuous (F := F)) (fun f ↦ Iff.rfl) _ _ e₁.1 e₂.1
+    (e₁.2.trans hb₁) (e₂.2.trans hb₂)
+
 -- TODO(paper-gap): The codomain in (6.3.2.5) is zero on a nontrivial norm-one
 -- component. The map (6.3.2.6) is identically zero there.
 
+set_option linter.all false in
 /-- Paper: Theorem 6.3.2.1(2), p. 304, equations (6.3.2.5) and (6.3.2.7).
 On a nontrivial norm-one component the polar test subspace maps openly and
 surjectively onto the full homogeneous theta space. In Mellin coordinates
@@ -380,7 +563,13 @@ the inclusion becomes the identity of the range in (6.3.2.3).
 Deviation: The terminal residue space is zero on this component, as in (6.3.2.7). -/
 theorem globalConverse_nontrivial_exact (ω : PontryaginDual C₁) (_hω : ω ≠ 1) :
     IsOpenQuotientMap ((K(ω)).mkQ.comp (P).subtype) := by
-  sorry
+  have h2 : ∃ c : C₁, ω c ≠ (1 : PontryaginDual C₁) c := DFunLike.ne_iff.mp _hω
+  have hl := globalConverse_nontrivial_exact_exists_lift h2.choose.val h2.choose.prop
+  have e₁ := adelePolarValues_surjective (F := F) (1, 0)
+  have e₂ := adelePolarValues_surjective (F := F) (0, 1)
+  exact globalConverse_nontrivial_exact_core ω h2.choose
+    (globalConverse_nontrivial_exact_one_sub_ne ω _ h2.choose_spec) hl.choose hl.choose_spec.1
+    hl.choose_spec.2 e₁.choose e₂.choose e₁.choose_spec e₂.choose_spec
 
 /-- Paper: Theorem 6.3.2.1(2), p. 304, equations (6.3.2.5)–(6.3.2.6).
 The signed polar evaluations descend to a continuous residue map on the trivial
