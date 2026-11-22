@@ -33,11 +33,13 @@ consultant to `agents.txt` (the nagger's roster).
 | fixer: `general-purpose`, model sonnet, effort medium | – | `Fix <failing check or review comment> on PR #<p> in worktree <wt>, following S/HUNTER.md "Checks and pull request". Model tag <M>.` |
 
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
-   last check (last seen: AGENTS 3de969e, ERRATA a04742c), re-read the change, update the briefs
+   last check (last seen: AGENTS ed9dbb7, ERRATA d77f273), re-read the change, update the briefs
    (HUNTER.md first), and update "last seen" here.
 1. Run `status.sh --mark` (advances the new-comments window) and `cleanup.sh` under timeout,
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
+   A Verdict `error` with "main itself does not build" is not ours: once main builds again
+   (Main state check green), push an empty commit to the PR branch to retrigger (pending: #5454, leads.txt).
 3. Release orphan or STALE claims only via `release.sh`. `ESCALATED` lines are not stale: leave
    them. For `ESCALATED … REFRESH-CLAIM` (claim older than 7 h; upstream auto-releases after 8 h),
    post `Claiming (Claude Opus 5.5, default effort): queued for an Opus escalator` once.
@@ -58,13 +60,13 @@ consultant to `agents.txt` (the nagger's roster).
    it repeats.
 6. READY or HINT lines in `== sieve`: launch ONE siever unless one runs. No blind hunters.
 7. Staffing (user, 2026-11-22: "when two sonnets are idle, spawn an opus instead. keep at minimum
-   two opuses and at maximum six sonnets"). Budget 10 units (table above). Count the running
+   two opuses and at maximum six sonnets"; 20:20Z: "bump the budget to twelve"). Budget 12 units (table above). Count the running
    agents (`agents.txt`), then hand out free units in this order, never stopping a running agent
    to rebalance:
    1. Opus (step 8) until 2 run.
    2. Sonnet hunters while quick-win rows (7a) exist, up to 6 Sonnets.
    3. What is left, two units at a time, to Opus (step 8). One unit left over waits.
-7a. New issues first: proof issues newer than the last shortlisted (last: #5369, triage8) get
+7a. New issues first: proof issues newer than the last shortlisted (last: #5525, triage10) get
    `shortlist.py` on their files and a triage agent into a new `triage<k>.tsv`; update "last"
    here. Hunters take rows rated 1–2 (then 3) with unclaimed issues, listed in the prompt by file:
    files in sequence, ONE PR PER TOUCHED FILE, until the list is done, 4 PRs or ~3 h (user:

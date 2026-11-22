@@ -107,21 +107,21 @@ a little thought. Skip anything deep.
   linter turned off). A timeout under load is not evidence the proof is slow: retry once with
   double the time before recording it as a failure.
 - One full `lake build` before each PR. Never run two builds in one worktree, and run only one
-  `lake build` of your own at a time (RAM is shared, 16 GB, by up to eight agents and the sieve:
+  `lake build` of your own at a time (RAM is shared, 20 GB, by up to eight agents and the sieve:
   prefer module builds, and run the full build only once).
 - **Wait in the FOREGROUND, never with `run_in_background`** (user, 2026-11-22): an agent that ends
   its turn to wait gets resumed by any message and then reports to the sender, not the coordinator,
   and every pause pings the coordinator. The harness moves any foreground call that runs over
-  **180 s** into the background (tested 2026-11-22), so every foreground call must finish within
-  170 s:
-  - Short (under ~2.5 min): run it directly under `timeout 170` (e.g. `timeout 170 lake lean
+  **120 s** into the background (measured 2026-11-22 ~20:00Z; earlier 180 s), so every foreground call must finish within
+  110 s:
+  - Short (under ~1.5 min): run it directly under `timeout 110` (e.g. `timeout 110 lake lean
     .agent/Probe.lean`).
   - Anything longer (most module builds under load, the full build, long probes): start it
     detached and return at once. Builds: `BUILD_TIMEOUT=<s> setsid nohup $S/build.sh <wt>
     [<Module>] >/dev/null 2>&1 &` (900 for a module, 3600 for the full build; log
     `<wt>/.agent/build.log`, status `<wt>/.agent/build.exit`, 124 = timeout). Probes: `setsid nohup
     bash -c 'timeout 600 lake lean .agent/P.lean > .agent/P.log 2>&1; echo $? > .agent/P.exit'
-    >/dev/null 2>&1 &`. Then wait with the foreground call `timeout 170 bash -c 'until [ -e <exit
+    >/dev/null 2>&1 &`. Then wait with the foreground call `timeout 110 bash -c 'until [ -e <exit
     file> ]; do sleep 15; done'`, repeated until the file exists. Do not end your turn while
     anything you started runs.
   - Never wait with `pgrep`/`pkill` on `lake` or `lean` (other agents and services build too).
@@ -141,6 +141,19 @@ a little thought. Skip anything deep.
   range (`scripts/paper.sh <p> <q>`, `--png <p>` for formulas).
 
 ## Elaboration traps and fixes that worked
+- **`abbrev` towers (AGENTS.md, origin/main ed9dbb7):** a space declared as an `abbrev` over a quotient,
+  `SchwartzBruhat` or another synonym borrows its instances by unfolding, so instance terms grow
+  exponentially and `whnf`/`isDefEq` time out on trivial goals (#5362, #5398; likely #4344's Θω(ω)). Do not
+  unfold it: state helpers generically or for the explicit instances, `set`/`generalize` the space,
+  use its `mem_…_iff`/characterizing lemmas. Turning the `abbrev` into a `def` is a statement change:
+  report it, do not do it.
+- **Destructuring a sibling inside an abbrev space** (#4344, PR #5538): `obtain ⟨…⟩ := sibling ω` about
+  Θω(ω) ran 3+ min. Fix: a generic private helper over `{E} [instances]` that takes the sibling's
+  conclusion (e.g. `IsFrechetTVS E`, `IsNuclearTVS E`) and destructures it there; the main proof is
+  one term `helper.{0} (sibling ω) (other ω)`.
+- **Unascribed `_mk`/`_apply` lemmas on quotients** (#4535, Ch07 Sec2, PR #5547): `rwa [coeff_apply]` and
+  `coeff_mk ω c hc _ f` with the index left as `_` each ran 15+ min. Fix: `have e : … (mkQ f) = … :=
+  coeff_mk ω c hc N f` with every index written out, then use `e`. Locate runaways by bisecting with `#exit`.
 - **Slow-compile trap:** if a module build grows from about 1 min to 10+ min, one of your proofs
   runs away. Bisect by turning your new proofs back into `sorry` one at a time; drop the culprit,
   note it, release it as stuck, and hand in the rest.

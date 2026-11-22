@@ -25,7 +25,7 @@ The rules of HUNTER.md "Constraints" and "Paper errors, gaps, ERRATA" bind you. 
 ## Probing (allowed, bounded)
 You may check that a skeleton elaborates. Make one worktree with `$S/newwt.sh fable/<n>
 $R/.agent/wt/fable-<n>` (or use the packet's partial-work worktree read-only), and run scratch files
-under `.agent/` with `timeout 170 lake lean .agent/Route.lean` in the foreground (the harness backgrounds any call over 180 s; for longer probes use the detached pattern in HUNTER.md "Builds and processes"; never `run_in_background`) (sorried helpers are fine). No full
+under `.agent/` with `timeout 110 lake lean .agent/Route.lean` in the foreground (the harness backgrounds any call over 120 s; for longer probes use the detached pattern in HUNTER.md "Builds and processes"; never `run_in_background`) (sorried helpers are fine). No full
 `lake build`, no commits, no PR, no claim comments (the claim is already ours). Budget: about
 1 hour and at most ~10 probes.
 

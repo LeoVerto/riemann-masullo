@@ -60,3 +60,12 @@ w24 (finished 17:38Z: PR #5393 Ch07 Sec5 proves #5133; released #5135 (needs ade
 17:42Z wind-down: esc-sec5 stopped (6 proved at f0a3c40 + #4409 uncommitted), w26 stopped (unbuilt #5369), nagger/watchdog/cron stopped; claims kept (user)
 17:42Z wind-down: esc-sec4 finished (3 proved, 2 local commits on hunt/esc-sec4-1, full build pending)
 17:46Z wind-down complete: all agents stopped; claims kept
+w26 2026-11-22T18:12Z done #5369 PR #5433 (sorryAx from open deps)
+esc-sec5 2026-11-22T18:20Z done Ch05 Sec5 7 issues PR #5441
+crit2526 2026-11-22T18:26Z split #2526 PR #5447
+esc-ch10sec4b 2026-11-22T18:50Z proved #5288 PR #5454
+esc-sec4 2026-11-22T19:40Z PR #5450 merged (#4338 #4352 #4356); #4344 PR #5538
+esc-ch05sec3a 2026-11-22T19:53Z proved #4144 PR #5542
+esc-ch07sec2 2026-11-22T20:05Z proved #4535 PR #5547
+w28 2026-11-22T20:14Z PR #5551 (5 of 6 Ch11 Sec3), released #5514 (Haar-null singleton needs >100 lines)
+w27 2026-11-22T20:19Z PR #5553 (7 Ch11 Sec2b); follow-up #5478

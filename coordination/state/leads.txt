@@ -44,3 +44,9 @@ Ch05 Sec3a: lemma adelePrincipalValue F ∅ = id would unblock #5175 (Ch11 Sec1b
 Ch05 Sec3a: adelePrincipalValue lemmas (F ∅ = id; F T' = F T ∘ F T' for T ≤ T') would unblock #5175 #5181 (#5184 via #5177) in Ch11 Sec1b
 Ch07 Sec1b/Sec4: theorem range Z = schwartzBergmanDivisible(Lambda) (now only a hypothesis of spectralTheta_jetRestriction_of_range_eq) would unblock #5078 #5079
 Ch10 SpectralProof_Printed refutations #5363-#5368: all need existence of Hecke L-function zeros on a line (no such result in the project); rated 4-5
+5135: keep for esc-ch11sec1b as its one follow-up (same adelePrincipalValue helpers)
+2026-11-22T19:45Z PR #5454: Verdict error because main cec1c13 did not build (not our PR). When main builds again: push an empty commit to fork esc/ch10sec4b-1 (wt/esc-ch10sec4b-1) to retrigger. No rerun rights.
+2026-11-22T19:47Z quick wins triage10 for Sonnet hunters when units free: RiemannMasullo/Ch11_ShellStructure/Sec2b.lean: #5461 #5469 #5474 #5462 #5470 #5458 #5456
+2026-11-22T19:47Z quick wins triage10 for Sonnet hunters when units free: RiemannMasullo/Ch11_ShellStructure/Sec3.lean: #5489 #5491 #5505 #5510 #5490 #5496
+2026-11-22T19:49Z add #5514 (Sec3, orbitalSectionWeight_eq_zero) to the Sec3 hunter list: true; for fixed ξ,x the first indicator forces g = ξ⁻¹x⁻¹τ(|x|), a singleton, Haar-null on norm-one ideles (no atoms) (findings evaluator, notes/reports-done/report-findings-1.md)
+2026-11-22T20:14Z #5478 (Sec2b rated 3) for w27 as its one follow-up when it finishes

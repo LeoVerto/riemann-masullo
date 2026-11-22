@@ -13,52 +13,30 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 
 **Time zones:** the shell, `status.sh` and service logs use CET (UTC+1); the cron tool uses UTC.
 
-## Current state (2026-11-22 ~17:50Z, coordinator session 09ff2a64 wound down for a restart)
+## Current state (2026-11-22 ~20:40Z, coordinator session a9c138b2, running)
 
-- **Wound down at the user's request** (they are restarting the coordinator with changes). Agents
-  were told to save notes and stop; the nagger, the hourly cron and the **watchdog are stopped**
-  (so it does not release our claims while nothing runs: restart it in startup step 3, with the
-  fixed `PROJ=/home/agent/.claude/projects`). warm, memguard and sieve still run (warm and sieve at
-  nice 19). **Claims are kept; do not release them** (user, 17:55Z: "we're continuing soon"; `claims.txt`); upstream auto-releases claims with no PR after 8 h,
-  so re-launch or refresh before ~01:00Z on 2026-11-23.
-- **Resume these from notes (fresh agents, never resume transcripts):**
-  - crit2526 (Opus hunter) #2526: SPLIT nearly done, uncommitted edit to Sec4.lean in wt/crit-2526
-    (backup `.agent/Sec4.v4.lean`). Proved: `infiniteLocalIdelicZFunction_unitTranslate`,
-    `infiniteLocalEulerFactor_twist_ne_zero`; sorried helpers: uniqueness, Z/L family, Z(Gaussian)=L.
-    Only the main theorem's body times out (heartbeats at Sec4:3430) in module mode; the same
-    assembly passes in a non-module probe. Next: close it with one term from a generic assembly
-    lemma, then full build, lint, signatures, PR (body ready in `.agent/PRBODY.md`; notes/2526.md).
-  - esc-sec5 (Opus escalator) Ch05 Sec5: **#4408 #4411 #4420 #4423 #4429 #4431 PROVED**, committed
-    f0a3c40 on local branch hunt/esc-sec5-1 (wt/esc-sec5, not pushed, no PR); #4409 checks clean,
-    uncommitted edit on top. To hand in one PR for all seven: module build, full `lake build`,
-    signature compare, axioms (`.agent/Check.lean` ready); lint passes. Report notes/report-esc-sec5.md.
-  - esc-sec4 (Opus escalator) Ch05 Sec4: **#4338 #4352 #4356 PROVED**, two local commits on branch
-    hunt/esc-sec4-1 (wt/hunt-esc-sec4-1, from main bd5d15c, clean, not pushed, no PR). Module builds
-    in 3m17, lint passes; still to do: full `lake build` (stopped at wind-down, 0 errors so far),
-    signature compare, axioms (`.agent/Check.lean` ready). Trap: `have key := …` then
-    `with_reducible_and_instances exact key _ ω hP A hA` (plain `exact` unfolds Ẽ(I) for 1.5 h+).
-    It released #4344 (see the Fable line).
-  - w26 (Sonnet) #5369: proof written, unbuilt; edit in wt/hunt-w26-1 (detached build may have left
-    `.agent/build.exit`); next steps in notes/5369.md.
-  - #4344 (Ch05 Sec4 separability): Fable returned a partial **ROUTE** (notes/4344.md `## Fable
-    route`, skeleton notes/4344-Route.lean): nuclear (proved, Sec2b:311) + metrizable (from sorried
-    sibling `_frechet`, Sec4:186) ⇒ separable; per-seminorm helper elaborates; applying the generic
-    lemma hit a whnf heartbeat timeout (traps in notes). Re-queued as an `opus` row for an escalator
-    (best after esc-sec4's PR, same file).
-- **Opus escalation queue** (`escalations.txt`, all claimed by us, notes in notes/<n>.md):
-  Ch11 Sec1b #5175 #5177 #5181 #5184 and Ch07 Sec5 #5135 (shared blocker: `adelePrincipalValue`
-  algebra — F ∅ = id, composition for T ≤ T', insert factorization; prove as private helpers);
-  Ch07 Sec4 #5078 #5079 (range Z = schwartzBergmanDivisible Λ is only a hypothesis) and #5108
-  (finest-LC dual bounded sets); Ch10 Sec3 #5207 #5208 #5204; Ch10 Sec4b #5288; Ch07 Sec2 #4535.
-  User: Opus tries these before any split.
-- **Open PRs:** #5371 (Ch07 Sec4 #5091), #5379 (Ch10 Sec4b #5290 #5316), #5382 (Ch10 Sec3 4
-  issues), #5386 (#4908), #5393 (Ch07 Sec5 #5133). Merged this session: #5355 #5356 #5358 #5360
-  #5370 (about 18 issues).
-- **Triage:** all issues up to #5369 triaged (triage7a–f, triage8); no Sonnet quick wins left.
-  #5363–#5368 need Hecke L zero existence (none in the project), rated 4–5.
-- **Pending user decision:** whether to post w25's unbuilt #5275 route (notes/5275.md) as a hint
-  for troyjlee, who holds #5275.
-- **Next session launches by subagent type** (HOURLY.md "Launching agents"; startup step 4).
+- **Restarted after a sandbox reboot** (~18:05Z): services restarted (watchdog with all-projects
+  `PROJ`, memguard, warm and sieve at nice 19); the token needed `sbx secret set` again after the
+  reboot. Hourly cron at minute 17 (session-only). Nagger running.
+- **Budget 12 units (user, 20:20Z), all in use:** Opus escalators esc-ch11sec1b (Ch11 Sec1b #5175
+  #5177 #5181 #5184), esc-ch07sec4 (#5078 #5079 #5108), esc-ch10sec3 (#5207 #5208 #5204),
+  esc-ch07sec3a (#4603, ours, prior work), esc-ch05sec3a2 (Ch05 Sec3a #4135 #4136 #4140 #4141
+  #4174 #4175 #4181 #4184: elmismisimoxhunca's attempts built but their auditor gave no verdict);
+  Sonnets w27 (follow-up #5478, Ch11 Sec2b), w29 (Ch11 Sec3 rated-3: #5494 first, #5495 #5497
+  #5492 #5502 #5512).
+- **Reserved:** #5135 (Ch07 Sec5) waits for esc-ch11sec1b's adelePrincipalValue helpers (one
+  follow-up by SendMessage), so two Opus do not build the same helpers.
+- **PRs opened this session:** #5433 #5441 #5447 #5450 merged; open #5454 (#5288; Verdict
+  `error` because main cec1c13 did not build: push an empty commit once main builds, leads.txt),
+  #5538 (#4344, Fable route), #5542 (#4144), #5547 (#4535), #5551 (Ch11 Sec3, 5 issues), #5553
+  (Ch11 Sec2b, 7 issues).
+- **Released:** #5514 (Haar-null singleton needs >100 lines; route on the issue).
+- **Triage:** done up to #5525 (triage10). Ch05 Sec3a still has ~30 more issues with failed
+  automated attempts by elmismisimoxhunca, most failing only on inherited sorryAx: good Opus work.
+- **Posted with user approval:** the #5275 route hint for troyjlee.
+- **New traps in HUNTER.md:** abbrev towers (AGENTS.md ed9dbb7), destructuring a sibling inside
+  an abbrev space (#4344), unascribed `_mk`/`_apply` lemmas (#4535). Foreground limit is now
+  110 s (the harness backgrounds calls after 120 s).
 
 ## Standing instructions from the user
 
@@ -73,7 +51,7 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
 - **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning; keep
   wake-ups sparse. Agents and the nagger wait in the FOREGROUND, every call under 170 s (HUNTER.md
   "Builds and processes"); never `run_in_background`.
-- **Staffing and Opus work** (2026-11-22): 10-unit budget, at least 2 Opus, at most 6 Sonnets;
+- **Staffing and Opus work** (2026-11-22): 12-unit budget (user, 20:20Z), at least 2 Opus, at most 6 Sonnets;
   Opus goes to escalation, then prior work (ours and others'), a fresh issue last; one Fable
   consultant and one findings evaluator outside the budget. HOURLY.md steps 7–9. No two agents
   share a file. A prover that finishes with a warm cache may get ONE related issue by SendMessage.
@@ -107,8 +85,8 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
 
 - Repo `/mnt/faststorage/math/riemann-masullo` (writable, ~65 GB free; its parent is not writable).
   The overlay root (~16 GB) does not survive a sandbox recreation.
-- 16 GB RAM, 24 cores. **RAM is the limit.** The old ceiling was one prover, one hunter or siever,
-  and the sieve; staffing of up to 8 agents (6 Sonnets + 2 Opus) is untested at that RAM. Agents build only their module
+- 20 GB RAM (raised from 16 GB on 2026-11-22), 24 cores. **RAM is the limit.** The old ceiling was one prover, one hunter or siever,
+  and the sieve; staffing of up to 8 agents (6 Sonnets + 2 Opus) is untested at 20 GB. Agents build only their module
   while working, the sieve waits for >6 GB free, and memguard kills the newest Lean below 1000 MB
   (cheap, rc 137). The hourly check watches `memguard.log` (HOURLY.md step 5). An OOM of the host
   is not cheap.
