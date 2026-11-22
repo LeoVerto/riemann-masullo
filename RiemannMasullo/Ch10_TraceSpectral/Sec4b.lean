@@ -4,6 +4,8 @@ public import RiemannMasullo.Ch10_TraceSpectral.Sec4a
 public import RiemannMasullo.AppC_LCTVS.Sec3b
 import all RiemannMasullo.Ch10_TraceSpectral.Sec1
 import all RiemannMasullo.AppC_LCTVS.Sec2a_part2
+import all RiemannMasullo.AppD_SchwartzBruhat.Sec2b
+import all RiemannMasullo.AppD_SchwartzBruhat.Sec3b
 public import RiemannMasullo.ForMathlib.Analysis.LocallyConvex.Completion
 
 /-!
@@ -128,7 +130,16 @@ theorem spectralKernelRectangle_single (e : Unit ↪ ℕ × ℕ) (ij : ℕ × �
     (_h₁ : (e ()).1 ≤ ij.1) (_h₂ : (e ()).2 ≤ ij.2)
     (j : J) (u : J → E) (v : J → G) :
     spectralKernelRectangle e (fun _ ↦ 1) (fun _ _ ↦ j) u v ij =
-      ((show ProjectiveTensor E G from u j ⊗ₜ[ℂ] v j) : Π(E, G)) := by sorry
+      ((show ProjectiveTensor E G from u j ⊗ₜ[ℂ] v j) : Π(E, G)) := by
+  have hpre : ((Finset.Iic ij.1).product (Finset.Iic ij.2)).preimage e e.injective.injOn =
+      Finset.univ := by
+    ext z
+    obtain rfl : z = () := Subsingleton.elim _ _
+    simp [Finset.mem_product, _h₁, _h₂]
+  unfold spectralKernelRectangle
+  rw [hpre]
+  simp
+  exact congrArg _ (Finset.sum_singleton _ _)
 
 end FiniteTensors
 
@@ -543,7 +554,14 @@ theorem geometricStripRestrictionKernel_hilbertSchmidt (_ha : 0 < a)
 
 /-- Paper: Definition 10.4.3.7, pp. 473–474. The two strip representatives are measurable. -/
 theorem globalStripKernels_measurable (hK : stripTensorExists) :
-    Measurable (kStrip(hK) : C𝔽 × C𝔽 → ℂ) ∧ Measurable geomStrip(hK) := by sorry
+    Measurable (kStrip(hK) : C𝔽 × C𝔽 → ℂ) ∧ Measurable geomStrip(hK) := by
+  have hk : Measurable (kStrip(hK) : C𝔽 × C𝔽 → ℂ) := (Lp.stronglyMeasurable _).measurable
+  refine ⟨hk, ?_⟩
+  have hc : Continuous φ.val :=
+    continuous_schwartzBruhat
+      (⟨φ.val, bruhatCompactSupport_mem_schwartz φ.property⟩ : SchwartzBruhat C𝔽)
+  unfold globalStripGeometricKernel
+  exact (hc.measurable.comp (measurable_fst.mul measurable_snd.inv)).sub hk
 
 end MeasurableKernels
 
