@@ -11,7 +11,7 @@ new upstream beyond normal Claiming/Releasing. STAFFING (user): always 4 Sonnet 
 issue we work on or have queued for one of our agents.
 
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
-   last check (last seen: AGENTS 3de969e), re-read the change, update the briefs (HUNTER.md first),
+   last check (last seen: AGENTS 3de969e, ERRATA a04742c), re-read the change, update the briefs (HUNTER.md first),
    and update "last seen" here.
 1. Run `status.sh` and `cleanup.sh` under timeout, output tailed.
 2. Fix failing Verdicts or review comments with short Sonnet fixers; re-check the PR's state first.
@@ -30,7 +30,7 @@ issue we work on or have queued for one of our agents.
    it repeats.
 6. READY or HINT lines in `== sieve`: launch ONE siever (SIEVER.md) unless one runs. No blind
    hunters.
-7. New issues first: proof issues newer than the last shortlisted (last: #4616) get
+7. New issues first: proof issues newer than the last shortlisted (last: #5344, triage7a-f) get
    `shortlist.py` on their files and a Haiku triage (TRIAGE.md) into a new `triage<k>.tsv`; update
    "last" here. Keep 4 Sonnet hunters (HUNTER.md, tag "Claude Sonnet 5.5, effort medium") on rows
    rated 1–2 (then 3) with unclaimed issues: one file per hunter, ONE PR PER TOUCHED FILE, each

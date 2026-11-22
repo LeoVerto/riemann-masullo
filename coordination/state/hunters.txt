@@ -39,3 +39,5 @@ w16 (finished 16:05Z: released #4535, core of Thm 7.2.1.1 + depends on sorried s
 16:07Z triage7a-d done (19 rows rated 1-2, SUSPECT #5108 queued to findings). Launched w17 Ch11 Sec1b, w18 Ch10 Sec4a (not #5248, FleckiBunti), w19 Ch10 Sec3, w20 Ch10 Sec4b #5298 + Ch07 Sec5 #5131
 w20 (finished 16:26Z: PR #5355 proves #5298 Ch10 Sec4b, PR #5356 proves #5131 Ch07 Sec5)
 16:27Z CPU load: warm+sieve at nice 19, HUNTER.md timeouts 900/300/3600; w21 Ch07 Sec4 #5091 #5108; Haiku triage 7e 7f (last 182 rows)
+w18 (finished 16:33Z: PR #5358 Ch10 Sec4a closes 8 (#5249 #5253-#5257 #5262 #5263); released #5275 (time))
+16:33Z w22 Ch10 Sec4b #5288 #5290 #5316 (lead from triage7e)

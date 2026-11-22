@@ -209,6 +209,9 @@ State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims
 - The "PR check" Verdict is the merge gate. Cancelled "Lean Action CI" runs are expected; do not
   re-run them. Issues of merged PRs stay open until the merger runs `issues.py --apply`; they are
   not orphans.
+- **A nagger SendMessage to an agent that is waiting on background work resumes it, and it then
+  reports to the nagger, not the coordinator** (esc-sec5, 2026-11-22 ~17:50Z). Track such agents
+  through `notes/report-<name>.md`, their PR and `claims.txt` in the hourly check.
 - Never `pgrep`/`pkill -f` a pattern from your own command line; kill only PIDs you started.
 
 ## Upstream reports (integrator decides)
