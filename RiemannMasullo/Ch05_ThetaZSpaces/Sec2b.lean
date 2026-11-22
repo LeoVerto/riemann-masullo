@@ -4,6 +4,8 @@ public import RiemannMasullo.Ch05_ThetaZSpaces.Sec2
 public import RiemannMasullo.Ch04_PeriodicSchauderBases.Sec3b
 import RiemannMasullo.ForMathlib.Topology.Algebra.Module.StrongDualQuotient
 import RiemannMasullo.ForMathlib.Topology.ContinuousMap.Sigma
+import RiemannMasullo.ForMathlib.MeasureTheory.Integral.Bochner.Regular
+import RiemannMasullo.ForMathlib.NumberTheory.NumberField.Completion.FinitePlace
 
 import all RiemannMasullo.AppC_LCTVS.Sec1
 
@@ -697,19 +699,135 @@ theorem sLocalThetaIsotypicAverage_equiv (χ : PontryaginDual (J₁(S))) :
 -- TODO(paper-gap): The global L² argument on p. 237 fails at norm zero for
 -- the rational Gaussian. Apply character uniqueness on each compact norm-one fibre.
 
+set_option linter.overlappingInstances false in
+/-- A continuous function on a compact abelian group whose integrals against all characters
+vanish is zero. -/
+private theorem exists_globalThetaToHomogeneousProduct_charUnique {G : Type*} [CommGroup G]
+    [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [CompactSpace G]
+    [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsHaarMeasure] [μ.Regular] (φ : C(G, ℂ))
+    (hz : ∀ χ : PontryaginDual G, ∫ x, φ x * (χ x : ℂ) ∂μ = 0) : φ = 0 := by
+  let ev (x : G) : PontryaginDual G →* Circle :=
+    { toFun := fun χ ↦ χ x, map_one' := rfl, map_mul' := fun _ _ ↦ rfl }
+  have hsep : Injective ev := fun _ _ h ↦
+    pontryaginDual_pairing_separates.1 (funext (DFunLike.congr_fun h))
+  have hi : Integrable φ μ :=
+    φ.continuous.integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _)
+  have hae := ae_eq_zero_of_integral_mul_circle_eq_zero ev (fun χ ↦ χ.continuous) hsep hi hz
+  have heq := Measure.eq_of_ae_eq hae φ.continuous continuous_const
+  exact ContinuousMap.ext fun g ↦ congrFun heq g
+
+private theorem exists_globalThetaToHomogeneousProduct_pi {E : Type*} [AddCommGroup E]
+    [Module ℂ E] [TopologicalSpace E] {ι : Type*} (K : Submodule ℂ E) (L : ι → Submodule ℂ E)
+    (hKL : ∀ i, K ≤ L i) (hinj : ∀ f, (∀ i, f ∈ L i) → f ∈ K) :
+    ∃ P : (E ⧸ K) →L[ℂ] (∀ i, E ⧸ L i),
+      Injective P ∧ ∀ (f : E) i, P (K.mkQ f) i = (L i).mkQ f := by
+  let P : (E ⧸ K) →ₗ[ℂ] (∀ i, E ⧸ L i) :=
+    LinearMap.pi fun i ↦ K.mapQ (L i) LinearMap.id (hKL i)
+  have hc : Continuous P :=
+    K.isQuotientMap_mkQ.continuous_iff.mpr
+      (continuous_pi fun i ↦ (L i).isQuotientMap_mkQ.continuous)
+  refine ⟨⟨P, hc⟩, ?_, fun f i ↦ rfl⟩
+  change Injective P
+  refine LinearMap.ker_eq_bot.mp (LinearMap.ker_eq_bot'.mpr fun q hq ↦ ?_)
+  induction q using Submodule.Quotient.induction_on with
+  | _ f =>
+    refine (Submodule.Quotient.mk_eq_zero K).mpr (hinj f fun i ↦ ?_)
+    exact (Submodule.Quotient.mk_eq_zero (L i)).mp (congrFun hq i)
+
+private theorem exists_sLocalThetaToHomogeneousProduct_le (χ : PontryaginDual (J₁(S))) :
+    Kₛ(S) ≤ Kₛω(S, χ) := by
+  intro f hf
+  have hθ (g : Jₛ(S)) : sLocalAdelicThetaOnClasses F S f g = 0 := by
+    induction g using QuotientGroup.induction_on with | H x => ?_
+    exact (sLocalAdelicThetaOnClasses_mk F S f x).trans
+      (DFunLike.congr_fun (LinearMap.mem_ker.mp hf) x)
+  refine LinearMap.mem_ker.mpr (ContinuousMap.ext fun g ↦ ?_)
+  rw [sLocalHomogeneousAdelicThetaLinearMap_apply]
+  simp [hθ]
+
+private theorem exists_globalThetaToHomogeneousProduct_le (ω : PontryaginDual C₁) :
+    K𝔽 ≤ K𝔽ω(ω) := by
+  intro f hf
+  have hθ : adelicTheta f = 0 := hf
+  refine LinearMap.mem_ker.mpr (ContinuousMap.ext fun g ↦ ?_)
+  change homogeneousAdelicTheta ω f g = 0
+  simp [homogeneousAdelicTheta, hθ]
+
+private theorem exists_sLocalThetaToHomogeneousProduct_ker (f : ℬₛ(S))
+    (hf : ∀ χ : PontryaginDual (J₁(S)), f ∈ Kₛω(S, χ)) : f ∈ Kₛ(S) := by
+  let : MeasurableSpace (J₁(S)) := borel _
+  have : BorelSpace (J₁(S)) := ⟨rfl⟩
+  have : CompactSpace (J₁(S)) := isCompact_iff_compactSpace.mp
+    ((isProperMap_sIdeleQuotientNorm F S).isCompact_preimage isCompact_singleton)
+  have : T2Space (Jₛ(S)) :=
+    letI := isClosed_sProjectedDiagonal (F := F) (S := S)
+    inferInstance
+  let (v : S) : ProperSpace (v.val.adicCompletion F) := properSpace_adicCompletion v.val
+  let (w : InfinitePlace F) : SecondCountableTopology w.Completion :=
+    (InfinitePlace.Completion.isometry_extensionEmbedding w).isEmbedding.secondCountableTopology
+  let : SecondCountableTopology (SAdeleRing F S) := inferInstanceAs (SecondCountableTopology
+    (((w : InfinitePlace F) → w.Completion) × ((v : S) → v.val.adicCompletion F)))
+  let : SecondCountableTopology (SAdeleRing F S)ˣ :=
+    (sIdeleGroup_description F S).1.secondCountableTopology
+  let : SecondCountableTopology (Jₛ(S)) := inferInstance
+  let : SecondCountableTopology (J₁(S)) := TopologicalSpace.Subtype.secondCountableTopology _
+  let μ := sLocalNormOneQuotientMeasure F S
+  have : μ.IsHaarMeasure := (sLocalNormOneQuotientMeasure_normProduct (F := F) (S := S)).1
+  have : μ.Regular := Measure.regular_of_isMulLeftInvariant isCompact_univ
+    (by simp) (measure_ne_top μ _)
+  have hθ : sLocalAdelicThetaOnClasses F S f = 0 := by
+    ext g
+    let φ : C(J₁(S), ℂ) := ⟨fun h ↦ sLocalAdelicThetaOnClasses F S f (g * h.val),
+      (sLocalAdelicThetaOnClasses F S f).continuous.comp
+        (continuous_const.mul continuous_subtype_val)⟩
+    have hφ : φ = 0 := exists_globalThetaToHomogeneousProduct_charUnique μ φ fun χ ↦ by
+      have h := DFunLike.congr_fun (LinearMap.mem_ker.mp (hf χ)) g
+      rw [sLocalHomogeneousAdelicThetaLinearMap_apply] at h
+      exact h
+    simpa [φ] using DFunLike.congr_fun hφ 1
+  refine LinearMap.mem_ker.mpr (ContinuousMap.ext fun x ↦ ?_)
+  refine (sLocalAdelicThetaOnClasses_mk F S f x).symm.trans ?_
+  rw [hθ]
+  rfl
+
+private theorem exists_globalThetaToHomogeneousProduct_ker (f : ℬ𝔽)
+    (hf : ∀ ω : PontryaginDual C₁, f ∈ K𝔽ω(ω)) : f ∈ K𝔽 := by
+  let : MeasurableSpace C𝔽 := borel _
+  have : BorelSpace C𝔽 := ⟨rfl⟩
+  have : T2Space C𝔽 := (ideleGroup_quotient.{_, 0} F).2.2.2.2.2.1
+  have : CompactSpace C₁ := (ideleClassGroup_finiteness F).2.1
+  let μ := normOneIdeleClassTamagawaMeasure F
+  have hspec := (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec
+  have : μ.IsHaarMeasure := hspec.2.2.2.1
+  have : μ.Regular := hspec.2.2.2.2.1
+  have hθ : adelicTheta f = 0 := by
+    ext g
+    let φ : C(C₁, ℂ) := ⟨fun h ↦ adelicTheta f (h.val * g),
+      (adelicTheta f).continuous.comp (continuous_subtype_val.mul continuous_const)⟩
+    have hφ : φ = 0 := exists_globalThetaToHomogeneousProduct_charUnique μ φ fun ω ↦ by
+      have h := DFunLike.congr_fun (LinearMap.mem_ker.mp (hf ω)) g
+      exact h
+    simpa [φ] using DFunLike.congr_fun hφ 1
+  exact hθ
+
 /-- Paper: Proposition 5.2.3.2(2), p. 236.
 The canonical global map to the product of homogeneous theta quotients is
 continuous and injective. -/
 theorem exists_globalThetaToHomogeneousProduct :
     ∃ P : Θ𝔽 →L[ℂ] (∀ ω : PontryaginDual C₁, Θ𝔽ω(ω)),
-      Injective P ∧ ∀ (f : ℬ𝔽) ω, P ((K𝔽).mkQ f) ω = (K𝔽ω(ω)).mkQ f := by sorry
+      Injective P ∧ ∀ (f : ℬ𝔽) ω, P ((K𝔽).mkQ f) ω = (K𝔽ω(ω)).mkQ f :=
+  exists_globalThetaToHomogeneousProduct_pi (K𝔽) (fun ω ↦ K𝔽ω(ω))
+    exists_globalThetaToHomogeneousProduct_le exists_globalThetaToHomogeneousProduct_ker
 
 /-- Paper: Proposition 5.2.3.2(2), p. 236.
 The canonical S-local map to the product of homogeneous theta quotients is
 continuous and injective. -/
 theorem exists_sLocalThetaToHomogeneousProduct :
     ∃ P : Θₛ(S) →L[ℂ] (∀ χ : PontryaginDual (J₁(S)), Θₛω(S, χ)),
-      Injective P ∧ ∀ (f : ℬₛ(S)) χ, P ((Kₛ(S)).mkQ f) χ = (Kₛω(S, χ)).mkQ f := by sorry
+      Injective P ∧ ∀ (f : ℬₛ(S)) χ, P ((Kₛ(S)).mkQ f) χ = (Kₛω(S, χ)).mkQ f :=
+  exists_globalThetaToHomogeneousProduct_pi (Kₛ(S)) (fun χ ↦ Kₛω(S, χ))
+    exists_sLocalThetaToHomogeneousProduct_le exists_sLocalThetaToHomogeneousProduct_ker
 
 local notation "M𝔽ω(" ω ")" => meromorphicNormOneComponent m𝔽
   (isProperMap_ideleClassNorm F).continuous ω (globalIdelicOrderBound (F := F))
