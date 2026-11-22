@@ -16,3 +16,5 @@ The user, 2026-11-22: read issue comments for earlier approaches when claiming; 
 - Release ONLY via .agent/sweeptools/release.sh <n> "<reason>": it posts `Releasing (<M>): reason` plus the notes, updates claims.txt and archives to notes/released/. watchdog.sh calls it, and so should the coordinator for stale or orphan claims.
 - PR bodies carry `Prover: <M>` above the 🤖 line.
 Related: [[low-hanging-sweep]], [[critical-path-workstream]].
+
+Update (user, 2026-11-22 ~08:45Z): "Why are we not claiming these if we're working on them?" — claim every issue we work on OR have queued for one of our agents. When a Sonnet releases an issue as stuck and it is escalated to Opus, re-claim it immediately ("Claiming (Claude Opus 5.5, default effort)", noting it is queued), add to claims.txt; never leave queued work released. Stale-claim releases must skip the ESCALATION QUEUE in leads.txt.

@@ -228,7 +228,11 @@ hand-ins happen at a normal pace once the issues exist.
 - **Opus**: "The cone doesn't matter at this point ... Just pick any open issue for Opus." Any open,
   unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held); no remapping. The
   mapper-fix job is dropped.
-- Crons now: only the hourly check **eb59d910** at :17.
+- Crons now: only the hourly check **d6366fe2** at :17.
+- **Claim what we work on or queue (user, ~08:45Z).** Escalated stuck issues are re-claimed at once
+  under the Opus tag ("queued for an Opus prover"); #4338 and #4408 claimed 08:45Z. Stale-claim
+  releases skip the ESCALATION QUEUE; watchdog.sh releases everything only when the whole session
+  is idle (correct).
 - **Escalation (user, ~08:30Z): "If sonnet gets stuck on the proofs, hand them off to opus."** Issues a
   Sonnet released as stuck go to an Opus escalation prover (HUNTER.md brief, one file each, after our
   Sonnet leaves the file); max 2 Opus at once (assumption). Running: **esc-sec2b** (Opus, Ch05 Sec2b
