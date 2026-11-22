@@ -1,0 +1,50 @@
+rating	file:line	decl	issue	note
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:501	globalThetaKernel_eq_induced_closure	4120	closure in induced topology; needs kernel infrastructure
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:490	sLocalThetaKernel_eq_induced_closure	4119	same argument as previous, S-local
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:75	sLocalPolarMultiplicity_eq_zero_iff	4035	unfold multiplicity; nonnegative meromorphic order
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:152	sLocalRhoPoleOrder_eq_one_iff	4051	compare pole order with meromorphic order in chart
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:56	rationalPrimeSplitsCompletely_rat	4043	unfold splitting; degree-one extension of Q
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:176	finitePlacePrincipalValue_unique	4145	uniqueness via isotype decomposition
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:665	testFunction_inductiveTensor_equiv	4183	completed inductive tensor isomorphism; deep
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:395	entireIdealAnnihilator_one	4068	unfold annihilator; unit ideal is whole ring
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:371	entireJet_apply	4066	unfold entireJet; iteratedDeriv coercion
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:186	finiteHeckeEulerProduct_poles_iff	4041	order of product vs factors; no-cancellation argument
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:744	complexDiracDerivative_one_zero	4187	unfold Dirac derivative; sign from Wirtinger definition
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:482	schwartzBergman_jet_eq_mellinInv_moment	4073	Mellin inversion and moment convergence; analytic
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:767	mem_complexSchwartzFlatAtOrigin_iff	4189	unfold flat subspace; Wirtinger derivative lemmas
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:66	reciprocalEulerProduct_over_prime_zero	4044	zero location and phase lattice argument
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:29	quasiCharacterNormTwist_mem_component	4080	kernel elements have norm one; cpow of 1
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:505	realSchwartzFlatQuotient_strongDual	4172	embedding and range of strong dual pullback
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:146	sLocalIdelicOrderBound_eq_neg_poleOrder	4050	unfold order bound and pole order; casts
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:451	realTemperedDistribution_eq_sum_diracDerivative	4167	structure theorem for distributions at zero
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:156	sLocalHomogeneousAdelicTheta_rat_not_isBigO_sqrt	4039	counterexample needing asymptotic estimates
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:173	finiteHeckeEulerFactor_poles_iff	4040	pole locus of unramified factor; period lattice
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:88	sLocalZLaurentCoeff_hasLaurentSeries	4036	Laurent expansion convergence on punctured disc
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:43	isGaloisType_normPower	4042	unfold IsGaloisType; trivial character case
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:754	complexTemperedDistribution_eq_sum_diracDerivative	4188	structure theorem for complex distributions at zero
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:99	sLocalRhoFactor_poles_iff	4037	union of three pole families; long case analysis
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:100	infinite_split_primes_unramified	4047	long statement (50 lines); not read further
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:80	reciprocalEulerProduct_over_prime_order_le	4045	analytic order bound by degree
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:528	orbitalHeckeGenerator_empty	4076	unfold generator; empty product identity
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:70	finitePlaceDifference_eq_of_unitInvariant	4137	uniformizer change; scaling by unit argument
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:121	sLocalNormOneCharacter_eq_sIdeleRestriction	4084	descended character agrees on norm-one classes
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:445	realDiracDerivative_one	4166	unfold; derivative at zero with sign
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:684	testFunction_no_projectiveTensor_product	4184	non-existence of projective tensor map; real argument
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:216	sLocalRhoPoleOrder_excess_eq_neg_normTwist	4057	excess pole forces location at negative twist
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:271	exists_globalPolarThetaMellin	4060	existence of induced map on quotient
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:221	archimedeanWeightedSchwartzSubmodule_singleton_zero	4214	ext over weights; zero exponents give Schwartz space
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:238	archimedeanWeightedSchwartz_empty_equiv	4215	build continuous linear equivalence to scalars
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:628	distribution_coordinatePlane_decomposition_eq_sum	4180	distribution decomposition on coordinate planes
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:620	coordinatePlaneDiracTensor_zero	4179	unfold tensor at zero multi-index
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:211	archimedeanSchwartzTwist_apply	4213	unfold twist; norm powers and casts
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:546	globalThetaMellin_isotypicAverage	4125	Tamagawa average and norm-one Haar mass
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:307	conj_not_mem_entireContinuousMapSubalgebra	4062	long statement (46 lines); not read further
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:464	mem_realSchwartzFlatAtOrigin_iff	4168	flat subspace characterized by derivatives at zero
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:723	schwartzWirtingerZ_add_zBar	4185	unfold Wirtinger sum; real directional derivative
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:272	finiteProjectiveTensor_empty_equiv	4219	equivalence with scalars; empty tensor infrastructure
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:166	finitePlacePrincipalValue_spec	4144	unfold definitions; pointwise agreement
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:52	archimedeanUnitModulation_apply	4195	unfold module evaluation; norm power
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:263	existsUnique_ideleNormSection_character_phase	4059	existence and uniqueness of phase
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:555	sLocalThetaMellin_isotypicAverage	4126	S-local Tamagawa average and Haar mass
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:135	finitePlacePrincipalValue_mem	4141	Schwartz-Bruhat membership of averaging formula
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:186	sLocalRhoPoleOrder_le_archimedean_of_re_neg	4054	pole order bound in left half-plane

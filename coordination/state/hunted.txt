@@ -39,3 +39,5 @@ appB  2026-11-22T02:27Z  hunt/appb5 started (sonnet medium, 47 unclaimed, newest
 appB  2026-11-22T02:28Z  hunt/appb5 finished: 0 PRs; all 46 unclaimed appB issues (#3749-#3914, Sec4b/5/6) are deep; #3864 heckeNormCoefficient_natCast closest (needs LFunction unfolding vs finsum over ideals of given norm)
 sieve  2026-11-22T02:55Z  sieve.sh service live (PID 45589/45591); sweep4 agent retired (0 PRs, no claims; res4 had 4 cheap results)
 crit  2026-11-22T03:17Z  crit/2663 finished: PR #4021 (proved modulo AppD exists_modulatedExponentialDecay_translationAction; signature-compare false positive from #2693 hcover sorry line shift); crit/3484 started (opus)
+triage  2026-11-22T04:22Z  haiku triage N=60 on new issues (Ch07 Sec1a/1b, Ch05 Sec2b/3a/3b; 176 issues #4034-#4213)
+w3  2026-11-22T04:23Z  hunt/w3 started (sonnet medium) on 12 Haiku-triaged quick wins (#4042 #4043 #4066 #4068 #4076 #4144 #4166 #4179 #4187 #4195 #4213 #4080)

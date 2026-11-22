@@ -1,0 +1,103 @@
+score	file:line	decl	issue	sweep_issue	signals
+71.9	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:75	sLocalPolarMultiplicity_eq_zero_iff			sig165c/2l name_zero_iff_eq_eq_ paper:no-proof
+71.8	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:110	sLocalThetaToGlobal_range_eq_invariants			sig169c/2l name_eq_eq_ doc:trivial paper:no-own-proof
+70.2	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:100	sLocalThetaTransition_range_eq_invariants			sig194c/2l name_eq_eq_ doc:trivial paper:no-own-proof
+69.7	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:152	sLocalRhoPoleOrder_eq_one_iff			sig211c/3l name_one_iff_eq_eq_ doc:sanity paper:no-own-proof
+69.5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:56	rationalPrimeSplitsCompletely_rat			sig98c/1l doc:sanity paper:no-proof
+67.7	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:149	sLocalThetaIsotypeSum_complete			sig51c/1l name_comp paper:no-proof
+67.7	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:160	globalThetaIsotypeSum_complete			sig51c/1l name_comp paper:no-proof
+67.3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:395	entireIdealAnnihilator_one			sig66c/0l name_one doc:sanity paper:no-own-proof
+64.2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:371	entireJet_apply			sig111c/1l name_apply doc:sanity paper:?
+64.1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:186	finiteHeckeEulerProduct_poles_iff			sig195c/3l name_iff paper:no-proof
+61.7	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:482	schwartzBergman_jet_eq_mellinInv_moment			sig93c/1l name_eq_eq_
+61.0	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:66	reciprocalEulerProduct_over_prime_zero			sig282c/5l name_zero paper:no-proof
+60.8	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:76	sLocalHomogeneousThetaToGlobal_equiv_of_unramified			sig287c/4l name_eq doc:trivial paper:no-own-proof
+60.5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:63	sLocalHomogeneousThetaTransition_equiv_of_unramified			sig261c/4l name_eq doc:trivial paper:no-own-proof
+60.4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:178	sLocalThetaIsotypeSum_inherited_properties			sig63c/1l paper:no-proof
+60.4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:188	globalThetaIsotypeSum_inherited_properties			sig63c/1l paper:no-proof
+59.9	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:296	finitePlaceUnitAverage_eq_zero_iff			sig165c/2l name_zero_iff_eq_eq_ paper:?
+59.7	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:146	sLocalIdelicOrderBound_eq_neg_poleOrder			sig171c/1l name_neg_eq_eq_ paper:?
+58.4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:156	sLocalHomogeneousAdelicTheta_rat_not_isBigO_sqrt			sig144c/2l doc:trivial paper:no-own-proof
+58.2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:173	finiteHeckeEulerFactor_poles_iff			sig433c/6l name_iff paper:no-proof
+58.1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:88	sLocalZLaurentCoeff_hasLaurentSeries			sig154c/1l paper:no-proof
+57.7	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:43	isGaloisType_normPower			sig91c/1l doc:sanity,trivial paper:?
+57.0	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:99	sLocalRhoFactor_poles_iff			sig79c/1l name_iff paper:no-own-proof
+57.0	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:100	infinite_split_primes_unramified			sig202c/2l paper:no-proof
+56.8	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:80	reciprocalEulerProduct_over_prime_order_le			sig207c/3l paper:no-proof
+56.8	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:528	orbitalHeckeGenerator_empty			sig127c/1l doc:sanity paper:proof1210c
+56.6	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:262	sLocalStandardThetaTensor_toGlobal_openQuotient			sig176c/3l doc:trivial paper:no-own-proof
+56.2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:216	sLocalRhoPoleOrder_excess_eq_neg_normTwist			sig273c/3l name_neg_eq_eq_ paper:no-own-proof
+56.1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:271	exists_globalPolarThetaMellin			sig235c/4l paper:no-proof
+55.5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:307	conj_not_mem_entireContinuousMapSubalgebra			sig142c/1l name_mem doc:sanity red:Continuous paper:?
+55.1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:263	existsUnique_ideleNormSection_character_phase			sig237c/3l name_id red:∃! paper:no-proof
+54.7	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:186	sLocalRhoPoleOrder_le_archimedean_of_re_neg			sig131c/1l name_neg paper:no-own-proof
+52.5	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:267	finitePlaceUnitAverage_zero			sig182c/3l name_zero paper:?
+51.7	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:60	mem_outsideIntegralIdeleUnits_iff			sig213c/3l name_iff paper:?
+51.5	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:333	finiteProductUnitAverage_zero			sig218c/3l name_zero paper:?
+51.3	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:251	sLocalStandardThetaTensor_apply			sig308c/4l name_apply paper:no-own-proof
+50.8	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:75	mem_relativeIntegralIdeleUnits_iff			sig248c/3l name_iff paper:?
+50.6	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:197	sLocalRhoPoleOrder_le_of_re_neg_odd			sig295c/4l name_neg paper:no-own-proof
+49.8	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:310	finitePlaceUnitAverage_coinvariants_equiv			sig287c/3l name_eq
+49.5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:365	finiteStandardThetaAverage_eq_character_mul_integral			sig259c/3l name_eq_eq_ red:∫ paper:?
+49.4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:207	sLocalRhoPoleOrder_exceptions_encard_le			sig106c/1l paper:no-own-proof
+49.3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:179	sLocalRhoPoleOrder_le_card			sig107c/1l paper:no-own-proof
+49.0	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:428	exists_schwartzBergman_entireInclusion			sig118c/1l paper:no-own-proof
+48.9	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:356	finiteProductUnitAverage_coinvariants_equiv			sig323c/3l name_eq
+48.8	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:128	sLocalThetaIsotypeSum_dense			sig48c/1l
+48.8	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:140	globalThetaIsotypeSum_dense			sig48c/1l
+48.8	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:411	spectralAnnihilator_directSum			sig50c/1l
+48.6	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:496	schwartzBergman_normalizedJets			sig54c/1l
+48.2	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:191	finitePlaceSchwartz_invariants_isClosed			sig150c/1l paper:no-own-proof
+48.2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:355	entireJet_properties			sig72c/1l paper:?
+48.2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:547	orbitalAnnihilator_directSum			sig70c/1l paper:proof1210c
+48.1	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:422	sLocalStandardThetaTensor_quotient_equiv			sig316c/5l name_eq paper:?
+48.1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:567	orbitalSchwartzBergman_biorthogonal			sig77c/1l paper:?
+48.0	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:122	sLocalRhoFactor_orderAt_pole			sig82c/1l paper:?
+47.6	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:88	reciprocalEulerProduct_over_split_prime			sig455c/7l paper:no-proof
+47.6	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:383	entireJetSpace_finrank			sig95c/1l paper:?
+47.4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:343	regularizedCompletedHeckeL_ne_zero_at_canceled_poles			sig303c/4l name_zero doc:sanity red:Meromorphic
+47.3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:449	schwartzBergmanDivisible_isClosed			sig108c/1l
+47.0	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:167	finiteHeckeEulerFactors_common_pole_subsingleton			sig162c/2l paper:no-own-proof
+46.9	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:84	globalHomogeneousThetaSpace_nuclearFrechet			sig123c/1l red:Nuclear paper:proof748c
+46.9	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:236	sLocalHomogeneousAdelicTheta_log_bound			sig166c/2l paper:no-own-proof
+46.7	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:211	globalThetaToHomogeneousProduct_not_isInducing			sig131c/1l paper:?
+46.4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:204	globalThetaToHomogeneousProduct_not_isClosed_range			sig145c/1l paper:?
+46.2	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:378	finiteStandardThetaAverage_isClosed_ker			sig153c/1l paper:?
+46.0	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:349	finiteProductSchwartz_unitInvariants_isClosed			sig160c/1l paper:?
+45.6	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:289	finitePlaceUnitAverage_continuous_schwartzBruhat			sig174c/2l paper:?
+45.5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:372	infiniteStandardThetaAverage_isClosed_ker			sig180c/2l paper:?
+45.3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:170	finitePlaceBallIndicator_at_power			sig267c/4l paper:no-own-proof
+45.2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:535	orbitalHeckeGenerator_order_at_canceled_pole			sig151c/2l
+44.9	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:108	split_rationalPrimes_pos_dirichletDensity			sig205c/2l paper:?
+44.5	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:255	finitePlaceSchwartz_unitRelations_closure_eq			sig179c/2l name_eq paper:proof3274c
+44.0	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:309	infiniteStandardThetaAverage_apply			sig198c/3l name_apply red:∫ paper:?
+43.7	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:357	finiteStandardThetaAverage_one			sig213c/3l name_one red:∫ paper:?
+42.2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:456	exists_schwartzBergman_jetRestriction			sig312c/3l
+41.4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:455	infiniteStandardThetaAverage_logBound			sig346c/5l paper:?
+41.0	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:197	finitePlaceSchwartz_invariants_laurent_equiv			sig401c/6l name_eq red:LocallyConvex paper:no-own-proof
+40.8	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:180	finitePlaceSchwartz_invariants_laurent_free			sig447c/7l paper:no-own-proof
+39.5	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:130	schwartzBruhatUnitRepresentation_map_one			sig100c/1l name_one paper:proof7712c
+39.0	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:82	outsideIntegralIdeleUnits_isCompact			sig119c/1l red:IsCompact paper:?
+39.0	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:87	relativeIntegralIdeleUnits_isCompact			sig120c/1l red:IsCompact paper:?
+38.9	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:49	existsUnique_sLocalNormOneQuotientTransition			sig486c/8l doc:trivial red:∃! paper:?
+38.2	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:148	schwartzBruhatUnitRepresentation_apply			sig153c/1l name_apply paper:proof7712c
+38.2	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:393	exists_infiniteStandardThetaMellinAverage			sig153c/3l red:∫ paper:?
+37.5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:443	infiniteStandardThetaAverage_forwardDecay			sig502c/7l paper:?
+37.3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:274	finitePlaceUnitAverage_integrable			sig188c/2l red:Integrable paper:?
+37.3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:316	regularizedCompletedHeckeL_differentiable			sig229c/3l red:Meromorphic paper:no-own-proof
+37.2	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:290	exists_infiniteStandardThetaAverage			sig190c/4l red:∫ paper:?
+36.8	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:511	orbitalHeckeGenerator_differentiable			sig208c/3l red:Differentiable
+36.6	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:342	exists_finiteStandardThetaAverage			sig215c/2l red:∫ paper:?
+36.4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:335	finiteStandardThetaAverage_integrable			sig224c/3l red:Integrable paper:?
+36.2	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:281	finitePlaceUnitAverage_continuous_uniform			sig230c/4l red:Continuous
+35.9	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:120	infinite_split_primes_reciprocalEulerProduct_normTwist			sig486c/6l paper:?
+35.0	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:340	finiteProductUnitAverage_integrable			sig278c/5l red:Integrable paper:?
+33.9	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:280	infiniteStandardThetaAverage_integrable			sig323c/5l red:Integrable paper:?
+33.8	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:230	finiteStandardGaussian_zeta_of_ramified			sig410c/6l red:Integrable paper:no-own-proof
+31.6	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:135	schwartzBruhatUnitRepresentation_map_mul			sig134c/1l paper:proof7712c
+31.3	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:467	ratTrivialHomogeneousTheta_quotient			sig548c/8l doc:trivial paper:proof8686c
+29.6	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:39	exists_heights_reciprocalPartialHeckeEulerProduct_strip_boundedBelow			sig576c/8l red:Tendsto paper:no-own-proof
+29.5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:93	sLocalThetaAction_tendstoUniformly			sig222c/3l red:Tendsto,Filter paper:proof2299c paper:SHORT
+28.0	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:101	sLocalThetaAction_twist_tendstoUniformly			sig279c/3l red:Tendsto,Filter paper:proof2299c paper:SHORT
+25.7	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:286	entireContinuousMap_subalgebra_properties			sig333c/5l red:Continuous,Differentiable paper:?
+16.2	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:226	sLocalSchwartz_invariants_laurent_equiv			sig953c/13l name_eq red:∃!,LocallyConvex

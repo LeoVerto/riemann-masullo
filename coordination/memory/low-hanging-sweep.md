@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-**Latest handover (2026-11-22 ~04:35Z): `git fetch fork coordination/low-hanging-campaign && git show FETCH_HEAD:coordination/HANDOVER.md` (latest 580d7e2; startup checklist inside; supersedes older lines below).**
+**Latest handover (2026-11-22 ~04:35Z): `git fetch fork coordination/low-hanging-campaign && git show FETCH_HEAD:coordination/HANDOVER.md` (latest a55dcee, 2026-11-22 ~05:45Z; startup checklist inside; supersedes older lines below).**
 
 Started 2026-11-21: the user asked to find and close low-hanging proof issues, delegating to subagents in worktrees.
 - Earlier PRs #2067/#2099/#2104 (issues #1313/#1314/#1316) were all merged on 2026-11-21.
@@ -55,3 +55,5 @@ State 2026-11-21 ~04:20:
 - 2026-11-22 ~04:00Z: the user says Ch06 Sec 6.1/6.2 are stated (no issues yet) and expects WAVE 3 to be seeded within a couple of hours. New unswept files: Ch06 Sec1 (25 sorries), Sec2 (31), Ch07 Sec1a (8), Sec1b (38), all added after sweep4's base a7b1173. sweep4 was slow (2 files in 1.5 h). Building a standing `autosweep` service (Sonnet infra agent): it sweeps new/changed files at every warm-base advance, newest first, one Lean process globally, and writes hits.tsv; status.sh classifies hits READY/HINT/CLAIMED/WAIT/DONE against issues. Plan: when the integrator opens issues, the hourly check dispatches short Sonnet hand-in agents on READY batches and posts HINT batches on sweep issues. Retire sweep4 once autosweep works.
 - 2026-11-22 ~04:55Z: the user asked how to find quick wins in the new sections beyond the sieve. Found the `lake env lean` bug (see sandbox quirks). All sieve runs so far had rc 137 (memguard kills) and were wrongly recorded as done. A Sonnet infra agent is fixing the sieve (retry policy, invalidate old results, cwd-based detection), adding grind and unfold-defs passes, and writing shortlist.py: a no-Lean scorer using statement size, name patterns, red-flag notions and the PAPER's proof length via scripts/paper.sh. User approved Haiku triage of the shortlist; REJECTED pre-proving (collaborative, not a race).
 - Haiku triage brief: .agent/sweeptools/TRIAGE.md (rates shortlist/latest.tsv top N 1-5, writes shortlist/triage.tsv). Launch with model haiku after shortlist.py runs; then send Sonnet hunters/sievers on rating 1-2 rows that have unclaimed issues.
+- 2026-11-22 ~06:10Z: NEW ISSUES dropped: #4034-#4213 (Ch07 Sec1a 8, Sec1b 38, Ch05 Sec2b 52, Sec3a 59, Sec3b 18) plus #4033 AppD Sec1c. Ch06 has no issues yet. Sieve priority reordered (files with issues first, Ch06 last); the sieve had swept 0 so far, with its fixes still in progress. shortlist.py re-run (223 rows, 182 with issue). Haiku triage N=60 launched; next, a Sonnet hunter on rows rated 1-2.
+- 2026-11-22 ~06:20Z: Haiku triage (81k tokens, 49 rows rated) gave 12 issues rated 1-2. Sonnet hunter hunt/w3 launched on exactly those, and asked to report the triage's accuracy so the triage can be tuned.

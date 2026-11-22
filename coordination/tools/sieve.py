@@ -4,6 +4,7 @@ import json, os, re, subprocess, sys, time, datetime
 R = "/mnt/faststorage/math/riemann-masullo"; T = R + "/.agent/sweeptools"; WT = R + "/.agent/wt/sieve"
 A = T + "/sieve"; BASE = T + "/base"
 TMO = {"cheap": 3600, "exact": 10800, "grind": 7200, "unfold": 10800}
+CHUNK_CAP = 2  # chunk runs per file per cycle, then the queue is re-ranked
 PASSES = ("cheap", "exact", "grind", "unfold")
 ONLY = os.environ.get("SIEVE_ONLY")  # test: comma list of files
 sys.path.insert(0, T)
@@ -79,6 +80,27 @@ def set_fail(key, v):
     else: d[key] = v
     json.dump(d, open(A + "/fails.json.tmp", "w")); os.replace(A + "/fails.json.tmp", A + "/fails.json")
 
+_ISS = {}
+def issue_names(c):
+    """names in backticks in titles of open proof issues; one gh call per base commit."""
+    if _ISS.get("c") != c:
+        names = set()
+        try:
+            for it in json.loads(sh(["gh", "issue", "list", "--label", "proof", "--state", "open", "--limit", "3000", "--json", "title"], cwd=R).stdout):
+                names |= {x.split(".")[-1] for x in re.findall(r"`([^`]+)`", it["title"])}
+            _ISS.clear(); _ISS.update(c=c, names=names, files={})
+        except Exception as e:
+            log("gh failed", repr(e)); _ISS.update(c=c, names=_ISS.get("names", set()), files={})
+    return _ISS["names"]
+def has_issue(c, f, blob):
+    names = issue_names(c)
+    if (f, blob) not in _ISS["files"]:
+        src = sh(["git", "-C", WT, "show", f"{c}:{f}"]).stdout.split("\n")
+        _ISS["files"][(f, blob)] = any(decl_of(src, i).split(".")[-1] in names for i, _ in find_sorries(src))
+    return _ISS["files"][(f, blob)]
+def due_head(c):
+    q = due_files(c); return q[0][2] if q else None
+
 def due_files(c):
     swept = {}
     if os.path.exists(A + "/swept.tsv"):
@@ -98,6 +120,7 @@ def due_files(c):
         if fails().get(f"{f}|{passes[0]}|{blob}", {}).get("after", 0) > time.time(): continue  # backing off
         changed = any((f, ps) in swept for ps in PASSES)
         tier = 0 if (changed or ct > time.time() - 12 * 3600) else 1
+        if tier >= 0 and not has_issue(c, f, blob): tier += 2   # no open proof issue yet: after files that have one
         if f in prio: tier, ct = -1, -prio.index(f)
         q.append((tier, -ct, f, blob, passes))
     q.sort()
@@ -118,6 +141,7 @@ def run_scope(f, ps, out, only=None, tries=2):
     for t in range(tries):
         wait_ready(); d = run_sweep(f, ps, out, extra)
         if not bad(d): return d
+        if d["rc"] == 124: log("timeout", f, ps, "only=", only); return None
         log("bad run rc", d["rc"], f, ps, "only=", only, "try", t + 1); time.sleep(60 * (t + 1))
     return None
 
@@ -130,25 +154,35 @@ def sweep_file(f, blob, ps, c):
     if nf < 2:
         wait_ready(); d = run_sweep(f, ps, out, ["--timeout", str(TMO[ps])])
         if bad(d):
-            set_fail(key, {"n": nf + 1, "after": time.time() + 900 * 2 ** nf, "rc": d["rc"]})
+            n2 = 2 if d["rc"] == 124 else nf + 1  # a timeout is deterministic: go straight to chunks
+            set_fail(key, {"n": n2, "after": time.time() + (60 if d["rc"] == 124 else 900 * 2 ** nf), "rc": d["rc"]})
             with open(A + "/swept.tsv", "a") as fh:
                 fh.write(f"{f}\t{blob}\t{ps}\t{d['rc']}\t{out}\t{now()}\tstatus=retry attempts={nf + 1}\n")
             log("requeue", f, ps, "rc", d["rc"], "attempt", nf + 1); return False
     else:
-        log("chunk mode", f, ps)
-        lines = sorted({i + 1 for i, _ in find_sorries(open(f"{WT}/{f}").read().split("\n"))})
-        src = open(f"{WT}/{f}").read().split("\n"); merged = {}; rcs = []
-        def take(dd, fallback_lines):
-            for s in dd["sorries"]: merged[(s["line"], s["col"])] = s
-        for k in range(0, len(lines), 4):
-            ch = lines[k:k + 4]; o = out + ".chunk"
-            cd = run_scope(f, ps, o, ch)
-            if cd is not None: take(cd, ch); continue
-            for l in ch:
-                sd = run_scope(f, ps, o, [l])
-                if sd is not None: take(sd, [l])
-                else: gaveup += 1; merged[(l, -1)] = {"line": l, "col": -1, "decl": decl_of(src, l - 1), "tac": None, "err": "gaveup"}
-        os.path.exists(out + ".chunk") and os.remove(out + ".chunk")
+        pf = f"{A}/partial/{f.replace('/', '_')}.{ps}.{blob[:8]}.json"; os.makedirs(A + "/partial", exist_ok=True)
+        src = open(f"{WT}/{f}").read().split("\n")
+        if os.path.exists(pf): P = json.load(open(pf))
+        else:
+            lines = sorted({i + 1 for i, _ in find_sorries(src)})
+            P = {"todo": [lines[k:k + 4] for k in range(0, len(lines), 4)], "sorries": [], "gaveup": 0}
+        log("chunk mode", f, ps, "todo units", len(P["todo"]))
+        units = 0
+        while P["todo"] and units < CHUNK_CAP:
+            ch = P["todo"][0]; units += 1
+            cd = run_scope(f, ps, out + ".chunk", ch)
+            P["todo"].pop(0)
+            if cd is not None: P["sorries"] += cd["sorries"]
+            elif len(ch) > 1: P["todo"] = [[l] for l in ch] + P["todo"]
+            else:
+                P["gaveup"] += 1
+                P["sorries"].append({"line": ch[0], "col": -1, "decl": decl_of(src, ch[0] - 1), "tac": None, "err": "gaveup"})
+            json.dump(P, open(pf, "w"))
+            if P["todo"] and units < CHUNK_CAP and due_head(c) not in (None, f): break  # preempted by a higher-ranked file
+        if P["todo"]:
+            log("chunk cycle ends", f, ps, "todo units", len(P["todo"])); return False
+        os.path.exists(out + ".chunk") and os.remove(out + ".chunk"); os.remove(pf)
+        gaveup = P["gaveup"]; merged = {(x["line"], x["col"]): x for x in P["sorries"]}
         d = {"file": f, "rc": 0 if not gaveup else 124, "sorries": list(merged.values()), "other_errors": [], "chunked": True, "gaveup": gaveup}
         json.dump(d, open(out, "w"), indent=1)
     set_fail(key, None)

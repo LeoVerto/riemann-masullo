@@ -70,7 +70,7 @@ Your model tag <M> is given in the launch prompt (default `Claude Sonnet 5.5, ef
 2. `S/sweep.py <wt> <file> <out.json> [--exact]` per file with a `sorry`, cheap pass then `--exact`,
    newest files first, with generous timeouts (tens of minutes per file). If a whole file times out,
    split it rather than give up. Run at most ONE sweep Lean process at a time (an `exact?` process
-   needs 3–5 GB; memguard kills the newest sweep Lean process below 3 GB free). Run it in the
+   needs 3–5 GB; memguard kills the newest sweep Lean process, or any Lean process if none, below 1 GB free; if yours is killed, see the memguard section in HUNTER.md and change approach rather than retrying). Run it in the
    background and wait with one blocking wait.
 3. Triage the hits as above (READY / HINT / drop), then hand in and post hints.
 4. Remove the manual worktree with `git worktree remove --force` when done.

@@ -1,6 +1,6 @@
 # Coordinator handover: critical path, sieve and hunters
 
-State as of 2026-11-22 ~05:45Z (service logs use local CET = UTC+1). This
+State as of 2026-11-22 04:35Z. **Time zones:** the shell, `status.sh` and the service logs use CET (UTC+1); the cron tool uses UTC. Earlier notes from this day give times about one hour too late when they say "Z". This
 branch (`coordination/low-hanging-campaign` on the `LeoVerto` fork) is **not meant to be merged**:
 `scripts/` and `prompts/` are integrator-owned, and `lean/Sweep*.lean.txt` define tactic macros,
 which the project bans from the library. It records the strategy, tools and state needed to take
@@ -11,6 +11,15 @@ ignored by git: `sweeptools/` (tools and state), `wt/` (worktrees) and `memory/`
 The folders here (`tools/`, `state/`, `critical/`, `sieve/`, `memory/`, `lean/`) are snapshots of
 them. `/home/agent/{sweeptools,wt}` are compatibility symlinks, and they are lost when the sandbox
 is recreated.
+
+## PAUSE in effect (2026-11-22 04:35Z until the usage reset at 05:40Z)
+
+- The user is near the usage limit. **Start no new Opus agents before 05:40Z.** The running #3484
+  Opus prover may finish.
+- Sonnet agents run on usage credits (user-approved).
+- The hourly cron is deleted. A one-shot cron (05:45Z, session-only) re-creates it from the "Hourly
+  check" section below, runs one check, and allows Opus provers again. If the session died, do
+  this by hand after 05:40Z.
 
 ## Standing instructions from the user
 
@@ -89,38 +98,35 @@ is recreated.
 
 ## State at handoff
 
-**Running:**
-- **Opus prover on #3484** (`schwartzBruhat_fourier_equiv`, AppD Sec1c, 11 dependents, bridge
-  tier, XL). The upstream sweeper on that file (#3792) finished without it, and the prover is told
-  to start from that sweeper's report. Worktree `.agent/wt/crit-3484`.
-- **Sonnet infra agent** fixing the sieve and building `shortlist.py`:
-  - Treat rc 137/124 as not done; retry with backoff, then split. Every earlier sieve run was a
-    memguard kill recorded as "done".
-  - Invalidate all results made with `lake env lean`.
-  - Detect sieve processes by cwd.
-  - Add `grind` and unfold-defs passes.
-  - `shortlist.py` is a no-Lean scorer: statement size, name patterns, red-flag notions, and the
-    paper's own proof length via `scripts/paper.sh`.
-  If it did not finish, check `SIEVE.md`, `sieve.log` and `shortlist/`.
-- **The sieve** is re-sieving everything with `lake lean`, new files first (Ch06 Sec1/Sec2, Ch07
-  Sec1a/Sec1b), 132 passes queued. No hits yet.
+**Running at 04:35Z:**
+- **Opus prover on #3484** (`schwartzBruhat_fourier_equiv`, AppD Sec1c, 11 dependents). It started
+  from sweep #3792's failure report. Worktree `.agent/wt/crit-3484`.
+- **Sonnet hunter `hunt/w3`** on the 12 issues the Haiku triage rated 1–2 in the new sections:
+  #4042 #4043 #4066 #4068 #4076 (Ch07 Sec1b), #4144 #4166 #4179 #4187 (Ch05 Sec3a), #4195
+  #4213 (Ch05 Sec3b), #4080 (Ch05 Sec2b), plus #4035 (Ch07 Sec1a, closed by the sieve's unfold
+  pass with `simp [defs]`).
+  - First PR: #4323 (four sanity lemmas, Ch07 Sec1b).
+  - Its claims are in `claims.txt`. Its report includes how accurate the triage was.
+- **The sieve v2:**
+  - Its queue ranks files with open issues first (Ch07 Sec1a, Sec1b, Ch05 Sec2b, Sec3a, Sec3b),
+    then the slow Ch06 Sec1, which takes >60 min per run and gets at most 2 chunks per cycle.
+  - Passes: cheap, exact, grind, unfold.
+  - Retries rc 124/137, then splits. A completed pass shows rc 1.
 
-**Next once `shortlist/latest.tsv` exists:**
-1. Haiku triage, approved by the user: `Read <S>/TRIAGE.md and follow it. N = 50.` with
-   `model: haiku`.
-2. Then Sonnet hunters or sievers on rows rated 1–2 that have unclaimed issues in files nobody
-   holds.
+**New issues dropped ~04:05Z:** 176 proof issues #4034–#4213 (Ch07 Sec1a 8, Sec1b 38, Ch05 Sec2b 52,
+Sec3a 59, Sec3b 18), plus #4033 (AppD Sec1c). Ch06 had none yet. `shortlist.py` was re-run on
+these files (223 rows, 182 with an issue), and Haiku rated the top 49 (`shortlist/triage.tsv`).
+Rows rated 3 are the next candidates for Sonnet hunters if the w3 ratings prove accurate.
 
-**Open PRs:**
-- **#4021** proves #2663 (Ch04 Sec5) modulo the sorried AppD lemma
-  `exists_modulatedExponentialDecay_translationAction`. Its PR check fails on a FALSE signature
-  diff, so it needs the integrator to read it:
-  - On main, `hcover` (Sec5.lean:531) elaborates to `sorry` (upstream #2693), and that sorry records
-    its line, so any Sec5 proof above line 531 changes two signatures.
-  - The PR body explains this. It also tells sweep #3999 (created 34 s before our claim) that it
-    may take the proof.
+**Quick-win loop for each new batch of issues:**
+1. Run `shortlist.py <files>`.
+2. Haiku triage: `Read <S>/TRIAGE.md and follow it. N = 60.` with `model: haiku`.
+3. Run a Sonnet hunter on exactly the rows rated 1–2 (list them in its prompt).
+
+**Open PRs:** #4323 (hunt/w3).
 
 **Merged today:**
+- #4021: proves #2663 (Ch04 Sec5); the integrator accepted the false signature diff caused by #2693.
 - #3823: fully proves #1219.
 - #3978: proves #1902.
 - #3993: fully proves #1885.
@@ -297,4 +303,4 @@ S=<repo>/.agent/sweeptools.`
 
 - About 55 PRs from LeoVerto merged, closing roughly 200 proof issues.
 - Critical path: #3660 (#1223), #3681 (#1906), #3823 (#1219), #3978 (#1902), #3993 (#1885), and
-  #4021 (#2663, open).
+  #4021 (#2663).

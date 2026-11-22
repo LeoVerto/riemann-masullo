@@ -103,3 +103,11 @@ Your model tag <M> is given in your launch prompt (default: hunters/fixers `Clau
    **Update this file after every build, failed approach or proved lemma, not just at the end.** When the watchdog sees the session idle it releases your claims and posts this file on the issue; if it is stale, hours of work are lost. **Failed approaches come first and matter most:** say what you tried, and why it failed (error, missing lemma, timeout), so nobody repeats it.
 4. **Release** only with `/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/release.sh <n> "<one-line reason>"`: it posts `Releasing (<M>): <reason>` plus your notes, removes the claim from claims.txt and archives the notes. Update the notes before calling it.
 5. **PR body:** add a line `Prover: <M>` just above the `🤖 Generated with` line. After the PR is open, delete `notes/<n>.md` for the issues it closes.
+
+
+## memguard: if your build or `lake lean` is killed (added 2026-11-22)
+`memguard.sh` runs in the background. When free RAM on the machine drops below ~1 GB it `kill -9`s the newest `lean` process (sieve runs first, otherwise any lean, possibly yours), to avoid an OOM kill of the whole sandbox. Symptoms: exit code 137, `Killed`, or a build that ends with no Lean error. The kill is about memory, not about your proof.
+- Check `tail -5 /mnt/faststorage/math/riemann-masullo/.agent/sweeptools/memguard.log` for a line with your command. If it is there, you were killed; a bare retry of the same command may be killed again.
+- Do not retry the identical command in a loop. Retry once if free RAM is high again (`free -m`), otherwise **change approach**: build a smaller module or only the file you edited (not the whole project), avoid `exact?`/`apply?`/`aesop` over big contexts, split a heavy proof into smaller lemmas, replace expensive `simp`/`fun_prop` calls with explicit terms.
+- Do not kill other agents' processes or touch memguard.sh.
+- Record it in `notes/<n>.md` under Failed approaches ("killed by memguard: <command/proof step>, memory-heavy because ...") so the next solver does not repeat it. If the same step is killed twice even in isolation, split it into smaller `sorry`s or release the issue with that reason.

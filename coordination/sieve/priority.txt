@@ -1,4 +1,7 @@
-RiemannMasullo/Ch06_LocalGlobal/Sec1.lean
-RiemannMasullo/Ch06_LocalGlobal/Sec2.lean
 RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean
 RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean
+RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean
+RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean
+RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean
+RiemannMasullo/Ch06_LocalGlobal/Sec1.lean
+RiemannMasullo/Ch06_LocalGlobal/Sec2.lean
