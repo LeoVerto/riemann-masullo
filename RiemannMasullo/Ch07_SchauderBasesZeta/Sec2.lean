@@ -165,13 +165,90 @@ def sLocalThetaPoleBound (ω : PontryaginDual J₁) (m : Xₛ → ℕ) : Submodu
   Submodule.span ℂ {x | ∃ f : ℬₛ, (Kₛ(ω)).mkQ f = x ∧
     ∀ c : Xₛ, onComponent(c, ω) → sLocalPolarMultiplicity f c ≤ m c}
 
+/-- Residues only depend on the germ on a punctured neighbourhood. -/
+private theorem mem_sLocalThetaPoleBound_iff_residue_congr {g h : ℂ → ℂ}
+    (he : g =ᶠ[𝓝[≠] (0 : ℂ)] h) : complexResidue g 0 = complexResidue h 0 := by
+  obtain ⟨δ, hδ, hEq⟩ := Metric.nhdsWithin_basis_ball.eventually_iff.mp he
+  unfold complexResidue limUnder
+  refine congrArg lim (Filter.map_congr ?_)
+  filter_upwards [Ioo_mem_nhdsGT hδ] with r hr
+  rw [circleIntegral.integral_congr hr.1.le fun z hz ↦ hEq ⟨?_, ?_⟩]
+  · rw [Metric.mem_ball, Metric.mem_sphere.mp hz]
+    exact hr.2
+  · rintro rfl
+    exact hr.1.ne (by simpa using hz)
+
+/-- The leading polar coefficient of a meromorphic germ with a pole of order `N` is nonzero. -/
+private theorem mem_sLocalThetaPoleBound_iff_leading {Z : ℂ → ℂ} (hZ : MeromorphicAt Z 0)
+    {N : ℕ} (hN : 0 < N) (ho : (-(meromorphicOrderAt Z 0).untop₀).toNat = N) :
+    complexResidue (fun z ↦ Z z / z ^ (-(N : ℤ) + 1)) 0 ≠ 0 := by
+  have hord : meromorphicOrderAt Z 0 = ((-(N : ℤ) : ℤ) : WithTop ℤ) := by
+    generalize meromorphicOrderAt Z 0 = o at ho ⊢
+    induction o using WithTop.recTopCoe with
+    | top => simp at ho; omega
+    | coe n =>
+      simp only [WithTop.untop₀_coe] at ho
+      congr 1
+      omega
+  obtain ⟨g, hg, hg0, hev⟩ := (meromorphicOrderAt_eq_int_iff hZ).mp hord
+  have he : (fun z ↦ Z z / z ^ (-(N : ℤ) + 1)) =ᶠ[𝓝[≠] (0 : ℂ)] (fun z ↦ g z / (z - 0)) := by
+    filter_upwards [hev, self_mem_nhdsWithin] with z hz hz0
+    have hz0' : z ≠ 0 := hz0
+    rw [hz, sub_zero, smul_eq_mul, zpow_add₀ hz0', zpow_one, zpow_neg, zpow_natCast]
+    field_simp
+  rw [mem_sLocalThetaPoleBound_iff_residue_congr he, complexResidue_div_sub hg]
+  exact hg0
+
 /-- Paper: Equation (7.2.1.9), p. 334.
 Membership in the pole-bound subspace is equivalent to vanishing of every coefficient
 on the component above its allowed pole order. -/
 theorem mem_sLocalThetaPoleBound_iff (ω : PontryaginDual J₁) (m : Xₛ → ℕ) (x : Θₛ(ω)) :
     x ∈ sLocalThetaPoleBound ω m ↔
       ∀ (c : Xₛ) (hc : onComponent(c, ω)), 0 < sLocalRhoPoleOrder c →
-        ∀ k : ℕ, m c < k → sLocalThetaPrincipalPartCoeff ω c hc k x = 0 := by sorry
+        ∀ k : ℕ, m c < k → sLocalThetaPrincipalPartCoeff ω c hc k x = 0 := by
+  constructor
+  · intro hx c hc _ k hk
+    have hle : sLocalThetaPoleBound ω m ≤ (sLocalThetaPrincipalPartCoeff ω c hc k).ker := by
+      refine Submodule.span_le.mpr ?_
+      rintro _ ⟨f, rfl, hf⟩
+      have e : sLocalThetaPrincipalPartCoeff ω c hc k ((Kₛ(ω)).mkQ f) =
+          sLocalZLaurentCoeff f c (-(k : ℤ)) := sLocalThetaPrincipalPartCoeff_mk ω c hc k f
+      have hz : sLocalZLaurentCoeff f c (-(k : ℤ)) = 0 := by
+        by_contra hne
+        have hne' : sLocalPrincipalPartCoeff c k f ≠ 0 := by
+          exact fun h ↦ hne ((sLocalPrincipalPartCoeff_apply c k f).symm.trans h)
+        have h := (sLocalPrincipalPartCoeff_ne_zero_imp_pole c k (by omega) f hne').2
+        have := hf c hc
+        omega
+      exact e.trans hz
+    exact hle hx
+  · intro hx
+    have count (m : ℕ) (o : WithTop ℤ) (ho : ((-(m : ℤ) : ℤ) : WithTop ℤ) ≤ o) :
+        (-o.untop₀).toNat ≤ m := by
+      induction o using WithTop.recTopCoe with
+      | top => simp
+      | coe n =>
+        have hn : -(m : ℤ) ≤ n := WithTop.coe_le_coe.mp ho
+        simp only [WithTop.untop₀_coe]
+        omega
+    refine ((Kₛ(ω)).mkQ_surjective x).elim fun f hf ↦ ?_
+    refine Submodule.subset_span ⟨f, hf, fun c hc ↦ ?_⟩
+    refine Nat.le_of_not_lt fun hlt ↦ ?_
+    have hcount : sLocalPolarMultiplicity f c ≤ sLocalRhoPoleOrder c :=
+      count _ _ ((sLocalIdelicOrderBound_eq_neg_poleOrder c).ge.trans (sLocalZ_centered f c).2.1)
+    have hmer : MeromorphicAt (fun z ↦ sLocalIdelicZFunction f (twistₛ c z)) 0 :=
+      (sLocalZ_centered f c).1
+    have hpos : 0 < sLocalRhoPoleOrder c := by omega
+    have h0 := hx c hc hpos (sLocalPolarMultiplicity f c) hlt
+    rw [← hf] at h0
+    have e : sLocalThetaPrincipalPartCoeff ω c hc (sLocalPolarMultiplicity f c) ((Kₛ(ω)).mkQ f) =
+        sLocalZLaurentCoeff f c (-(sLocalPolarMultiplicity f c : ℤ)) :=
+      sLocalThetaPrincipalPartCoeff_mk ω c hc (sLocalPolarMultiplicity f c) f
+    have h1 := e.symm.trans h0
+    have h2 : complexResidue (fun z ↦ sLocalIdelicZFunction f (twistₛ c z) /
+        z ^ (-(sLocalPolarMultiplicity f c : ℤ) + 1)) 0 = 0 := h1
+    exact mem_sLocalThetaPoleBound_iff_leading (N := sLocalPolarMultiplicity f c) hmer
+      (by omega) rfl h2
 
 /-- Paper: Theorem 7.2.1.1(4), p. 334.
 The homogeneous theta classes with the prescribed bounds on pole order form a closed subspace. -/
