@@ -337,13 +337,50 @@ including when the archimedean integral of each tensor factor must vanish. -/
 theorem globalArchimedeanFlatTests_isClosed (requireArchMoment : Prop) :
     IsClosed (globalArchimedeanFlatTests F requireArchMoment : Set ℬ(𝔸[F])) := by sorry
 
+/-- A flat archimedean Schwartz function vanishes at the origin, which meets a wall. -/
+private theorem globalArchimedeanFlatTests_zero_moments_flat
+    (h : archimedeanFlatSchwartz (ι := RealPlaces) (κ := ComplexPlaces)) :
+    h.val (0 : Coordinates) = 0 := by
+  have hw : (∃ i, (0 : Coordinates).1 i = 0) ∨ (∃ j, (0 : Coordinates).2 j = 0) := by
+    obtain ⟨w⟩ := (inferInstance : Nonempty (InfinitePlace F))
+    rcases w.isReal_or_isComplex with hr | hc
+    · exact Or.inl ⟨⟨w, hr⟩, rfl⟩
+    · exact Or.inr ⟨⟨w, hc⟩, rfl⟩
+  have hk := Submodule.mem_iInf _ |>.mp h.property ⟨0, hw⟩
+  have hk := Submodule.mem_iInf _ |>.mp hk 0
+  have hk := Submodule.mem_iInf _ |>.mp hk (fun i => Fin.elim0 i)
+  have := LinearMap.mem_ker.mp hk
+  simpa using this
+
 /-- Paper: Equation (7.4.3.1), p. 368.
 Archimedean flatness kills evaluation at the adelic origin. Within the flat space,
 the other zero-moment condition is the vanishing of the Fourier value at the origin. -/
 theorem globalArchimedeanFlatTests_zero_moments (f : ℬ(𝔸[F]))
     (_hf : f ∈ globalArchimedeanFlatTests F) :
     f (Multiplicative.ofAdd 0) = 0 ∧
-      (f ∈ adelePolarSubspace F ↔ adeleSchwartzFourier (F := F) f (Multiplicative.ofAdd 0) = 0) := by sorry
+      (f ∈ adelePolarSubspace F ↔ adeleSchwartzFourier (F := F) f (Multiplicative.ofAdd 0) = 0) := by
+  have h0 : f (Multiplicative.ofAdd 0) = 0 := by
+    let ev : ℬ(𝔸[F]) →ₗ[ℂ] ℂ :=
+      { toFun := fun f ↦ f (Multiplicative.ofAdd 0)
+        map_add' := fun _ _ ↦ rfl
+        map_smul' := fun _ _ ↦ rfl }
+    change ev f = 0
+    have hf : f ∈ LinearMap.ker ev := by
+      refine (Submodule.span_le.mpr ?_) _hf
+      rintro _ ⟨g₁, g₂, h, hx, -, rfl⟩
+      change (adeleSchwartz_inductiveTensor_equiv F).choose (g₁ ⊗ₜ[ℂ] g₂) (Multiplicative.ofAdd 0) = 0
+      rw [(adeleSchwartz_inductiveTensor_equiv F).choose_spec g₁ g₂ 0]
+      have : g₁ (Multiplicative.ofAdd (0 : InfiniteAdeleRing F)) = 0 := by
+        rw [hx 0]
+        convert globalArchimedeanFlatTests_zero_moments_flat h using 2
+        refine Prod.ext (funext fun v ↦ ?_) (funext fun v ↦ ?_)
+        · exact map_zero (InfinitePlace.Completion.ringEquivRealOfIsReal v.property)
+        · exact map_zero (InfinitePlace.Completion.ringEquivComplexOfIsComplex v.property)
+      exact mul_eq_zero_of_left this _
+    exact LinearMap.mem_ker.mp hf
+  refine ⟨h0, ?_⟩
+  rw [mem_adelePolarSubspace]
+  exact ⟨fun h ↦ h.2, fun h ↦ ⟨h0, h⟩⟩
 
 variable (χ : PontryaginDual (IdeleClassGroup (𝓞 F) F))
   (τ : ℝ≥0ˣ →ₜ* IdeleGroup (𝓞 F) F) (hτ : RightInverse τ (ideleNorm F))
