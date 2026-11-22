@@ -25,6 +25,10 @@ copies are in `/home/agent/sweeptools/`; `tools/`, `state/` and `critical/` here
 
 ## State right now
 
+> **Update 2026-11-22 ~00:30Z:**
+> - **#1219 is proved** in PR #3823 (no split; standard axioms only), and the #1219 prover has finished. Next on the path: the four sorries listed at the top of `critical/QUEUE.md`.
+> - **The Lake artifact cache is DISABLED.** When Lake reuses a module from the cache it writes no local `.olean`, which breaks `scripts/signatures.sh` and `lake env lean`. The exports are removed from `/etc/sandbox-persistent.sh` (it now `unset`s them) and commented out in `warm.sh` and `build.sh`. The running `warm.sh` still has them in its environment: restart it when idle. Re-enable only after testing `LAKE_RESTORE_ARTIFACTS=true` in a tmp worktree.
+
 - **Paused for usage (93%; reset 2026-11-22 12:40Z).** The user authorized usage credits so that
   **only** the Opus prover on **#1219** (`globalIdelicZetaIntegral_integrable`, worktree
   `/home/agent/wt/crit-1219`, branch `crit/1219`) can finish. It was in its last checks (module

@@ -39,7 +39,12 @@ Data: `graph.tsv` (one row per cone node). Blockers: `BLOCKERS.md`. Short work f
 
 ## Queue
 
-- **Promoted (coordinator, 2026-11-21):** #1219 `globalIdelicZetaIntegral_integrable` is now the only open sorry left in #1223's own proof (PR #3660). Take it right after #1906.
+- **Promoted (coordinator, 2026-11-22):** #1223 (PR #3660) and #1219 (PR #3823) are proved, and Ch03 Sec2's own chain no longer uses sorry. `globalIdelicZetaIntegral_exists_continuation` and `completedHeckeL_exists_continuation` still carry sorryAx through four declarations. Take these next, before #1902:
+  - `schwartzBruhat_fourier_equiv` (AppD Sec1c:1697; issues #3484/#3792)
+  - `lcaCosetIntegral_mem_schwartzBruhat` (AppD Sec1c:1739; #3486/#3792)
+  - `schwartzBruhat_poisson` (AppD Sec1c:1761; #3488/#3792)
+  - `exists_ratAdeleDualEquiv` (AppA Sec3:3052; #3099/#3703/#3806)
+  Several issue numbers per declaration means duplicates: pick the well-formed open one. The new bounds `adelicTheta_normSum_decay_large` and `adelicTheta_normSum_le_small` (Ch02 Sec2a) are the majorant that #1220 and #1222 need.
 
 ### 1. #1223 `globalIdelicZetaIntegral_exists_continuation`: Ch03_IdelicZeta/Sec2.lean:662 (XL)
 - **Why critical:** this is Tate's thesis, Theorem 3.2.2.1(1)(a), p. 124.

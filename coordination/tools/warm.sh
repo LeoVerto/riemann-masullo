@@ -7,8 +7,8 @@
 #   /home/agent/sweeptools/base/sig.txt       scripts/signatures.sh output at COMMIT
 # A snapshot is swapped in with mv, so readers see either the old or the new one.
 set -u
-export LAKE_ARTIFACT_CACHE=true
-export LAKE_CACHE_DIR=/home/user/git/riemann-masullo/.lake/artifact-cache
+# DISABLED 2026-11-22 (cache reuse leaves no local .olean; breaks signatures.sh): export LAKE_ARTIFACT_CACHE=true
+# DISABLED 2026-11-22 (cache reuse leaves no local .olean; breaks signatures.sh): export LAKE_CACHE_DIR=/home/user/git/riemann-masullo/.lake/artifact-cache
 T=/home/agent/sweeptools; B=$T/base; WT=/home/agent/wt/base; MAIN=/home/user/git/riemann-masullo
 INTERVAL=${INTERVAL:-600}
 mkdir -p $B
