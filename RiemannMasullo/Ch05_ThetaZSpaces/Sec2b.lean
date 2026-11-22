@@ -608,20 +608,83 @@ theorem globalThetaKernel_eq_induced_closure :
       (globalThetaKernel_eq_induced_closure_translate p.1 p.2 c).symm).trans
         (adelicThetaLinearMap_apply (F := F) _).symm))
 
+local notation "unitAtₛ(" S ")" =>
+  MonoidHom.comp (Units.map (RingHom.toMonoidHom (RingHom.comp (adeleProjection F S)
+    (Subring.subtype (integralAdelesOutside F S)))))
+    (Units.map (RingHom.toMonoidHom (integralAdeleDiagonal F S)))
+
+/-- A quotient by a smaller submodule maps onto the quotient by a larger one, compatibly
+with the quotient maps. -/
+private theorem exists_quotient_to_quotient_of_le {R M : Type*} [Ring R] [AddCommGroup M]
+    [Module R M] {V K : Submodule R M} (h : V ≤ K) :
+    ∃ q : (M ⧸ V) →ₗ[R] (M ⧸ K), Surjective q ∧ q.comp V.mkQ = K.mkQ :=
+  ⟨V.liftQ K.mkQ (by rwa [Submodule.ker_mkQ]),
+    fun y ↦ by obtain ⟨x, rfl⟩ := K.mkQ_surjective y; exact ⟨V.mkQ x, rfl⟩,
+    V.liftQ_mkQ _ _⟩
+
+/-- S-local theta is invariant under translation by a diagonal S-unit. -/
+private theorem sLocalAdelicTheta_translate_diag
+    (u : ((S : Set (HeightOneSpectrum (𝓞 F))).integer F)ˣ) (f : ℬₛ(S)) :
+    sLocalAdelicTheta F S (schwartzBruhatUnitTranslate (R := SAdeleRing F S) (diagₛ(S) u) f) =
+      sLocalAdelicTheta F S f := by
+  refine ContinuousMap.ext fun g ↦ ?_
+  change ∑' ξ : ((S : Set (HeightOneSpectrum (𝓞 F))).integer F)ˣ,
+      schwartzBruhatUnitTranslate (R := SAdeleRing F S) (diagₛ(S) u) f
+        (Multiplicative.ofAdd (Units.val (unitAtₛ(S) ξ * g))) =
+    ∑' ξ : ((S : Set (HeightOneSpectrum (𝓞 F))).integer F)ˣ,
+      f (Multiplicative.ofAdd (Units.val (unitAtₛ(S) ξ * g)))
+  refine ((Equiv.mulLeft u).tsum_eq _).symm.trans (tsum_congr fun ξ ↦ ?_)
+  rw [Equiv.coe_mulLeft, schwartzBruhatUnitTranslate_apply]
+  refine congrArg (fun x : SAdeleRing F S ↦ f (Multiplicative.ofAdd x)) ?_
+  exact congrArg Units.val (show (diagₛ(S) u)⁻¹ * (unitAtₛ(S) (u * ξ) * g) =
+      unitAtₛ(S) ξ * g by
+    rw [map_mul, mul_assoc]; exact inv_mul_cancel_left (diagₛ(S) u) _)
+
+/-- The S-unit translation differences lie in the S-local theta kernel. -/
+private theorem sLocalSpan_le_ker : Vₛ(S) ≤ Kₛ(S) :=
+  Submodule.span_le.mpr (Set.range_subset_iff.mpr fun p ↦ LinearMap.mem_ker.mpr
+    (((sLocalAdelicTheta F S).map_sub _ _).trans
+      (sub_eq_zero.mpr (sLocalAdelicTheta_translate_diag p.1 p.2).symm)))
+
+/-- Global theta is invariant under translation by a principal idele. -/
+private theorem adelicThetaLinearMap_translate_diag (u : Fˣ) (f : ℬ𝔽) :
+    adelicThetaLinearMap F (schwartzBruhatUnitTranslate (R := 𝔸[F]) (diag𝔽 u) f) =
+      adelicThetaLinearMap F f := by
+  change adelicTheta (schwartzBruhatUnitTranslate (R := 𝔸[F]) (diag𝔽 u) f) = adelicTheta f
+  refine ContinuousMap.ext fun c ↦ ?_
+  induction c using QuotientGroup.induction_on with | H g => ?_
+  refine (adelicTheta_mk _ g).trans (Eq.trans ?_ (adelicTheta_mk f g).symm)
+  refine ((Equiv.mulLeft u).tsum_eq _).symm.trans (tsum_congr fun ξ ↦ ?_)
+  rw [Equiv.coe_mulLeft, schwartzBruhatUnitTranslate_apply]
+  refine congrArg (fun x : 𝔸[F] ↦ f (Multiplicative.ofAdd x)) ?_
+  exact congrArg Units.val (show (diag𝔽 u)⁻¹ * (diag𝔽 (u * ξ) * g) = diag𝔽 ξ * g by
+    rw [map_mul, mul_assoc, inv_mul_cancel_left])
+
+/-- The principal translation differences lie in the global theta kernel. -/
+private theorem globalSpan_le_ker : V𝔽 ≤ K𝔽 :=
+  Submodule.span_le.mpr (Set.range_subset_iff.mpr fun p ↦ LinearMap.mem_ker.mpr
+    (((adelicThetaLinearMap F).map_sub _ _).trans
+      (sub_eq_zero.mpr (adelicThetaLinearMap_translate_diag p.1 p.2).symm)))
+
 /-- Paper: Remark 5.2.3.4, p. 238.
 The algebraic S-unit coinvariants surject canonically onto the S-local theta quotient.
 Deviation: The source is the quotient by the relation span. -/
 theorem exists_sLocalAlgebraicCoinvariants_to_theta (S : Finset (HeightOneSpectrum (𝓞 F))) :
     let V := Vₛ(S)
     ∃ q : (ℬₛ(S) ⧸ V) →ₗ[ℂ] Θₛ(S),
-      Surjective q ∧ q.comp V.mkQ = (Kₛ(S)).mkQ := by sorry
+      Surjective q ∧ q.comp V.mkQ = (Kₛ(S)).mkQ := by
+  intro V
+  exact exists_quotient_to_quotient_of_le (sLocalSpan_le_ker (S := S))
 
 /-- Paper: Remark 5.2.3.4, p. 238.
 The algebraic principal coinvariants surject canonically onto the global theta quotient.
 Deviation: The source is the quotient by the relation span. -/
 theorem exists_globalAlgebraicCoinvariants_to_theta :
     let V : Submodule ℂ ℬ𝔽 := V𝔽
-    ∃ q : (ℬ𝔽 ⧸ V) →ₗ[ℂ] Θ𝔽, Surjective q ∧ q.comp V.mkQ = (K𝔽).mkQ := by sorry
+    ∃ q : (ℬ𝔽 ⧸ V) →ₗ[ℂ] Θ𝔽, Surjective q ∧ q.comp V.mkQ = (K𝔽).mkQ := by
+  intro V
+  have h := globalSpan_le_ker (F := F)
+  exact exists_quotient_to_quotient_of_le h
 
 /-- Paper: Remark 5.2.3.4, pp. 237–238.
 The S-local theta quotient is bornological. Every seminorm bounded on all of its
