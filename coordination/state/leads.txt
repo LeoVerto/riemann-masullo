@@ -31,3 +31,5 @@ Unassigned rated-3 leads: Ch06 Sec1 #4285 #4286 #4287 (triage3b); give to w4 or 
 06:20Z Ch05 Sec5 rated-3 unattempted: #4409 #4411 #4420 #4423 #4429 #4431 (factory-davidgu holds 7 others in Sec5) [assigned to w10]
 06:45Z Ch06 Sec3 (triage5): only 3 quick wins (#4445 #4452 #4453) [assigned to w11]; rest rated 4-5 or ERRATA/GAP. Quick wins now exhausted after w8/w10/w11 -> next free slot: one Opus critical prover (user rule)
 06:46Z quick wins exhausted (w11 found Ch06 Sec3 claimed by CalebAlbers). Old critical QUEUE.md fully closed upstream -> Sonnet remap (crit/remap) running; then ONE Opus critical prover on its top item (user rule)
+07:18Z Ch06 Sec2 #4313 #4314 unassigned again (w10 didn't start)
+07:37Z ESCALATION QUEUE (user: stuck Sonnet proofs -> Opus; max 2 Opus at once): #4338 Ch05 Sec4 (SchwartzBergman ext from overlap; after w12 finishes Sec4), #4408 Ch05 Sec5 (choose_spec build blowup; after w13 finishes Sec5), plus anything w12/w13 release as stuck. #4304 now claimed by troyjlee.

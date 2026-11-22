@@ -228,7 +228,13 @@ hand-ins happen at a normal pace once the issues exist.
 - **Opus**: "The cone doesn't matter at this point ... Just pick any open issue for Opus." Any open,
   unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held); no remapping. The
   mapper-fix job is dropped.
-- Crons now: only the hourly check **34c4c6d7** at :17.
+- Crons now: only the hourly check **eb59d910** at :17.
+- **Escalation (user, ~08:30Z): "If sonnet gets stuck on the proofs, hand them off to opus."** Issues a
+  Sonnet released as stuck go to an Opus escalation prover (HUNTER.md brief, one file each, after our
+  Sonnet leaves the file); max 2 Opus at once (assumption). Running: **esc-sec2b** (Opus, Ch05 Sec2b
+  #4121 #4122). Queue in `state/leads.txt` "ESCALATION QUEUE": #4338 (Sec4, after w12), #4408 (Sec5,
+  after w13). #4304 is now troyjlee's. w10 finished with no PR (Sec5 proofs too slow);
+  **w13** (Sonnet) is timing and handing in its saved proofs (`patches/w10-*.lean`).
 - **Report files (07:50Z):** an agent woken by a nagger message reports to the nagger, not the
   coordinator (happened to crit/1526). So every hunter/siever/prover also writes its final report to
   `notes/report-<name>.md` (HUNTER.md, CRITICAL_PROVER.md, SIEVER.md end sections); the hourly check
