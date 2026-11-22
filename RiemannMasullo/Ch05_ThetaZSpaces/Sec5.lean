@@ -445,10 +445,74 @@ theorem globalThetaPolarValues_fst_translate (g : C𝔽) (x : Θ) :
     globalThetaPolarValues_fst_translate_rep g x
   with_reducible_and_instances exact h.trans (one_mul _)
 
+open MeasureTheory in
+/-- Integration against the additive Tamagawa measure scales by the idelic norm under
+multiplication by an inverse idele. -/
+private theorem adeleSchwartzFourier_zero_unitTranslate_integral (u : IdeleGroup (𝓞 F) F)
+    (k : 𝔸[F] → ℂ) :
+    ∫ x, k ((↑u⁻¹ : 𝔸[F]) * x) ∂additiveTamagawaMeasure F =
+      (((ideleNorm F u).val : ℝ) : ℂ) * ∫ x, k x ∂additiveTamagawaMeasure F := by
+  let : MeasurableSpace 𝔸[F] := borel _
+  have : BorelSpace 𝔸[F] := ⟨rfl⟩
+  have hH : (additiveTamagawaMeasure F).IsAddHaarMeasure :=
+    (additiveTamagawaMeasure_existsUnique F).exists.choose_spec.1
+  let d : 𝔸[F] ≃ₜ 𝔸[F] := Homeomorph.smul (u⁻¹ : IdeleGroup (𝓞 F) F)
+  have hset (s : Set 𝔸[F]) :
+      d ⁻¹' s = (fun a : 𝔸[F] ↦ (u : 𝔸[F]) * a) '' s := by
+    ext y
+    constructor
+    · intro hy
+      exact ⟨(↑u⁻¹ : 𝔸[F]) * y, hy, Units.mul_inv_cancel_left u y⟩
+    · rintro ⟨a, ha, rfl⟩
+      change (↑u⁻¹ : 𝔸[F]) * ((u : 𝔸[F]) * a) ∈ s
+      rwa [Units.inv_mul_cancel_left]
+  have hmap : (additiveTamagawaMeasure F).map d =
+      ((ideleNorm F u).val : ENNReal) • additiveTamagawaMeasure F := by
+    refine Measure.ext fun s hs ↦ ?_
+    rw [Measure.map_apply d.continuous.measurable hs, hset s]
+    exact adeleHaar_mul_image F (additiveTamagawaMeasure F) u s hs
+  have h1 : ∫ x, k (d.toMeasurableEquiv x) ∂additiveTamagawaMeasure F =
+      ∫ y, k y ∂((additiveTamagawaMeasure F).map d.toMeasurableEquiv) :=
+    (integral_map_equiv d.toMeasurableEquiv k).symm
+  have h2 : ((additiveTamagawaMeasure F).map d.toMeasurableEquiv) =
+      ((ideleNorm F u).val : ENNReal) • additiveTamagawaMeasure F := hmap
+  rw [h2, integral_smul_measure, ENNReal.coe_toReal, Complex.real_smul] at h1
+  exact h1
+
+/-- Fourier evaluation at zero scales by the idelic norm under unit translation. -/
+private theorem adeleSchwartzFourier_zero_unitTranslate (u : IdeleGroup (𝓞 F) F)
+    (f : ℬ(𝔸[F])) :
+    adeleSchwartzFourier (schwartzBruhatUnitTranslate u f) zeroAdele =
+      (((ideleNorm F u).val : ℝ) : ℂ) * adeleSchwartzFourier f zeroAdele := by
+  have hA := (adeleSchwartzFourier_apply_zero (schwartzBruhatUnitTranslate u f)).2
+  have hB := (adeleSchwartzFourier_apply_zero f).2
+  have hI := adeleSchwartzFourier_zero_unitTranslate_integral u
+    (fun z : 𝔸[F] ↦ f (Multiplicative.ofAdd z))
+  exact hA.trans (hI.trans (congrArg _ hB.symm))
+
+/-- On representatives, Fourier evaluation at zero scales by the idelic norm under unit
+translation. -/
+private theorem globalThetaPolarValues_snd_translate_rep (g : IdeleGroup (𝓞 F) F)
+    (f : ℬ(𝔸[F])) :
+    (globalThetaPolarValues (F := F) ((K𝔽).mkQL (schwartzBruhatUnitTranslate g f))).2 =
+      (fun g : C𝔽 ↦ normℂ(g)) (QuotientGroup.mk g) *
+        (globalThetaPolarValues (F := F) ((K𝔽).mkQL f)).2 := by
+  have hn : normℂ((QuotientGroup.mk g : C𝔽)) = (((ideleNorm F g).val : ℝ) : ℂ) := rfl
+  refine (congrArg Prod.snd (globalThetaPolarValues_mk (F := F)
+    (schwartzBruhatUnitTranslate g f))).trans (Eq.trans ?_ (congrArg (fun z ↦ normℂ((QuotientGroup.mk g : C𝔽)) * z)
+      (congrArg Prod.snd (globalThetaPolarValues_mk (F := F) f))).symm)
+  exact (adeleSchwartzFourier_zero_unitTranslate g f).trans (congrArg (· * _) hn.symm)
+
 /-- Paper: Lemma 5.5.2.1, p. 280.
 Fourier evaluation at zero on the global theta quotient has weight equal to the idelic norm. -/
 theorem globalThetaPolarValues_snd_translate (g : C𝔽) (x : Θ) :
-    (globalThetaPolarValues (F := F) (ρ𝔽 g x)).2 = normℂ(g) * (globalThetaPolarValues (F := F) x).2 := by sorry
+    (globalThetaPolarValues (F := F) (ρ𝔽 g x)).2 = normℂ(g) * (globalThetaPolarValues (F := F) x).2 := by
+  have hρ := (existsUnique_globalThetaAction (F := F)).exists.choose_spec.2
+  have h := globalThetaPolarValues_translate_aux (E := ℬ(𝔸[F])) (K𝔽) QuotientGroup.mk
+    QuotientGroup.mk_surjective (fun g x ↦ ρ𝔽 g x) schwartzBruhatUnitTranslate hρ
+    (globalThetaPolarValues (F := F)) (fun g ↦ normℂ(g)) Prod.snd
+    globalThetaPolarValues_snd_translate_rep g x
+  with_reducible_and_instances exact h
 
 /-- Paper: Lemma 5.5.2.1, p. 280.
 On the trivial norm-one isotype the two polar values can be prescribed independently.
