@@ -160,7 +160,24 @@ def IsSLocalCarvingCofinal {S : Finset V} (A : ℕ → SLocalCarvingIndex (F := 
 /-- Paper: Remark 11.1.2.2, p. 480. An increasing sequence exhausts the outside
 places exactly when every finite set of them is contained in some term. -/
 theorem isSLocalCarvingCofinal_iff {S : Finset V} (A : ℕ → SLocalCarvingIndex (F := F) S) :
-    IsSLocalCarvingCofinal A ↔ Monotone A ∧ ∀ i : SLocalCarvingIndex (F := F) S, ∃ k, i ≤ A k := by sorry
+    IsSLocalCarvingCofinal A ↔ Monotone A ∧ ∀ i : SLocalCarvingIndex (F := F) S, ∃ k, i ≤ A k := by
+  unfold IsSLocalCarvingCofinal
+  refine and_congr_right fun hA ↦ ⟨fun h i ↦ ?_, fun h ↦ ?_⟩
+  · have hv : ∀ v ∈ i.val, ∃ k, v ∈ (A k).val := fun v hv ↦ by
+      have : v ∈ (S : Set V)ᶜ := fun hS ↦ Finset.disjoint_left.mp i.2 hS hv
+      rw [← h] at this
+      simpa using this
+    choose! k hk using hv
+    refine ⟨i.val.sup k, fun v hv' ↦ ?_⟩
+    exact hA (Finset.le_sup (f := k) hv') (hk v hv')
+  · refine Set.Subset.antisymm ?_ ?_
+    · intro v hv
+      obtain ⟨k, hk⟩ := Set.mem_iUnion.mp hv
+      intro hS
+      exact Finset.disjoint_left.mp (A k).2 (by simpa using hS) hk
+    · intro v hv
+      obtain ⟨k, hk⟩ := h ⟨{v}, by simpa using hv⟩
+      exact Set.mem_iUnion.mpr ⟨k, hk (Finset.mem_singleton_self v)⟩
 
 /-- Paper: Remark 11.1.2.2, p. 480. Every base admits a cofinal sequence
 of finite sets of outside places. -/
@@ -289,7 +306,13 @@ Deviation: Sanity check for the character average in the repaired generator. -/
 theorem sLocalCarvingGenerator_trivial (S : Finset V) (J : Set ℝ) (f : ℬₛ(S))
     (_hf : ∀ (h : C₁) (g : C𝔽), sLocalCarvingTheta S f (h.val * g) = sLocalCarvingTheta S f g) :
     sLocalCarvingGenerator S 1 J f =
-      fun g ↦ (μ₁).real univ • (norm𝔽 ⁻¹' J).indicator (sLocalCarvingTheta S f) g := by sorry
+      fun g ↦ (μ₁).real univ • (norm𝔽 ⁻¹' J).indicator (sLocalCarvingTheta S f) g := by
+  funext g
+  unfold sLocalCarvingGenerator
+  by_cases hg : g ∈ norm𝔽 ⁻¹' J
+  · simp only [Set.indicator_of_mem hg, _hf]
+    simp [integral_const]
+  · simp [Set.indicator_of_notMem hg]
 
 /-- Paper: Theorem 11.1.2.1(3), p. 480. The projected cutoff generators are
 square-integrable for the zero-line weight. -/
