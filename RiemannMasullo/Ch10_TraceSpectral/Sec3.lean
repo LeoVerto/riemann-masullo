@@ -48,13 +48,48 @@ def IsStronglyNuclearBanachOperator (A : E →L[ℂ] G) : Prop :=
 using a single coefficient after normalizing the factors.
 Deviation: Sanity check for the strongly nuclear condition. -/
 theorem isStronglyNuclearBanachOperator_smulRight (Λ : StrongDual ℂ E) (y : G) :
-    IsStronglyNuclearBanachOperator (Λ.smulRight y) := by sorry
+    IsStronglyNuclearBanachOperator (Λ.smulRight y) := by
+  classical
+  refine ⟨fun n ↦ if n = 0 then ((‖Λ‖ * ‖y‖ : ℝ) : ℂ) else 0,
+    fun n ↦ if n = 0 then ((‖Λ‖⁻¹ : ℝ) : ℂ) • Λ else 0,
+    fun n ↦ if n = 0 then ((‖y‖⁻¹ : ℝ) : ℂ) • y else 0, ?_, ?_, ?_⟩
+  · intro n
+    by_cases hn : n = 0
+    · subst hn
+      simp only [ite_true, norm_smul, Complex.norm_real, norm_inv, norm_norm]
+      constructor
+      · by_cases h : ‖Λ‖ = 0 <;> simp [h]
+      · by_cases h : ‖y‖ = 0 <;> simp [h]
+    · simp [hn]
+  · intro k
+    refine tendsto_const_nhds.congr' ?_
+    filter_upwards [eventually_ne_atTop 0] with n hn
+    simp [hn]
+  · convert hasSum_single (f := fun n : ℕ ↦ (if n = 0 then ((‖Λ‖ * ‖y‖ : ℝ) : ℂ) else 0) •
+        (if n = 0 then ((‖Λ‖⁻¹ : ℝ) : ℂ) • Λ else 0).smulRight
+          (if n = 0 then ((‖y‖⁻¹ : ℝ) : ℂ) • y else 0)) 0 (by intro n hn; simp [hn]) using 1
+    simp only [ite_true]
+    by_cases hΛ : ‖Λ‖ = 0
+    · have : Λ = 0 := norm_eq_zero.mp hΛ
+      subst this; ext; simp
+    by_cases hy : ‖y‖ = 0
+    · have : y = 0 := norm_eq_zero.mp hy
+      subst this; ext; simp
+    ext x
+    simp [ContinuousLinearMap.smulRight_apply, smul_smul]
+    field_simp [hΛ, hy]
 
 /-- Paper: §10.3, p. 448. Strong nuclearity implies nuclearity. -/
 theorem IsStronglyNuclearBanachOperator.isNuclearOperator [CompleteSpace E]
     {A : E →L[ℂ] G} (_hA : IsStronglyNuclearBanachOperator A) : IsNuclearOperator A := by sorry
 
 end StrongNuclearity
+
+private theorem liftQL_mkQ_aux {M N : Type*} [AddCommGroup M] [Module ℂ M] [TopologicalSpace M]
+    [AddCommGroup N] [Module ℂ N] [TopologicalSpace N] (S : Submodule ℂ M) (f : M →L[ℂ] N)
+    (h : S ≤ f.ker) (v : M) : S.liftQL f h (S.mkQ v) = f v := by
+  rw [Submodule.liftQL_apply]; rfl
+
 
 variable {F : Type*} [Field F] [NumberField F]
 
@@ -110,7 +145,12 @@ def spectralConvolution (φ : BruhatCompactSupport C𝔽) : Q(a, hI, hs) →L[�
 spectral convolution takes the quotient class of its ambient convolution. -/
 theorem spectralConvolution_mkQ (φ : BruhatCompactSupport C𝔽) (v : W(l, r, s)) :
     spectralConvolution (F := F) a hI hs φ ((Θ(a, hI, hs)).mkQ v) =
-      (Θ(a, hI, hs)).mkQ (testAction(l, r, s, hI, hs) φ v) := by sorry
+      (Θ(a, hI, hs)).mkQ (testAction(l, r, s, hI, hs) φ v) := by
+  unfold spectralConvolution
+  have h := (liftQL_mkQ_aux (Θ(a, hI, hs))
+    ((Θ(a, hI, hs)).mkQL.comp (testAction(l, r, s, hI, hs) φ))
+    (hardySobolevTestAction_preserves_globalTheta (F := F) a hI hs φ) v)
+  with_reducible_and_instances exact h.trans (Submodule.mkQL_apply _ _)
 
 /-- Paper: (10.3.1.2), p. 448, and (10.3.2.2), p. 454. The descended action
 is complex linear in the test. -/
@@ -146,7 +186,11 @@ On an isotypic representative the restricted operator takes the class of its con
 theorem spectralIsotypeConvolution_mkQ (ω : PontryaginDual C₁) (φ : BruhatCompactSupport C𝔽)
     (v : Wω(hI, hs, ω)) :
     spectralIsotypeConvolution (F := F) a hI hs ω φ ((Nω(ω)).mkQ v) =
-      (Nω(ω)).mkQ (Aω(ω, φ) v) := by sorry
+      (Nω(ω)).mkQ (Aω(ω, φ) v) := by
+  unfold spectralIsotypeConvolution
+  have h := (liftQL_mkQ_aux (Nω(ω)) ((Nω(ω)).mkQL.comp Aω(ω, φ))
+    (hardySobolevTestAction_preserves_spectralIsotypeTheta (F := F) a hI hs ω φ) v)
+  with_reducible_and_instances exact h.trans (Submodule.mkQL_apply _ _)
 
 /-- Paper: Theorems 10.3.1.1(3), p. 449, and 10.3.2.1(3), p. 454.
 The full quotient action of an isotypic test has range in the corresponding quotient isotype.
@@ -176,7 +220,8 @@ Deviation: Sanity check in multiplicity one. -/
 theorem spectralConvolutionFiniteSum_single (A : E →L[ℂ] E) (x : ι → E) (Λ : ι → StrongDual ℂ E)
     (z : Z) (jet : Z → Fin 1 → ι) :
     spectralConvolutionFiniteSum A x Λ {z} (fun _ ↦ 1) jet =
-      ((Λ (jet z 0)).comp A).smulRight (x (jet z 0)) := by sorry
+      ((Λ (jet z 0)).comp A).smulRight (x (jet z 0)) := by
+  simp [spectralConvolutionFiniteSum]
 
 end FiniteSums
 
