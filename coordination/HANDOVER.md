@@ -117,7 +117,7 @@ appear. This supersedes "ask the user before resuming Opus" anywhere below.
 ## State at handoff
 
 ### Update 2026-11-22 ~06:00Z (user asleep from here; work autonomously, post nothing new upstream)
-- Crons (session-only; recreate on restart, CronList first): hourly check **c06e208e** at :17
+- Crons (session-only; recreate on restart, CronList first): hourly check **9dc215ca** at :17
   (text below); notes nagger **5d728683** every 15 min (:04/:19/:34/:49), see workstream 5.
 - Docs on origin/main unchanged since 02f36f8/15e78ca. HUNTER.md gained "One file at a time"
   (**ONE PR PER TOUCHED FILE**, user instruction; don't crowd a file with 2–3 other claimants) and
@@ -218,6 +218,17 @@ hand-ins happen at a normal pace once the issues exist.
   `anchors.py` still treats Ch5.2–8 as undigested (cone is a lower bound), `emit.py` doesn't apply
   claim/ERRATA/paper-gap exclusions. Fix before the next remap (Sonnet job).
 - Next Opus item after #1526: next QUEUE entry, one at a time; back to Sonnets when new issues bring quick wins.
+
+### Update 2026-11-22 ~07:30Z (user): nagger out of session; Opus on any open issue
+- **Nagger** is now ONE long-running Haiku (`tools/NAGGER.md`) looping in a single turn on
+  `tools/nag-wait.sh` (blocks ≤10 min per call, 15-min per-hunter cooldown, logs to `nag.log`),
+  SendMessaging stale hunters. The 15-min nagger cron is DELETED — never nag via cron ticks in the
+  coordinator session (user: keep it entirely out of this session). Coordinator only keeps
+  `agents.txt` in sync and relaunches the nagger if it ends; stop it with `touch sweeptools/nagger.stop`.
+- **Opus**: "The cone doesn't matter at this point ... Just pick any open issue for Opus." Any open,
+  unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held); no remapping. The
+  mapper-fix job is dropped.
+- Crons now: only the hourly check **9dc215ca** at :17.
 
 ## Workstreams
 

@@ -15,3 +15,4 @@
 - [Low-hanging mode](low-hanging-mode.md) — since 2026-11-22 04:40Z: several Sonnet hunters on new issues, NO Opus until quick wins run out (then resume without asking)
 - [Read docs from origin/main](read-docs-origin-main.md) — AGENTS/CONTRIBUTING/ERRATA via git show origin/main; gap handling binds hunters
 - [One PR per file](one-pr-per-file.md) — hunter/siever PRs each cover exactly one Lean file (user, 2026-11-22)
+- [Nagger out of session](nagger-out-of-session.md) — notes nagger = one long-running Haiku loop (NAGGER.md), never cron ticks in this session
