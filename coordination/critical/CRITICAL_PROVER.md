@@ -20,8 +20,8 @@ in your notes, release the issue, and report.
 
 ## Differences from HUNTER.md
 - `gh issue view <n> --repo mccorvie/riemann-masullo --comments`: if someone else holds an
-  unreleased claim, stop and report. Earlier `Releasing` comments and `$S/notes/released/<n>-*.md`
-  hold previous attempts; start from them.
+  unreleased claim, stop and report. Then follow HUNTER.md "Prior work first" (`$S/prior.sh <n>`):
+  start from any earlier attempt, ours or upstream.
 - Worktree `$S/newwt.sh crit/<n> $R/.agent/wt/crit-<n>`, branch `crit/<n>`, pushed to `fork`.
 - **Stuck:** before releasing an issue you tried and failed, write the stuck packet (HUNTER.md
   "Stuck packet") and run `$S/escalate.sh <n> "<reason>" --to fable`. A Fable consultant then

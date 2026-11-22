@@ -62,6 +62,10 @@ a little thought. Skip anything deep.
   Next idea: <what you would try next>
   ```
   Failed approaches come first and matter most.
+- **Prior work first** (user, 2026-11-22): before working on an issue, run `$S/prior.sh <n>` and
+  read the issue's `Releasing` comments. Build on what they list (notes, released notes, saved
+  patches, worktrees, commits) instead of starting over: reuse the proof text, skip the failed
+  approaches. Name the earlier attempt in the PR body.
 - **Stuck** (you tried and failed, and nobody else holds the issue): do NOT release it. Update the
   notes, then run `$S/escalate.sh <n> "<one-line reason>"`. It keeps our upstream claim (posts
   nothing), keeps the issue in `claims.txt`, and queues it in `$S/escalations.txt` for an Opus
@@ -71,8 +75,9 @@ a little thought. Skip anything deep.
   notes, removes the claim from `claims.txt` and archives the notes. Update the notes first.
 - **Escalators** (Opus agents given escalated issues): the claim is already ours, so post no
   `Claiming`. If the notes have a `## Fable route`, implement that route first. Mark the row `TAKEN <your name> <UTC>` in `escalations.txt`, change the `Model:` line
-  of `notes/<n>.md` to your tag, and read the Sonnet's notes before anything else. In the PR body
-  write `Prover: <M> (continuing an attempt by <Sonnet tag>)`. When done, mark the row `DONE <PR url>`
+  of `notes/<n>.md` to your tag, and read the prior work ("Prior work first") before anything
+  else: an escalated issue always has some. In the PR body write `Prover: <M> (continuing an
+  attempt by <earlier tag>)`. When done, mark the row `DONE <PR url>`
   or release with `release.sh` (which then posts your notes).
   **Try to prove it outright before splitting** (user, 2026-11-22): a missing lemma goes in as a
   private helper in the issue's file, proved. Split into new `sorry`s only as a last resort,

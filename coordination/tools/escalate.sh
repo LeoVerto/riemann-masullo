@@ -7,12 +7,18 @@
 #   --to fable: an Opus agent is stuck; a Fable consultant reads the "## Stuck packet" in the notes
 #               and writes a route (FABLE.md); then an Opus escalator implements it (--to opus again).
 # Use release.sh instead when the issue was merely not attempted or someone else holds it.
+# Resuming a released issue (coordinator, after re-claiming it): if notes/<issue>.md is missing,
+# the newest notes/released/<issue>-*.md is restored first.
 set -u
 T=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools
 n=${1:?usage: escalate.sh <issue> "<reason>" [--to opus|fable]}; reason=${2:?give a one-line reason}
 level=opus; [ "${3:-}" = --to ] && level=${4:?--to needs opus or fable}
 case $level in opus|fable) ;; *) echo "escalate: unknown level $level"; exit 1;; esac
 N=$T/notes/$n.md; Q=$T/escalations.txt
+if [ ! -s "$N" ]; then
+  old=$(ls "$T"/notes/released/"$n"-*.md 2>/dev/null | sort | tail -1)
+  [ -n "$old" ] && cp "$old" "$N" && echo "escalate #$n: restored notes from ${old#$T/}"
+fi
 [ -s "$N" ] || { echo "escalate #$n: notes/$n.md missing or empty; write it first"; exit 1; }
 if [ $level = fable ] && ! grep -q '^## Stuck packet' "$N"; then
   echo "escalate #$n: add a '## Stuck packet' section to notes/$n.md first (HUNTER.md 'Stuck packet')"; exit 1

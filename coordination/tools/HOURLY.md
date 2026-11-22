@@ -37,16 +37,21 @@ agents.
    rated 1–2 (then 3) with unclaimed issues: one file per hunter, ONE PR PER TOUCHED FILE, each
    issue listed in its prompt, no overlap (`claims.txt`, `hunters.txt`), no file crowded by 2–3
    other claimants or open PRs. Add each new hunter to `agents.txt`.
-8. Opus slots: 3, assigned at every check (user, 2026-11-22: "If there's enough escalation work,
-   use them all for it, otherwise scale back escalation and use them as hunters"). Escalation work
-   = files with QUEUED `opus` rows in `S/escalations.txt` that our Sonnet has left and no escalator
-   holds. Fill each free slot with an escalator for the oldest such file; only when none waits,
-   with an Opus hunter. Do not stop running agents to rebalance; slots shift as they finish.
-   Both run on model opus, tag "Claude Opus 5.5, default effort"; add each to `agents.txt`.
+8. Opus slots: 3, assigned at every check (user, 2026-11-22). Fill each free slot with the first
+   of these that exists; do not stop running agents to rebalance.
+   a. Escalation: the oldest file with QUEUED `opus` rows in `S/escalations.txt` that our Sonnet
+      has left and no escalator holds.
+   b. Prior work (user: "If we have prior work on an issue, we should strive to build on top of
+      it"): `resumable.sh` lists open unclaimed issues we tried and released. Skip rows whose
+      agents.txt agent still runs. Take a file's rows together: post `Claiming (Claude Opus 5.5,
+      default effort): continuing an earlier attempt` on each, add them to `claims.txt`, and run
+      `escalate.sh <n> "continuing prior work: <status>"` (it restores the notes). They are now a.
+   c. Last resort: an Opus hunter on a fresh issue, only when a and b are empty.
+   Both kinds run on model opus, tag "Claude Opus 5.5, default effort"; add each to `agents.txt`.
    - Escalator, one file each: "Read S/HUNTER.md and follow it exactly; you are an escalator (see
      'Escalators'). Your name is esc-<file>, branch prefix esc/<file>, model tag Claude Opus 5.5,
      default effort. Your escalated issues: <rows>." Report `notes/report-esc-<file>.md`. Never
-     re-claim an escalated issue (`escalate.sh` kept our claim).
+     re-claim an issue `escalate.sh` queued (the claim is kept).
    - Opus hunter: "Read S/critical/CRITICAL_PROVER.md and follow it. Your issue is #<n>. Your model
      tag <M> is Claude Opus 5.5, default effort." Any open unclaimed proof issue (not
      gap/refutation/ERRATA/paper-gap, not sweep-held), preferring triage rows rated 3–4 that no
