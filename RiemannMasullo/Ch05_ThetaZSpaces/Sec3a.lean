@@ -528,6 +528,11 @@ def coordinateDerivative {ι A : Type*} [Fintype ι] [Monoid A] (derivative : ι
     (α : ι → ℕ) : A :=
   ((Finset.univ.toList : List ι).map (fun i ↦ derivative i ^ α i)).prod
 
+/-- The coordinate derivative of the zero multi-index is the identity. -/
+theorem coordinateDerivative_zero {ι A : Type*} [Fintype ι] [Monoid A] (derivative : ι → A) :
+    coordinateDerivative derivative (0 : ι → ℕ) = 1 := by
+  simp [coordinateDerivative]
+
 open Classical in
 /-- Paper: Theorem 5.3.2.3, p. 245.
 A multi-index supported in one coordinate acts by the corresponding power
@@ -618,7 +623,10 @@ def coordinatePlaneDiracTensor (β : ι → ℕ) (U : 𝒟'(κ)) : 𝒟'(ι ⊕ 
 At derivative order zero the tensor restricts the test to the coordinate plane and applies
 the tangential distribution. -/
 theorem coordinatePlaneDiracTensor_zero (U : 𝒟'(κ)) (f : 𝒟(ι ⊕ κ)) :
-    coordinatePlaneDiracTensor (0 : ι → ℕ) U f = U (R𝒟 f) := by sorry
+    coordinatePlaneDiracTensor (0 : ι → ℕ) U f = U (R𝒟 f) := by
+  have h0 : Sum.elim (0 : ι → ℕ) (0 : κ → ℕ) = 0 := by
+    ext i; cases i <;> rfl
+  simp [coordinatePlaneDiracTensor, h0, coordinateDerivative_zero]
 
 open Classical in
 /-- Paper: Theorem 5.3.2.3(4), p. 245.
