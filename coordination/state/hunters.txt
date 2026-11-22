@@ -58,3 +58,4 @@ w24 (finished 17:38Z: PR #5393 Ch07 Sec5 proves #5133; released #5135 (needs ade
 17:39Z user resumed the Fable consultant on #4344; row TAKEN
 17:40Z triage8: only #5369 rated 3 (others 4-5: need Hecke L zero existence, none in project); w26 on #5369
 17:42Z wind-down: esc-sec5 stopped (6 proved at f0a3c40 + #4409 uncommitted), w26 stopped (unbuilt #5369), nagger/watchdog/cron stopped; claims kept (user)
+17:42Z wind-down: esc-sec4 finished (3 proved, 2 local commits on hunt/esc-sec4-1, full build pending)

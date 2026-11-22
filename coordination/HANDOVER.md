@@ -26,11 +26,19 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
     f0a3c40 on local branch hunt/esc-sec5-1 (wt/esc-sec5, not pushed, no PR); #4409 checks clean,
     uncommitted edit on top. To hand in one PR for all seven: module build, full `lake build`,
     signature compare, axioms (`.agent/Check.lean` ready); lint passes. Report notes/report-esc-sec5.md.
-  - esc-sec4 (Opus escalator) Ch05 Sec4 #4338 #4352 #4356, wt/hunt-esc-sec4-1 (it released #4344).
+  - esc-sec4 (Opus escalator) Ch05 Sec4: **#4338 #4352 #4356 PROVED**, two local commits on branch
+    hunt/esc-sec4-1 (wt/hunt-esc-sec4-1, from main bd5d15c, clean, not pushed, no PR). Module builds
+    in 3m17, lint passes; still to do: full `lake build` (stopped at wind-down, 0 errors so far),
+    signature compare, axioms (`.agent/Check.lean` ready). Trap: `have key := …` then
+    `with_reducible_and_instances exact key _ ω hP A hA` (plain `exact` unfolds Ẽ(I) for 1.5 h+).
+    It released #4344 (see the Fable line).
   - w26 (Sonnet) #5369: proof written, unbuilt; edit in wt/hunt-w26-1 (detached build may have left
     `.agent/build.exit`); next steps in notes/5369.md.
-  - Fable consultant on #4344 (Ch05 Sec4 separability): coordinator stuck packet + partial route in
-    notes/4344.md; wt/fable-4344 has `.agent/Route.lean`.
+  - #4344 (Ch05 Sec4 separability): Fable returned a partial **ROUTE** (notes/4344.md `## Fable
+    route`, skeleton notes/4344-Route.lean): nuclear (proved, Sec2b:311) + metrizable (from sorried
+    sibling `_frechet`, Sec4:186) ⇒ separable; per-seminorm helper elaborates; applying the generic
+    lemma hit a whnf heartbeat timeout (traps in notes). Re-queued as an `opus` row for an escalator
+    (best after esc-sec4's PR, same file).
 - **Opus escalation queue** (`escalations.txt`, all claimed by us, notes in notes/<n>.md):
   Ch11 Sec1b #5175 #5177 #5181 #5184 and Ch07 Sec5 #5135 (shared blocker: `adelePrincipalValue`
   algebra — F ∅ = id, composition for T ≤ T', insert factorization; prove as private helpers);
