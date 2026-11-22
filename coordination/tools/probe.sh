@@ -11,7 +11,7 @@
 #   probe.sh build [-t <s>] <wt> [<Module>...]  start S/build.sh detached (default 900 s;
 #                                          give 3600 for the full build); log/status <wt>/.agent/build.{log,exit}
 #   probe.sh waitbuild [-t <s>] <wt>       wait up to <s> (default 100) for <wt>/.agent/build.exit
-# Exit codes of `wait`/`waitbuild`: 0 all done, 3 something still running. 124 in an exit file = timeout.
+# Exit codes of `wait`/`waitbuild`: 0 all done, 3 something still running; `build`: 75 = a build already runs there. 124 in an exit file = timeout.
 export LAKE_ARTIFACT_CACHE=true
 export LAKE_CACHE_DIR=/mnt/faststorage/math/riemann-masullo/.lake/artifact-cache
 export LAKE_RESTORE_ARTIFACTS=true
@@ -40,7 +40,11 @@ case $cmd in
     [ $all = 1 ] || exit 3 ;;
   build)
     wt=$1; shift; [ -d "$wt" ] || { echo "no worktree $wt" >&2; exit 2; }
-    mkdir -p "$wt/.agent"; rm -f "$wt/.agent/build.exit"
+    mkdir -p "$wt/.agent"
+    # build.sh holds this lock while it builds; refuse loudly instead of starting a build that exits 75
+    if ! flock -n "$wt/.agent/build.lock" true; then
+      echo "a build is already running in $wt: probe.sh waitbuild $wt, then start again if you edited since" >&2; exit 75; fi
+    rm -f "$wt/.agent/build.exit"
     BUILD_TIMEOUT=${t:-900} setsid nohup "$S/build.sh" "$wt" "$@" >/dev/null 2>&1 < /dev/null &
     echo "build started in $wt (timeout ${t:-900} s)" ;;
   waitbuild)
