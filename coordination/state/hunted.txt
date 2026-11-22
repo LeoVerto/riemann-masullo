@@ -38,3 +38,4 @@ crit  2026-11-22T02:14Z  crit/1885 finished: PR #3993 (fully proved, clean axiom
 appB  2026-11-22T02:27Z  hunt/appb5 started (sonnet medium, 47 unclaimed, newest #3914)
 appB  2026-11-22T02:28Z  hunt/appb5 finished: 0 PRs; all 46 unclaimed appB issues (#3749-#3914, Sec4b/5/6) are deep; #3864 heckeNormCoefficient_natCast closest (needs LFunction unfolding vs finsum over ideals of given norm)
 sieve  2026-11-22T02:55Z  sieve.sh service live (PID 45589/45591); sweep4 agent retired (0 PRs, no claims; res4 had 4 cheap results)
+crit  2026-11-22T03:17Z  crit/2663 finished: PR #4021 (proved modulo AppD exists_modulatedExponentialDecay_translationAction; signature-compare false positive from #2693 hcover sorry line shift); crit/3484 started (opus)

@@ -30,7 +30,7 @@ in the repo, a short `calc`, `ext` + `simp [...]`, `constructor` + pieces, etc.
    `/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/newwt.sh <P>-<k> /mnt/faststorage/math/riemann-masullo/.agent/wt/<P>-<k>`
    which gives a pre-built tree at a recent main and the baseline signatures in
    `/mnt/faststorage/math/riemann-masullo/.agent/wt/<P>-<k>-before.txt` (no baseline build). Iterate with `lake build <Module>`
-   (`lake env lean` fails on a `module` file itself; it works for scratch files under .agent/ that
+   (`lake lean` fails on a `module` file itself; it works for scratch files under .agent/ that
    import the module). If `git fetch` fails with "cannot lock ref", another agent is fetching: retry.
    If an issue is harder than it looked, release it (comment starting `Releasing`, remove it from
    claims.txt) rather than sinking time. If a statement is false or vacuous, do not change it:
@@ -38,7 +38,7 @@ in the repo, a short `calc`, `ext` + `simp [...]`, `constructor` + pieces, etc.
 3. Before handing in a batch, all must pass: full `lake build`; `scripts/lint.sh`;
    `scripts/signatures.sh > /mnt/faststorage/math/riemann-masullo/.agent/wt/<P>-<k>-after.txt && scripts/signatures.sh --compare /mnt/faststorage/math/riemann-masullo/.agent/wt/<P>-<k>-before.txt /mnt/faststorage/math/riemann-masullo/.agent/wt/<P>-<k>-after.txt`
    (no changed declarations); `#print axioms` for each proved declaration via a scratch file under
-   .agent/ with `lake env lean .agent/Check.lean`. Your proof must add no axioms beyond propext,
+   .agent/ with `lake lean .agent/Check.lean`. Your proof must add no axioms beyond propext,
    Classical.choice, Quot.sound (`sorryAx` inherited from definitions whose proof fields cite
    still-open lemmas is acceptable; say so in the PR).
 4. Commit (message ends with a blank line then `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`),
@@ -51,15 +51,13 @@ in the repo, a short `calc`, `ext` + `simp [...]`, `constructor` + pieces, etc.
    `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. Then remove those numbers from claims.txt.
 5. Repeat. Stop after 4 PRs or about 90 minutes, whichever comes first (short-lived hunters keep
    context and cost down; the coordinator launches fresh ones).
-6. Handoff: keep `/mnt/faststorage/math/riemann-masullo/.agent/wt/<P>-<k>/.agent/STATE.md` current in a few lines (claimed issues,
-   which are proved, what is left, next step), so that a fresh agent can take over if you are cut
-   off by a usage limit.
+6. Handoff: your approach notes in `notes/<n>.md` (see "Claims, approach notes" below) are the handoff; there is no separate STATE.md.
 
 ## Fail fast on the known elaboration blocker
 Terms using `+`, `-`, `•` on `SchwartzBruhat` / `ModulatedExponentialDecay` values, or `Lβ`
 coercions, often time out or hang (blocked #1288 #1463 #2614 #2686 #2710 #2841 #2842). Before
 claiming such an issue, elaborate the bare statement with a `sorry` body in a scratch file under
-`timeout 120 lake env lean .agent/Probe.lean`; if that does not finish, skip the issue. Known
+`timeout 120 lake lean .agent/Probe.lean`; if that does not finish, skip the issue. Known
 workarounds: `(someLinearMap).map_add f f'` elaborates; `Eq.trans ?_ (integral_add ..)` works
 where `rw [← integral_add ..]` times out.
 
@@ -109,7 +107,7 @@ The integrator runs its own file-wide sweeper agents: issues labelled `sweep` ("
 - Wait on builds with ONE blocking command (`build.sh <wt>` then a single background `until [ -e <wt>/.agent/build.exit ]; do sleep 20; done`), never with repeated polling turns.
 - Keep tool output small: `tail`, `grep -m`, `cut -c1-200`. Never print whole files or logs you do not need.
 - Read the paper and Lean files by the exact line ranges you need.
-- **Sweeper race (added 2026-11-22):** post your `Claiming` comment BEFORE doing any work, so upstream sweep tables mark your declaration as taken. Right before pushing, re-run the open-sweep list; if your file has become held by a sweep issue meanwhile, move any NEW helper lemmas you added to that file into `RiemannMasullo/ForMathlib/` (or a private section of a file not held) and say so in the PR body, so you do not collide with the sweeper.
+- **Sweeper overlap (added 2026-11-22):** post your `Claiming` comment BEFORE doing any work, so upstream sweep tables mark your declaration as taken. Right before pushing, re-run the open-sweep list; if your file has become held by a sweep issue meanwhile, move any NEW helper lemmas you added to that file into `RiemannMasullo/ForMathlib/` (or a private section of a file not held) and say so in the PR body, so you do not collide with the sweeper.
 
 ## Where helper lemmas go (added 2026-11-22; from prompts/prover.md, prompts/merger.md, scripts/proof_review.sh)
 - Default: directly above first use, in the same file, `private` if only that proof needs it.
@@ -127,12 +125,13 @@ Your model tag <M> is given in your launch prompt (default: hunters/fixers `Clau
 3. **Notes:** right after claiming, create `/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/notes/<n>.md` and keep it current (at most ~20 lines) every time an approach fails or you learn something:
    ```
    Model: <M>
+   Status: <approach; what is proved, what is left; one or two lines>
    Failed approaches:
    - <what you tried> -> <why it failed: error, missing lemma, timeout, false subgoal>
    Blocked by: <the concrete obstacle, if any>
    Useful: <lemmas, files:lines, paper pages>
    Next idea: <what you would try next>
    ```
-   **Failed approaches come first and matter most:** if you stop or are stopped, the watchdog posts this file on the issue for the next solver.
+   **Update this file after every build, failed approach or proved lemma, not just at the end.** When the watchdog sees the session idle it releases your claims and posts this file on the issue; if it is stale, hours of work are lost. **Failed approaches come first and matter most:** say what you tried, and why it failed (error, missing lemma, timeout), so nobody repeats it.
 4. **Release** only with `/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/release.sh <n> "<one-line reason>"`: it posts `Releasing (<M>): <reason>` plus your notes, removes the claim from claims.txt and archives the notes. Update the notes before calling it.
 5. **PR body:** add a line `Prover: <M>` just above the `🤖 Generated with` line. After the PR is open, delete `notes/<n>.md` for the issues it closes.

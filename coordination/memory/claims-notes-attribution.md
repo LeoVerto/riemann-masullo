@@ -12,7 +12,7 @@ The user, 2026-11-22: read issue comments for earlier approaches when claiming; 
 **How to apply:**
 - Rules are in the last section of HUNTER.md and CRITICAL_PROVER.md. Launch prompts give the tag <M>, e.g. `Claude Sonnet 5.5, effort medium` or `Claude Opus 5.5, default effort`.
 - Claim with first line `Claiming (<M>)`. Upstream's claims.yml only parses the first word, so this is safe.
-- Notes live in .agent/sweeptools/notes/<n>.md: Model, Failed approaches (first), Blocked by, Useful, Next idea.
+- Notes live in .agent/sweeptools/notes/<n>.md and are the ONLY handoff file (STATE.md dropped 2026-11-22 as duplicate): Model, Status, Failed approaches (first), Blocked by, Useful, Next idea. Agents must update it after every build/failed approach, since the watchdog posts it on the issue and stale notes lose hours of work.
 - Release ONLY via .agent/sweeptools/release.sh <n> "<reason>": it posts `Releasing (<M>): reason` plus the notes, updates claims.txt and archives to notes/released/. watchdog.sh calls it, and so should the coordinator for stale or orphan claims.
 - PR bodies carry `Prover: <M>` above the 🤖 line.
 Related: [[low-hanging-sweep]], [[critical-path-workstream]].

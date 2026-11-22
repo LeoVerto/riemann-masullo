@@ -13,7 +13,7 @@ S=$R/.agent/sweeptools, worktrees under $R/.agent/wt.
 ## Read first
 - `$R/AGENTS.md` (project rules).
 - `S/HUNTER.md`, all of it, including the sections at its end: token check, upstream sweepers,
-  token thrift, sweeper race, helper placement, and claims/notes/attribution. It defines how you
+  token thrift, sweeper overlap, helper placement, and claims/notes/attribution. It defines how you
   claim, build, check and hand in. This brief only adds what is specific to sieve hits.
 - `S/SIEVE.md` (how the sieve service works, where its results are).
 

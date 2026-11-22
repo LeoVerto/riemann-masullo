@@ -1,11 +1,18 @@
 # sieve: standing background sweep of every sorry (replaces nothing; sweep.py and macros unchanged)
 - Start: cd S && setsid nohup ./sieve.sh >> sieve.log 2>&1 < /dev/null &   Stop: kill $(cat sieve/wrapper.pid) and the python child (pid in sieve/state.json).
 - sieve.py: worktree $R/.agent/wt/sieve (detached, follows base/COMMIT, build copied from base/build, Sweep*.lean installed only there, untracked).
-- Queue: files with `sorry` whose git blob differs from the last completed pass in sieve/swept.tsv; tier 0 = changed since last sweep or touched <12h, then backlog; newest commit first. Per file: cheap pass (30 min) then exact? pass (120 min).
-- Timeout: file is re-run in chunks of 4 sorries (sweep.py --only L1,L2), then per sorry; timeouts recorded in swept.tsv (last column).
-- One lean at a time; waits until no other `lean --json` runs and MemAvailable > 6000 MB; nice 10; kills only its own process group.
+- Queue: files with `sorry` whose git blob differs from the last completed pass in sieve/swept.tsv; tier 0 = changed since last sweep or touched <12h, then backlog; newest commit first. Per file, passes in order: cheap (60 min), exact? (180 min), grind (120 min), unfold (180 min). Everything runs `lake lean <file> -- --json` (applies lakefile leanOptions; never `lake env lean`).
+- Retry policy: rc 124 (timeout), rc >= 128 or < 0 (memguard kill 137 etc.) and runs with no Lean messages at all are NOT results. The pass is requeued (sieve/fails.json, backoff 15 min, 30 min) and logged `requeue`; swept.tsv gets a `status=retry attempts=N` line which does not count as done. After 2 failed whole-file attempts the file runs in chunks of 4 sorries (`--only`), each chunk twice, then per sorry twice; a sorry that still fails is recorded `gaveup`. Only `status=done` lines in swept.tsv (columns: file, blob, pass, rc, json, date, status attempts gaveup) mark a pass finished. rc 1 is normal (unclosed sorries make the macro fail).
+- Epoch: results from before the `lake lean` switch (wrong options) are archived in sieve/old-envlean/ and ignored.
+- Passes (sweep.py --pass cheap|exact|grind|unfold; macros in lean/Sweep.lean.txt, Sweep2, Sweep3):
+  grind: `grind`, then `grind [defs]`; unfold: per sorry the repo `def`/`abbrev` names occurring in the declaration header (<= 12; repo_defs() in sweep.py) are put into `sweepdtac [..]` = first of `unfold ..; rfl` | `simp [..]` | `simp only [..]; aesop` | `unfold ..; exact?`. A sorry with no such names is left alone in the unfold pass.
+- One lean at a time; waits until no other lean process with cwd under $R/.agent/wt/sieve* (not our own child) runs and MemAvailable > 6000 MB; nice 10; kills only its own process group.
 - Output: sieve/res/{cheap,exact}/<file>.json, sieve/hits.tsv (commit, file, line, decl, tactic, date, blob), sieve/state.json, sieve.log.
 - status.sh `== sieve` (sieve_status.py) classifies unreported hits via gh + origin/main:
   READY #n (open unclaimed proof issue, file not in an open sweep issue), HINT #n (file held by open sweep issue), CLAIMED #n, WAIT (no issue yet), DONE (no longer sorry on origin/main).
 - DONE hits go to sieve/reported.txt; hits listed in dispatched.txt (`<file>::<decl>`) are hidden. READY/HINT/WAIT repeat until dispatched.
 - sieve/priority.txt: files listed there (one per line) go first, in order, while due.
+
+# shortlist.py: quick wins without Lean
+`python3 shortlist.py [files..]` (default: files changed on origin/main in the last 48 h containing sorry) -> shortlist/latest.tsv (score, file:line, decl, proof issue, open sweep issue holding the file, signals) and a top-30 on stdout.
+Score = 50 minus signature size/binders/hypotheses, plus name patterns (_apply, _def, _mem, _zero, ...), plus docstring hints (sanity, by definition, trivial, ...), minus red flags (integrals, Tendsto, Summable, Meromorphic, ...), plus/minus the paper's proof length (`Paper: <item>, p. N` looked up via scripts/paper.sh N..N+2, cached in shortlist/paper/; Remark/Definition without proof +12, short proof or `PROOF. Clear/This follows` more, long proof less; labels that are equations or sections give `paper:?`). It is a heuristic ordering, not a guarantee.

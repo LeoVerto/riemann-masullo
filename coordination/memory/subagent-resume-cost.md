@@ -9,4 +9,4 @@ After the 2026-11-21 spend-limit halt (~35 min, longer than the prompt-cache lif
 
 **Why:** a resumed agent re-sends its whole context; after a gap longer than the cache TTL that is billed as fresh input. Long-lived agents also make every tool call expensive.
 
-**How to apply:** keep subagents short-lived (hunters stop after 2 PRs / ~90 min, see /home/agent/sweeptools/HUNTER.md), have them keep a short `.agent/STATE.md` handoff in their worktree, and after a halt launch fresh agents pointed at those handoff notes instead of resuming old transcripts. Keep the coordinator's own periodic loop sparse. Related: [[low-hanging-sweep]].
+**How to apply:** keep subagents short-lived (hunters stop after 2 PRs / ~90 min, see /home/agent/sweeptools/HUNTER.md), have them keep their per-issue `notes/<n>.md` current (Status line, failed approaches; no separate STATE.md since 2026-11-22), and after a halt launch fresh agents pointed at those notes instead of resuming old transcripts. Keep the coordinator's own periodic loop sparse. Related: [[low-hanging-sweep]].

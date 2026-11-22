@@ -1,0 +1,36 @@
+module
+
+public import Mathlib.Tactic.FunProp
+public import Mathlib.Tactic.Positivity
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.NormNum
+public import Mathlib.Tactic.Ring
+public import Aesop
+
+public section
+
+/-- grind pass: `sweepgtac [c1, c2]` tries plain `grind`, then `grind` with the definitions as hints. -/
+syntax "sweepgtac" "[" ident,* "]" : tactic
+open Lean in
+macro_rules
+  | `(tactic| sweepgtac [$cs,*]) => do
+    let gs ← cs.getElems.mapM fun c => `(Lean.Parser.Tactic.grindParam| $c:ident)
+    `(tactic| first
+    | ((grind); done; trace "SWEEP:grind")
+    | ((grind [$gs,*]); done; trace "SWEEP:grind [defs]"))
+macro "sweepgtac" "[" cs:ident,* "]" : term => `(by sweepgtac [$cs,*])
+
+/-- unfold-defs pass: `sweepdtac [c1, c2]` unfolds / simps the repo definitions of the statement. -/
+syntax "sweepdtac" "[" ident,* "]" : tactic
+open Lean in
+macro_rules
+  | `(tactic| sweepdtac [$cs,*]) => do
+    let ss ← cs.getElems.mapM fun c => `(Lean.Parser.Tactic.simpLemma| $c:ident)
+    `(tactic| first
+    | ((unfold $cs*; rfl); done; trace "SWEEP:unfold; rfl")
+    | ((simp [$ss,*]); done; trace "SWEEP:simp [defs]")
+    | ((simp only [$ss,*]; aesop); done; trace "SWEEP:simp only [defs]; aesop")
+    | ((unfold $cs*; exact?); done; trace "SWEEP:unfold; exact?"))
+macro "sweepdtac" "[" cs:ident,* "]" : term => `(by sweepdtac [$cs,*])
+
+end

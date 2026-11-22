@@ -3,7 +3,8 @@
 import json, os, re, subprocess, sys, time, datetime
 R = "/mnt/faststorage/math/riemann-masullo"; T = R + "/.agent/sweeptools"; WT = R + "/.agent/wt/sieve"
 A = T + "/sieve"; BASE = T + "/base"
-TMO = {"cheap": 1800, "exact": 7200}
+TMO = {"cheap": 3600, "exact": 10800, "grind": 7200, "unfold": 10800}
+PASSES = ("cheap", "exact", "grind", "unfold")
 ONLY = os.environ.get("SIEVE_ONLY")  # test: comma list of files
 sys.path.insert(0, T)
 exec(open(T + "/sweep.py").read().split("def main():")[0])  # find_sorries, decl_of
@@ -18,9 +19,24 @@ def state(**kw):
     d.update(kw); d["pid"] = os.getpid(); d["updated"] = time.time()
     json.dump(d, open(A + "/state.json.tmp", "w")); os.replace(A + "/state.json.tmp", A + "/state.json")
 
+def descendants(pid):
+    kids, out = {}, set()
+    for p in os.listdir("/proc"):
+        if p.isdigit():
+            try: kids.setdefault(int(open(f"/proc/{p}/stat").read().rsplit(")", 1)[1].split()[1]), []).append(int(p))
+            except Exception: pass
+    st = [pid]
+    while st:
+        for k in kids.get(st.pop(), []): out.add(k); st.append(k)
+    return out
 def lean_running():
-    return sh(["pgrep", "-x", "lean"]).stdout.split() and \
-        any("--json" in open(f"/proc/{p}/cmdline").read() for p in sh(["pgrep", "-x", "lean"]).stdout.split() if os.path.exists(f"/proc/{p}/cmdline"))
+    """another sieve-style sweep: a lean process with cwd under $R/.agent/wt/sieve* that is not our own descendant."""
+    mine = descendants(os.getpid())
+    for p in sh(["pgrep", "-x", "lean"]).stdout.split():
+        try: cwd = os.readlink(f"/proc/{p}/cwd")
+        except Exception: continue
+        if cwd.startswith(R + "/.agent/wt/sieve") and int(p) not in mine: return True
+    return False
 def memavail():
     for l in open("/proc/meminfo"):
         if l.startswith("MemAvailable"): return int(l.split()[1]) // 1024
@@ -45,72 +61,99 @@ def refresh():
         sh(["rm", "-rf", WT + "/.lake/build"]); sh(["cp", "-r", BASE + "/build", WT + "/.lake/build"])
         if open(BASE + "/COMMIT").read().strip() == c: break
         c = open(BASE + "/COMMIT").read().strip(); sh(["git", "-C", WT, "checkout", "-q", "-f", "--detach", c])
-    for n, f in (("Sweep", "Sweep.lean.txt"), ("Sweep2", "Sweep2.lean.txt")):
+    for n, f in (("Sweep", "Sweep.lean.txt"), ("Sweep2", "Sweep2.lean.txt"), ("Sweep3", "Sweep3.lean.txt")):
         sh(["cp", f"{T}/lean/{f}", f"{WT}/RiemannMasullo/{n}.lean"])
     wait_ready()
-    p = sh(["nice", "-n", "10", "lake", "build", "RiemannMasullo.Sweep", "RiemannMasullo.Sweep2"], cwd=WT)
+    p = sh(["nice", "-n", "10", "lake", "build", "RiemannMasullo.Sweep", "RiemannMasullo.Sweep2", "RiemannMasullo.Sweep3"], cwd=WT)
     log("macro build rc", p.returncode, p.stdout[-200:] if p.returncode else "")
     if p.returncode: return None
     open(A + "/installed", "w").write(c)
     return c
+
+def fails():
+    try: return json.load(open(A + "/fails.json"))
+    except Exception: return {}
+def set_fail(key, v):
+    d = fails()
+    if v is None: d.pop(key, None)
+    else: d[key] = v
+    json.dump(d, open(A + "/fails.json.tmp", "w")); os.replace(A + "/fails.json.tmp", A + "/fails.json")
 
 def due_files(c):
     swept = {}
     if os.path.exists(A + "/swept.tsv"):
         for l in open(A + "/swept.tsv"):
             p = l.rstrip("\n").split("\t")
-            if len(p) >= 4: swept.setdefault((p[0], p[2]), []).append(p[1])  # (file,pass) -> blobs
+            if len(p) >= 7 and p[6].startswith("status=done"): swept.setdefault((p[0], p[2]), []).append(p[1])  # (file,pass) -> blobs
     out = sh(["git", "-C", WT, "grep", "-lw", "sorry", c, "--", "RiemannMasullo"]).stdout.split()
-    files = [x.split(":", 1)[1] for x in out if "/External/" not in x and not x.endswith(("/Sweep.lean", "/Sweep2.lean"))]
+    files = [x.split(":", 1)[1] for x in out if "/External/" not in x and not x.endswith(("/Sweep.lean", "/Sweep2.lean", "/Sweep3.lean"))]
     if ONLY: files = [f for f in files if f in ONLY.split(",")]
     q = []
     prio = open(A + "/priority.txt").read().split() if os.path.exists(A + "/priority.txt") else []
     for f in files:
         blob = sh(["git", "-C", WT, "rev-parse", f"{c}:{f}"]).stdout.strip()
         ct = int(sh(["git", "-C", WT, "log", "-1", "--format=%ct", c, "--", f]).stdout.strip() or 0)
-        passes = [ps for ps in ("cheap", "exact") if blob not in swept.get((f, ps), [])]
+        passes = [ps for ps in PASSES if blob not in swept.get((f, ps), [])]
         if not passes: continue
-        changed = any((f, ps) in swept for ps in ("cheap", "exact"))
+        if fails().get(f"{f}|{passes[0]}|{blob}", {}).get("after", 0) > time.time(): continue  # backing off
+        changed = any((f, ps) in swept for ps in PASSES)
         tier = 0 if (changed or ct > time.time() - 12 * 3600) else 1
         if f in prio: tier, ct = -1, -prio.index(f)
         q.append((tier, -ct, f, blob, passes))
     q.sort()
     return q
 
+def bad(d):
+    """killed (137/143/signal), timed out (124) or lake failed without any message: not a result."""
+    rc = d["rc"]
+    return rc == 124 or rc >= 128 or rc < 0 or (rc != 0 and d.get("nmsgs", 1) == 0)
+
 def run_sweep(f, ps, out, extra):
-    p = sh(["python3", T + "/sweep.py", WT, f, out] + extra)
-    return p.stdout.strip()
+    p = sh(["python3", T + "/sweep.py", WT, f, out, "--pass", ps] + extra)
+    try: return json.load(open(out))
+    except Exception: return {"rc": -1, "sorries": [], "other_errors": []}
+
+def run_scope(f, ps, out, only=None, tries=2):
+    extra = ["--timeout", str(TMO[ps])] + (["--only", ",".join(map(str, only))] if only else [])
+    for t in range(tries):
+        wait_ready(); d = run_sweep(f, ps, out, extra)
+        if not bad(d): return d
+        log("bad run rc", d["rc"], f, ps, "only=", only, "try", t + 1); time.sleep(60 * (t + 1))
+    return None
 
 def sweep_file(f, blob, ps, c):
+    """returns True if a result was recorded; False if the whole-file run failed and was requeued with backoff."""
     out = f"{A}/res/{ps}/{f.replace('/', '_')}.json"
-    flag = ["--exact"] if ps == "exact" else []
-    tmo = TMO[ps]
-    wait_ready()
+    key = f"{f}|{ps}|{blob}"; nf = fails().get(key, {}).get("n", 0)
     state(current=f"{f} [{ps}]", since=time.time())
-    run_sweep(f, ps, out, flag + ["--timeout", str(tmo)])
-    d = json.load(open(out)); timeouts = 0
-    if d["rc"] == 124:
-        timeouts += 1; log("timeout", f, ps, "-> chunks")
-        lines = [s["line"] for s in d["sorries"]]
-        merged = {}
+    gaveup = 0; attempts = nf + 1
+    if nf < 2:
+        wait_ready(); d = run_sweep(f, ps, out, ["--timeout", str(TMO[ps])])
+        if bad(d):
+            set_fail(key, {"n": nf + 1, "after": time.time() + 900 * 2 ** nf, "rc": d["rc"]})
+            with open(A + "/swept.tsv", "a") as fh:
+                fh.write(f"{f}\t{blob}\t{ps}\t{d['rc']}\t{out}\t{now()}\tstatus=retry attempts={nf + 1}\n")
+            log("requeue", f, ps, "rc", d["rc"], "attempt", nf + 1); return False
+    else:
+        log("chunk mode", f, ps)
+        lines = sorted({i + 1 for i, _ in find_sorries(open(f"{WT}/{f}").read().split("\n"))})
+        src = open(f"{WT}/{f}").read().split("\n"); merged = {}; rcs = []
+        def take(dd, fallback_lines):
+            for s in dd["sorries"]: merged[(s["line"], s["col"])] = s
         for k in range(0, len(lines), 4):
-            ch = lines[k:k + 4]; wait_ready()
-            o = out + ".chunk"; run_sweep(f, ps, o, flag + ["--timeout", str(tmo), "--only", ",".join(map(str, ch))])
-            cd = json.load(open(o))
-            if cd["rc"] == 124 and len(ch) > 1:
-                timeouts += 1
-                for l in ch:
-                    wait_ready(); run_sweep(f, ps, o, flag + ["--timeout", str(tmo), "--only", str(l)])
-                    sd = json.load(open(o))
-                    if sd["rc"] == 124: timeouts += 1
-                    for s in sd["sorries"]: s["timeout"] = sd["rc"] == 124; merged[(s["line"], s["col"])] = s
-            else:
-                for s in cd["sorries"]: s["timeout"] = cd["rc"] == 124; merged[(s["line"], s["col"])] = s
+            ch = lines[k:k + 4]; o = out + ".chunk"
+            cd = run_scope(f, ps, o, ch)
+            if cd is not None: take(cd, ch); continue
+            for l in ch:
+                sd = run_scope(f, ps, o, [l])
+                if sd is not None: take(sd, [l])
+                else: gaveup += 1; merged[(l, -1)] = {"line": l, "col": -1, "decl": decl_of(src, l - 1), "tac": None, "err": "gaveup"}
         os.path.exists(out + ".chunk") and os.remove(out + ".chunk")
-        d["sorries"] = list(merged.values()) or d["sorries"]; d["chunked"] = True; d["timeouts"] = timeouts
+        d = {"file": f, "rc": 0 if not gaveup else 124, "sorries": list(merged.values()), "other_errors": [], "chunked": True, "gaveup": gaveup}
         json.dump(d, open(out, "w"), indent=1)
+    set_fail(key, None)
     with open(A + "/swept.tsv", "a") as fh:
-        fh.write(f"{f}\t{blob}\t{ps}\t{d['rc']}\t{out}\t{now()}\ttimeouts={timeouts}\n")
+        fh.write(f"{f}\t{blob}\t{ps}\t{d['rc']}\t{out}\t{now()}\tstatus=done attempts={attempts} gaveup={gaveup}\n")
     # hits
     seen = set()
     if os.path.exists(A + "/hits.tsv"):
@@ -123,7 +166,8 @@ def sweep_file(f, blob, ps, c):
         seen.add((f, s["decl"], blob))
         open(A + "/hits.tsv", "a").write(f"{c}\t{f}\t{s['line']}\t{s['decl']}\t{t}\t{now()}\t{blob}\n")
         log("HIT", f, s["decl"], t)
-    log("done", f, ps, "rc", d["rc"], "closed", sum(1 for s in d["sorries"] if s.get("tac")), "/", len(d["sorries"]))
+    log("done", f, ps, "rc", d["rc"], "closed", sum(1 for s in d["sorries"] if s.get("tac")), "/", len(d["sorries"]), "gaveup", gaveup)
+    return True
 
 def main():
     os.makedirs(A + "/res/cheap", exist_ok=True); os.makedirs(A + "/res/exact", exist_ok=True)
@@ -134,11 +178,11 @@ def main():
             if not c: time.sleep(300); continue
             q = due_files(c)
             state(queue=sum(len(x[4]) for x in q), queue_files=[x[2] for x in q][:12], current=None, waiting=False)
-            if not q: time.sleep(300); continue
+            if not q: time.sleep(300 if not fails() else 120); continue
             tier, _, f, blob, passes = q[0]
             sh(["git", "-C", WT, "checkout", "-q", "-f", "--", f])
             for ps in passes:
-                sweep_file(f, blob, ps, c)
+                if not sweep_file(f, blob, ps, c): break
                 if open(BASE + "/COMMIT").read().strip() != c: break  # base moved: re-evaluate queue
         except Exception as e:
             log("error", repr(e)); time.sleep(120)
