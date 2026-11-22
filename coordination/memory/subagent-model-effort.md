@@ -9,4 +9,6 @@ The user (2026-11-21): "use Sonnet medium for them" and "Keep subagents running 
 
 **Why:** usage budget and fewer coordinator wake-ups.
 
+"4 PRs" means files in sequence, one PR per file ([[one-pr-per-file]]).
+
 **How to apply:** the agent definitions in `.agent/agents/` fix model and effort; fixers are `general-purpose` with model sonnet, effort medium (HOURLY.md table). Related: [[custom-subagents]], [[subagent-resume-cost]].

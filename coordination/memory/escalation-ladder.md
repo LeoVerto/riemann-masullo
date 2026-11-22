@@ -5,7 +5,7 @@ metadata:
   type: feedback
 ---
 
-The user, 2026-11-22: "If sonnet gets stuck on the proofs, hand them off to opus" (~08:30Z); keep the claim during escalation (~16:00Z); on getting a Fable allowance, escalate Opus to Fable "without burning too many tokens", and turned the advisor off; "ensure the coordinator knows it can also escalate to Fable if needed"; ~17:10Z: "I'd rather Opus give them a try before we split them."
+The user, 2026-11-22: "If sonnet gets stuck on the proofs, hand them off to opus" (~08:30Z); keep the claim during escalation (~16:00Z); on getting a Fable allowance, escalate Opus to Fable "without burning too many tokens", and turned the advisor off; "ensure the coordinator knows it can also escalate to Fable if needed"; ~17:10Z: "I'd rather Opus give them a try before we split them." Asked whether that covers Opus hunters too, the user took my recommendation (~18:10Z): yes, all Opus work tries before splitting; a split is the end-of-budget fallback (CRITICAL_PROVER.md).
 
 **Why:** the advisor sends the whole transcript (100–200k tokens) per call; a cold Fable reading a ~5–10k-token stuck packet costs a fraction, and build-and-fix stays on Opus.
 

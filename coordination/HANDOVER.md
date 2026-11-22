@@ -64,10 +64,9 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 
 Where a rule is carried out, the procedure is named; the quotes and dates are there too.
 
-- **Conflicting instructions go back to the user** (2026-11-22: "If my instructions conflict, ask
-  me to resolve. The parameters and tools of the whole operation changed a couple times after
-  all"). In the unattended hourly check, follow the newer instruction and name the conflict in
-  the report until the user answers.
+- **Ask, but don't wait** (2026-11-22: "the main session can always ask me, I just might not be
+  around"): put decisions that are the user's, such as conflicting instructions, to the user, and
+  meanwhile carry on with the newer instruction or the safer choice (HOURLY.md header).
 - **Coordinator only.** No proofs, builds or long log reads in the main session; delegate and
   relay short reports. No `advisor` tool (off since 2026-11-22: it sends the whole transcript);
   escalation goes through `escalate.sh` and the Fable consultant.

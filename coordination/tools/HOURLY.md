@@ -6,10 +6,11 @@ The cron prompt is only: `Read /mnt/faststorage/math/riemann-masullo/.agent/swee
 
 S=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools.
 
-Coordinator only; CPU is cheap, tokens are scarce. Work autonomously, ask nothing, and post nothing
-new upstream beyond normal Claiming/Releasing. If two of the user's instructions conflict, follow
-the newer one and name the conflict in the report. We claim every issue we work on or have queued
-for one of our agents.
+Coordinator only; CPU is cheap, tokens are scarce. Work autonomously and post nothing new upstream
+beyond normal Claiming/Releasing. Ask the user when a decision is theirs (for example, two of their
+instructions conflict), but never wait for the answer: they may be away. Carry on with the newer
+instruction or the safer choice and say which in the report. We claim every issue we work on or have queued for
+one of our agents.
 
 **Launching agents.** Use the Agent tool's `subagent_type`. The definitions (`.agent/agents/`) fix
 model, effort and tools and send each agent to its brief, so the prompt carries only the specifics
@@ -65,9 +66,10 @@ consultant to `agents.txt` (the nagger's roster).
    3. What is left, two units at a time, to Opus (step 8). One unit left over waits.
 7a. New issues first: proof issues newer than the last shortlisted (last: #5369, triage8) get
    `shortlist.py` on their files and a triage agent into a new `triage<k>.tsv`; update "last"
-   here. Hunters take rows rated 1–2 (then 3) with unclaimed issues: one file per hunter, ONE PR
-   PER TOUCHED FILE, each issue listed in its prompt, no overlap (`claims.txt`, `hunters.txt`), no
-   file crowded by 2–3 other claimants or open PRs.
+   here. Hunters take rows rated 1–2 (then 3) with unclaimed issues, listed in the prompt by file:
+   files in sequence, ONE PR PER TOUCHED FILE, until the list is done, 4 PRs or ~3 h (user:
+   "Files in sequence"). No overlap (`claims.txt`, `hunters.txt`), no file crowded by 2–3 other
+   claimants or open PRs.
 8. Opus work: each Opus that step 7 allows takes the first of these that exists (user,
    2026-11-22: escalation and prior work before any fresh issue).
    a. Escalator: the oldest file with QUEUED `opus` rows in `S/escalations.txt` that our Sonnet has

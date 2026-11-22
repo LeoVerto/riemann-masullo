@@ -14,7 +14,9 @@ file. The issue is not chosen by any critical-path ranking: it is any open, uncl
 ## What success looks like
 Exactly what `prompts/prover.md` asks for: either a complete proof, or a split into smaller
 sorried lemmas that is real progress, each piece clearly easier, stated faithfully, with `Paper:`
-docstrings. A split is a good outcome for a deep declaration. So is a precise finding that the
+docstrings. **Try to prove it outright first** (missing lemmas as private helpers, HUNTER.md): a
+split is the fallback when the budget runs out, and the PR says why (user, 2026-11-22: try before
+splitting, for all Opus work). So is a precise finding that the
 statement is false or not what the paper says (HUNTER.md "Paper errors, gaps, ERRATA"): record it
 in your notes, release the issue, and report.
 

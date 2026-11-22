@@ -1,4 +1,4 @@
-- [Ask on conflict](ask-on-conflict.md) — conflicting user instructions go back to the user; hourly runs follow the newer one and report it
+- [Ask, don't wait](ask-dont-wait.md) — coordinator may ask the user (e.g. conflicting instructions) but carries on meanwhile; user may be away
 - [Campaign source of truth](low-hanging-sweep.md) — HANDOVER on fork branch coordination/low-hanging-campaign; memory only points, never duplicates
 - [Staffing instructions](quick-wins-mode.md) — user quotes on Sonnet/Opus budget and Opus work order; procedure HOURLY.md steps 7–8
 - [Escalation ladder](escalation-ladder.md) — Sonnet -> Opus escalator -> Fable route -> Opus; claim kept; advisor off
