@@ -29,7 +29,7 @@ consultant to `agents.txt` (the nagger's roster).
 | `opus-hunter` (Opus) | 2 | `Your issue is #<n>. Your model tag <M>.` |
 | `siever` (Sonnet) | – | `Your name is siev<k>, model tag <M>. Your hits: <lines>.` |
 | `triage` (Haiku) | – | `N = 60.` |
-| `fable-consultant` (Fable) | – | `Your issue: <row>.` |
+| `fable-consultant` (Fable) | 2 | `Your issue: <row>.` |
 | `findings-evaluator` (Fable; until the coordinator restarts, pass `model: fable` in the Agent call) | – | `Your findings: <rows>.` |
 | `nagger` (Haiku) | – | `Start the loop.` |
 | fixer: `general-purpose`, model sonnet, effort medium | – | `Fix <failing check or review comment> on PR #<p> in worktree <wt>, following S/HUNTER.md "Checks and pull request". Model tag <M>.` |
@@ -69,8 +69,11 @@ consultant to `agents.txt` (the nagger's roster).
    agents (`agents.txt`), then hand out free units in this order, never stopping a running agent
    to rebalance:
    1. Opus (step 8) until 2 run.
-   2. Sonnet hunters while quick-win rows (7a) exist, up to 6 Sonnets.
-   3. What is left, two units at a time, to Opus (step 8). One unit left over waits.
+   2. The Fable consultant (step 8b, 2 units), if a QUEUED `fable` row waits and none runs.
+      Consultations come before new work (user, 2026-11-22): while such a row waits, hold freed
+      units for it instead of starting Sonnet hunters or Opus beyond the two above.
+   3. Sonnet hunters while quick-win rows (7a) exist, up to 6 Sonnets.
+   4. What is left, two units at a time, to Opus (step 8). One unit left over waits.
 7a. New issues first: proof issues newer than the last shortlisted (last: #5615, triage12) get
    `shortlist.py` on their files and a triage agent into a new `triage<k>.tsv`; update "last"
    here. Hunters take rows rated 1–2 (then 3) with unclaimed issues not labelled `stuck`, listed in
@@ -91,7 +94,7 @@ consultant to `agents.txt` (the nagger's roster).
       paper-gap, not sweep-held), preferring triage rows rated 3–4 that no Sonnet holds, never in a
       file another of our agents works in. Record in `hunted.txt`.
 8b. Fable: if `escalations.txt` has a QUEUED `fable` row and no Fable consultant runs, launch ONE
-   (outside the budget). Its ROUTE/SPLIT hand-back appears as a new `opus` row (step 8a).
+   (2 units, step 7 item 2). Its ROUTE/SPLIT hand-back appears as a new `opus` row (step 8a).
    **The coordinator may escalate to Fable itself** when that is the better use of tokens: an
    Opus agent released an issue it tried and failed without escalating; the same blocker keeps
    stopping several issues (one packet for the shared
