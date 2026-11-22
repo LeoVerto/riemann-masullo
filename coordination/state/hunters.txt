@@ -49,3 +49,6 @@ w21 (finished ~16:59Z: PR #5371 Ch07 Sec4 proves #5091; released #5108 (finest-L
 16:59Z w25 Ch10 Sec4a #5275 + Ch10 Sec1_Printed #4908 (two PRs); quick-win list now exhausted
 17:13Z nagger restarted fresh (old one kept ending turns; foreground brief)
 17:23Z watchdog bug: PROJ watched only the old project dir, so it released 25 live claims at 17:02Z; fixed (all project dirs), restarted; 14 re-claimed (crit2526, esc-sec5 had re-claimed themselves); #5275 lost to troyjlee (17:21Z), w25 told to step back
+w22 (finished 17:24Z: PR #5379 Ch10 Sec4b proves #5290 #5316; released #5288 (isDefEq timeouts) -> escalated to Opus)
+17:25Z Fable consultant on #4344 (coordinator packet; esc-sec4 released it). Older triage rows: no free Sonnet candidates (4555 troyjlee, 4144 released by other, 4603 needs sorried deps); 4th Sonnet slot empty until new issues
+w19 (finished 17:26Z: PR #5382 Ch10 Sec3 proves #5203 #5206 #5210 #5212; released #5207 (heartbeat timeouts on quotient maps); #5208 #5204 not claimed (deep) -> all three escalated to Opus)

@@ -24,7 +24,7 @@ agents.
    remains in their worktree; record in `hunters.txt`; remove their line from `agents.txt`. If
    `pgrep -f nag-wait.sh` finds nothing while agents run, relaunch the nagger once (model haiku):
    "Follow the brief S/NAGGER.md exactly. It is a long-running loop: keep looping in this single
-   turn and do not stop or write a final answer until its stop condition holds. Every Bash call is FOREGROUND (never run_in_background), with tool timeout 600000 ms. Never end your turn to wait for anything. If a hunter sends you its final results, ignore them and carry on."
+   turn and do not stop or write a final answer until its stop condition holds. Every Bash call is FOREGROUND (never run_in_background) and must finish within 170 s (the harness backgrounds longer calls). Never end your turn to wait for anything. If a hunter sends you its final results, ignore them and carry on."
 5. Services: warm, watchdog, memguard, sieve (restart commands in HANDOVER startup step 3). RAM:
    count memguard kills of agent builds (not sieve runs) in `memguard.log` over the last hour. If
    there are more than 3, launch no new agents this tick and say so in the report; tell the user if

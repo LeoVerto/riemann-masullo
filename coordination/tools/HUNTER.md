@@ -111,16 +111,19 @@ a little thought. Skip anything deep.
   prefer module builds, and run the full build only once).
 - **Wait in the FOREGROUND, never with `run_in_background`** (user, 2026-11-22): an agent that ends
   its turn to wait gets resumed by any message and then reports to the sender, not the coordinator,
-  and every pause pings the coordinator. One Bash call is capped at 600 s, so:
-  - Up to ~9 min: run it directly, `timeout 540 lake build <Module>` (or `timeout 300 lake lean
-    .agent/Probe.lean` for a probe).
-  - Longer (slow modules under load, the full build): start it detached and return at once,
-    `BUILD_TIMEOUT=<s> setsid nohup $S/build.sh <wt> [<Module>] >/dev/null 2>&1 &` (900 for a
-    module, 3600 for the full build; log in `<wt>/.agent/build.log`, status in
-    `<wt>/.agent/build.exit`, 124 = timeout), then wait in the foreground with
-    `timeout 590 bash -c 'until [ -e <wt>/.agent/build.exit ]; do sleep 20; done'`, repeating that
-    same call (one cheap tool call per ~10 min) until the file exists. Do not end your turn while
-    a build runs.
+  and every pause pings the coordinator. The harness moves any foreground call that runs over
+  **180 s** into the background (tested 2026-11-22), so every foreground call must finish within
+  170 s:
+  - Short (under ~2.5 min): run it directly under `timeout 170` (e.g. `timeout 170 lake lean
+    .agent/Probe.lean`).
+  - Anything longer (most module builds under load, the full build, long probes): start it
+    detached and return at once. Builds: `BUILD_TIMEOUT=<s> setsid nohup $S/build.sh <wt>
+    [<Module>] >/dev/null 2>&1 &` (900 for a module, 3600 for the full build; log
+    `<wt>/.agent/build.log`, status `<wt>/.agent/build.exit`, 124 = timeout). Probes: `setsid nohup
+    bash -c 'timeout 600 lake lean .agent/P.lean > .agent/P.log 2>&1; echo $? > .agent/P.exit'
+    >/dev/null 2>&1 &`. Then wait with the foreground call `timeout 170 bash -c 'until [ -e <exit
+    file> ]; do sleep 15; done'`, repeated until the file exists. Do not end your turn while
+    anything you started runs.
   - Never wait with `pgrep`/`pkill` on `lake` or `lean` (other agents and services build too).
 - Never pipe `lake build` into `head` (the build outlives the pipe); redirect to a log and read the
   log. If chapter index modules fail with "Too many open files", build them one at a time and
