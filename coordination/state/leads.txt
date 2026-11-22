@@ -43,3 +43,4 @@ Ch07 Sec5 #5133 mem_strongCoprimalityDifferenceRange (3), #5135 strongCoprimalit
 Ch05 Sec3a: lemma adelePrincipalValue F ∅ = id would unblock #5175 (Ch11 Sec1b, released by w17)
 Ch05 Sec3a: adelePrincipalValue lemmas (F ∅ = id; F T' = F T ∘ F T' for T ≤ T') would unblock #5175 #5181 (#5184 via #5177) in Ch11 Sec1b
 Ch07 Sec1b/Sec4: theorem range Z = schwartzBergmanDivisible(Lambda) (now only a hypothesis of spectralTheta_jetRestriction_of_range_eq) would unblock #5078 #5079
+Ch10 SpectralProof_Printed refutations #5363-#5368: all need existence of Hecke L-function zeros on a line (no such result in the project); rated 4-5

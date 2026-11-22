@@ -9,7 +9,7 @@
 5108 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec4.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w21: needs bounded sets of the finest-LC dual lie in finite-dim subspaces (route in notes/reports-done/report-findings-5108.md); >40 lines for Sonnet
 4535 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w16: reverse direction is the core of Thm 7.2.1.1; forward needs sorried sLocalPrincipalPartCoeff_ne_zero_imp_pole; Opus try before splitting (user)
 5288 opus RiemannMasullo/Ch10_TraceSpectral/Sec4b.lean 2026-11-22T17:24Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w22 stuck: isDefEq timeouts / >15 min builds on every approach; see notes
-4344 fable RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean 2026-11-22T17:25Z QUEUED Claude Opus 5.5, default effort: Opus esc-sec4 released (not short: missing separability/metrizability); coordinator packet
+4344 fable RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean 2026-11-22T17:25Z TAKEN fable4344 17:39Z Claude Opus 5.5, default effort: Opus esc-sec4 released (not short: missing separability/metrizability); coordinator packet
 5207 opus RiemannMasullo/Ch10_TraceSpectral/Sec3.lean 2026-11-22T17:26Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w19 stuck: heartbeat timeouts extending maps out of the quotient; see notes
 5208 opus RiemannMasullo/Ch10_TraceSpectral/Sec3.lean 2026-11-22T17:26Z QUEUED Claude Opus 5.5, default effort: Sonnet w19 judged deep (isotype analysis), unattempted; Opus try before splitting (user)
 5204 opus RiemannMasullo/Ch10_TraceSpectral/Sec3.lean 2026-11-22T17:26Z QUEUED Claude Opus 5.5, default effort: Sonnet w19 judged deep (nuclear from strongly nuclear), unattempted; Opus try before splitting (user)

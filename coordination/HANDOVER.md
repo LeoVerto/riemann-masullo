@@ -12,20 +12,40 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 
 **Time zones:** the shell, `status.sh` and service logs use CET (UTC+1); the cron tool uses UTC.
 
-## Current state (2026-11-22 ~16:35Z, coordinator session 09ff2a64)
+## Current state (2026-11-22 ~17:50Z, coordinator session 09ff2a64 wound down for a restart)
 
-- **Campaign resumed ~16:05Z.** Services (warm, watchdog, memguard, sieve) restarted; `no-resume`
-  kept. Hourly cron at minute 17 (job in this session). Nagger running.
-- **Running (agents.txt):** crit2526 (Opus hunter, #2526 SPLIT plan); esc-sec5 (Opus,
-  Ch05 Sec5 #4408 #4420 #4423 #4429 #4431 #4409 #4411); esc-sec4 (Opus, Ch05 Sec4 #4344 #4352 #4356
-  #4338); Sonnet w17 Ch11 Sec1b, w18 Ch10 Sec4a (not #5248: FleckiBunti), w19 Ch10 Sec3, w20 Ch10
-  Sec4b #5298 + Ch07 Sec5 #5131; Opus findings evaluator on #5108.
-- **Triage 7a–7d done** (top 240 of `shortlist/untriaged7.tsv`, issues >4616); 182 rows (untriaged7
-  rows 242+) still untriaged. Rated-3 rows outside the hunters' files are in `triage7*.tsv`.
-- **Findings:** #4255 #4574 #4575 DONE (closed/proved), #4430 #4432 #4603 REJECTED
-  (`notes/report-findings-1.md`); #5108 under evaluation.
-- #4535 released by w16 (rate 4–5). #2517 still on local branch `hunt/ch03n-1` (jcosmos0 holds it).
-- Saved partial proofs: `S/patches/`.
+- **Wound down at the user's request** (they are restarting the coordinator with changes). Agents
+  were told to save notes and stop; the nagger, the hourly cron and the **watchdog are stopped**
+  (so it does not release our claims while nothing runs: restart it in startup step 3, with the
+  fixed `PROJ=/home/agent/.claude/projects`). warm, memguard and sieve still run (warm and sieve at
+  nice 19). **Claims are kept; do not release them** (user, 17:55Z: "we're continuing soon"; `claims.txt`); upstream auto-releases claims with no PR after 8 h,
+  so re-launch or refresh before ~01:00Z on 2026-11-23.
+- **Resume these from notes (fresh agents, never resume transcripts):**
+  - crit2526 (Opus hunter) #2526, notes/2526.md, wt/crit-2526.
+  - esc-sec5 (Opus escalator) Ch05 Sec5: **#4408 #4411 #4420 #4423 #4429 #4431 PROVED**, committed
+    f0a3c40 on local branch hunt/esc-sec5-1 (wt/esc-sec5, not pushed, no PR); #4409 checks clean,
+    uncommitted edit on top. To hand in one PR for all seven: module build, full `lake build`,
+    signature compare, axioms (`.agent/Check.lean` ready); lint passes. Report notes/report-esc-sec5.md.
+  - esc-sec4 (Opus escalator) Ch05 Sec4 #4338 #4352 #4356, wt/hunt-esc-sec4-1 (it released #4344).
+  - w26 (Sonnet) #5369: proof written, unbuilt; edit in wt/hunt-w26-1 (detached build may have left
+    `.agent/build.exit`); next steps in notes/5369.md.
+  - Fable consultant on #4344 (Ch05 Sec4 separability): coordinator stuck packet + partial route in
+    notes/4344.md; wt/fable-4344 has `.agent/Route.lean`.
+- **Opus escalation queue** (`escalations.txt`, all claimed by us, notes in notes/<n>.md):
+  Ch11 Sec1b #5175 #5177 #5181 #5184 and Ch07 Sec5 #5135 (shared blocker: `adelePrincipalValue`
+  algebra — F ∅ = id, composition for T ≤ T', insert factorization; prove as private helpers);
+  Ch07 Sec4 #5078 #5079 (range Z = schwartzBergmanDivisible Λ is only a hypothesis) and #5108
+  (finest-LC dual bounded sets); Ch10 Sec3 #5207 #5208 #5204; Ch10 Sec4b #5288; Ch07 Sec2 #4535.
+  User: Opus tries these before any split.
+- **Open PRs:** #5371 (Ch07 Sec4 #5091), #5379 (Ch10 Sec4b #5290 #5316), #5382 (Ch10 Sec3 4
+  issues), #5386 (#4908), #5393 (Ch07 Sec5 #5133). Merged this session: #5355 #5356 #5358 #5360
+  #5370 (about 18 issues).
+- **Triage:** all issues up to #5369 triaged (triage7a–f, triage8); no Sonnet quick wins left.
+  #5363–#5368 need Hecke L zero existence (none in the project), rated 4–5.
+- **Pending user decisions:** whether idle Sonnet slots may run as extra Opus escalators; whether to
+  post w25's unbuilt #5275 route (notes/5275.md) as a hint for troyjlee, who holds #5275.
+- Staffing (user): 4 Sonnet hunters, 1 Opus hunter, 2 Opus escalators, 1 Fable consultant.
+  Agents and the nagger wait in the foreground, every call under 170 s (HUNTER.md).
 
 ## Standing instructions from the user
 

@@ -54,3 +54,7 @@ w22 (finished 17:24Z: PR #5379 Ch10 Sec4b proves #5290 #5316; released #5288 (is
 w19 (finished 17:26Z: PR #5382 Ch10 Sec3 proves #5203 #5206 #5210 #5212; released #5207 (heartbeat timeouts on quotient maps); #5208 #5204 not claimed (deep) -> all three escalated to Opus)
 w25 (finished 17:29Z: PR #5386 proves #4908 Ch10 Sec1_Printed; stepped back from #5275 (troyjlee), unbuilt route in notes/5275.md, wt hunt-w25-2)
 w24 (finished 17:38Z: PR #5393 Ch07 Sec5 proves #5133; released #5135 (needs adelePrincipalValue insert factorization) -> Opus)
+17:39Z user stopped the Fable consultant on #4344; row HELD (not relaunched); claim kept pending user decision
+17:39Z user resumed the Fable consultant on #4344; row TAKEN
+17:40Z triage8: only #5369 rated 3 (others 4-5: need Hecke L zero existence, none in project); w26 on #5369
+17:42Z wind-down: esc-sec5 stopped (6 proved at f0a3c40 + #4409 uncommitted), w26 stopped (unbuilt #5369), nagger/watchdog/cron stopped; claims kept (user)

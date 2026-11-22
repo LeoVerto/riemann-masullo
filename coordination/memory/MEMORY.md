@@ -1,6 +1,6 @@
 - [GitHub token scope](github-token-scope.md) — use token only for LeoVerto fork and mccorvie upstream
 - [Sandbox quirks](riemann-masullo-sandbox-quirks.md) — lake lean not lake env lean, open-file limit, Lake cache with RESTORE, memguard 1000 MB, gh 401 cache, time zones
-- [Low-hanging sweep](low-hanging-sweep.md) — campaign pointer: HANDOVER.md on fork branch coordination/low-hanging-campaign; halted 2026-11-22 11:32Z (spend limit)
+- [Low-hanging sweep](low-hanging-sweep.md) — campaign pointer: HANDOVER.md on fork branch coordination/low-hanging-campaign; wound down 2026-11-22 ~17:50Z for a coordinator restart (watchdog stopped, claims kept)
 - [Subagent resume cost](subagent-resume-cost.md) — after a halt, start fresh agents from notes/<n>.md handoffs; never resume long transcripts
 - [Subagent model and effort](subagent-model-effort.md) — Sonnet medium until list done / 4 PRs / ~3 h; Opus no override; Haiku for triage and nagger
 - [Escalation ladder](escalation-ladder.md) — Sonnet -> Opus escalator -> Fable consultant (stuck packet, route only) -> Opus; claim kept; advisor off
