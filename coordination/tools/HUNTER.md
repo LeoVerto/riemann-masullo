@@ -74,6 +74,9 @@ a little thought. Skip anything deep.
   of `notes/<n>.md` to your tag, and read the Sonnet's notes before anything else. In the PR body
   write `Prover: <M> (continuing an attempt by <Sonnet tag>)`. When done, mark the row `DONE <PR url>`
   or release with `release.sh` (which then posts your notes).
+  **Try to prove it outright before splitting** (user, 2026-11-22): a missing lemma goes in as a
+  private helper in the issue's file, proved. Split into new `sorry`s only as a last resort,
+  because new issues for them appear only after a coordinator cycle; if you split, say so and why.
 - **Stuck packet** (Opus agents, before escalating to Fable): append to `notes/<n>.md`, at most
   ~150 lines, so a fresh Fable consultant can work from it alone (it does not see your transcript):
   ```

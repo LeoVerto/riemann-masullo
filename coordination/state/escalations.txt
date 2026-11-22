@@ -1,2 +1,10 @@
 # Escalation queue: stuck issues handed to the next tier with the claim KEPT (escalate.sh).
 # <issue> <level opus|fable> <file> <queued UTC> <QUEUED | TAKEN <agent> <UTC> | DONE <PR url / route / finding / released>> <from model>: <reason>
+5175 opus RiemannMasullo/Ch11_ShellStructure/Sec1b.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w17 stuck: needs adelePrincipalValue F ∅ = id (Ch05 Sec3a def via Classical.choose); try a private helper in Sec1b before splitting (user)
+5177 opus RiemannMasullo/Ch11_ShellStructure/Sec1b.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w23 stuck: needs choose-defined hardySobolevTranslation to commute with cutoff M and theta in isotype; try before splitting (user)
+5181 opus RiemannMasullo/Ch11_ShellStructure/Sec1b.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w23 stuck: needs adelePrincipalValue F T' = F T ∘ F T' for T ≤ T' (choose-defined, polar membership sorried); try before splitting (user)
+5184 opus RiemannMasullo/Ch11_ShellStructure/Sec1b.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w23 stuck: depends on #5177; do after it
+5078 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec4.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w21 stuck: needs range Z = schwartzBergmanDivisible(Λ), only a hypothesis of spectralTheta_jetRestriction_of_range_eq in Sec1b; try before splitting (user)
+5079 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec4.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w21 stuck: same blocker as #5078
+5108 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec4.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w21: needs bounded sets of the finest-LC dual lie in finite-dim subspaces (route in notes/reports-done/report-findings-5108.md); >40 lines for Sonnet
+4535 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean 2026-11-22T17:07Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w16: reverse direction is the core of Thm 7.2.1.1; forward needs sorried sLocalPrincipalPartCoeff_ne_zero_imp_pole; Opus try before splitting (user)

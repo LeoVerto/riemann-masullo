@@ -41,3 +41,9 @@ w20 (finished 16:26Z: PR #5355 proves #5298 Ch10 Sec4b, PR #5356 proves #5131 Ch
 16:27Z CPU load: warm+sieve at nice 19, HUNTER.md timeouts 900/300/3600; w21 Ch07 Sec4 #5091 #5108; Haiku triage 7e 7f (last 182 rows)
 w18 (finished 16:33Z: PR #5358 Ch10 Sec4a closes 8 (#5249 #5253-#5257 #5262 #5263); released #5275 (time))
 16:33Z w22 Ch10 Sec4b #5288 #5290 #5316 (lead from triage7e)
+w17 (finished 16:47Z: PR #5360 Ch11 Sec1b closes 6 (#5169 #5170 #5171 #5172 #5178 #5188); released #5175 (needs adelePrincipalValue F ∅ = id in Ch05 Sec3a); rated-3 not attempted)
+16:47Z w23 Ch11 Sec1b rated-3 #5177 #5179 #5181 #5184 #5192 (after w17)
+w23 (finished 16:56Z: PR #5370 Ch11 Sec1b proves #5179 #5192; released #5177 #5184 (choose-defined translation vs cutoff) #5181 (needs adelePrincipalValue composition lemma))
+16:57Z w24 Ch07 Sec5 #5133 #5135 (after #5356 merged)
+w21 (finished ~16:59Z: PR #5371 Ch07 Sec4 proves #5091; released #5108 (finest-LC dual bounded sets: missing infra) #5078 #5079 (range Z = schwartzBergmanDivisible only a hypothesis in Sec1b))
+16:59Z w25 Ch10 Sec4a #5275 + Ch10 Sec1_Printed #4908 (two PRs); quick-win list now exhausted
