@@ -52,3 +52,5 @@ w21 (finished ~16:59Z: PR #5371 Ch07 Sec4 proves #5091; released #5108 (finest-L
 w22 (finished 17:24Z: PR #5379 Ch10 Sec4b proves #5290 #5316; released #5288 (isDefEq timeouts) -> escalated to Opus)
 17:25Z Fable consultant on #4344 (coordinator packet; esc-sec4 released it). Older triage rows: no free Sonnet candidates (4555 troyjlee, 4144 released by other, 4603 needs sorried deps); 4th Sonnet slot empty until new issues
 w19 (finished 17:26Z: PR #5382 Ch10 Sec3 proves #5203 #5206 #5210 #5212; released #5207 (heartbeat timeouts on quotient maps); #5208 #5204 not claimed (deep) -> all three escalated to Opus)
+w25 (finished 17:29Z: PR #5386 proves #4908 Ch10 Sec1_Printed; stepped back from #5275 (troyjlee), unbuilt route in notes/5275.md, wt hunt-w25-2)
+w24 (finished 17:38Z: PR #5393 Ch07 Sec5 proves #5133; released #5135 (needs adelePrincipalValue insert factorization) -> Opus)

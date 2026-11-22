@@ -13,3 +13,4 @@
 5207 opus RiemannMasullo/Ch10_TraceSpectral/Sec3.lean 2026-11-22T17:26Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w19 stuck: heartbeat timeouts extending maps out of the quotient; see notes
 5208 opus RiemannMasullo/Ch10_TraceSpectral/Sec3.lean 2026-11-22T17:26Z QUEUED Claude Opus 5.5, default effort: Sonnet w19 judged deep (isotype analysis), unattempted; Opus try before splitting (user)
 5204 opus RiemannMasullo/Ch10_TraceSpectral/Sec3.lean 2026-11-22T17:26Z QUEUED Claude Opus 5.5, default effort: Sonnet w19 judged deep (nuclear from strongly nuclear), unattempted; Opus try before splitting (user)
+5135 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec5.lean 2026-11-22T17:38Z QUEUED Claude Sonnet 5.5, effort medium: Sonnet w24: needs adelePrincipalValue F (insert v S) factorization (same adelePrincipalValue-algebra blocker as #5175 #5181 in Ch11 Sec1b); prove as private helper

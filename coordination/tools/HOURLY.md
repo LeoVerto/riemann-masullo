@@ -47,7 +47,7 @@ work on or have queued for one of our agents.
    1. Opus (step 8) until 2 Opus run.
    2. Sonnet hunters while quick-win rows (7a) exist, up to 6 Sonnets.
    3. What is left, two units at a time, to Opus (step 8). One unit left over waits.
-7a. New issues first: proof issues newer than the last shortlisted (last: #5344, triage7a-f) get
+7a. New issues first: proof issues newer than the last shortlisted (last: #5369, triage8) get
    `shortlist.py` on their files and a Haiku triage (TRIAGE.md) into a new `triage<k>.tsv`; update
    "last" here. Sonnet hunters (HUNTER.md, tag "Claude Sonnet 5.5, effort medium") take rows
    rated 1–2 (then 3) with unclaimed issues: one file per hunter, ONE PR PER TOUCHED FILE, each
