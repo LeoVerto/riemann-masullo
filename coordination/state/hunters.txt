@@ -19,3 +19,5 @@ w10 (running 06:21Z: Ch05 Sec5 #4411 #4420 #4423 #4429 #4431 #4409; then Ch06 Se
 w6 (finished 06:43Z: PR #4439 Ch05 Sec3a closes #4133 #4142 #4173; released #4121 #4122 Sec2b (quotient-map step runs away / isDefEq timeout; helpers in notes); #4154 #4155 #4164 #4085 #4093 #4083 #4087 claimed by others)
 w11 (running 06:45Z: triage5 Ch06 Sec3 #4445 #4452 #4453)
 w11 (finished 06:45Z: nothing done; #4445 #4452 #4453 claimed by CalebAlbers 06:07Z, PR #4474)
+w8 (finished 07:09Z: PR #4488 Ch05 Sec4 closes #4336 #4347 #4353 (module build only, no full build); released #4338 (needs SchwartzBergman ext from overlap); #4344 #4352 #4356 not attempted (notes saved); #4355 troyjlee)
+w12 (running 07:09Z: Ch05 Sec4 rated-3 #4344 #4352 #4356, left by w8)

@@ -228,7 +228,12 @@ hand-ins happen at a normal pace once the issues exist.
 - **Opus**: "The cone doesn't matter at this point ... Just pick any open issue for Opus." Any open,
   unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held); no remapping. The
   mapper-fix job is dropped.
-- Crons now: only the hourly check **9dc215ca** at :17.
+- Crons now: only the hourly check **34c4c6d7** at :17.
+- **Report files (07:50Z):** an agent woken by a nagger message reports to the nagger, not the
+  coordinator (happened to crit/1526). So every hunter/siever/prover also writes its final report to
+  `notes/report-<name>.md` (HUNTER.md, CRITICAL_PROVER.md, SIEVER.md end sections); the hourly check
+  reads those and moves them to `notes/reports-done/`. w8 finished: PR #4488 (Ch05 Sec4 #4336 #4347
+  #4353); w12 (Sonnet) now on Sec4 #4344 #4352 #4356. HUNTER.md has a "Slow-compile trap" section.
 - Running at 07:35Z (user asleep): Sonnet hunters **w8** (Ch05 Sec4) and **w10** (Ch05 Sec5 rated-3,
   then Ch06 Sec2 #4313/#4314); Opus **crit/1526**; long-running Haiku nagger; services warm/watchdog/
   memguard/sieve. Open LeoVerto PRs awaiting Verdict/merge: #4377 #4434 #4439 #4440 #4466 #4472 (and

@@ -174,3 +174,10 @@ CONTRIBUTING.md "When the paper is wrong" are binding. In short:
 
 ## PR titles (added 2026-11-22)
 Write PR titles for a reader with no context: name the declarations or the file and say what is proved, e.g. `Prove finiteStandardThetaAverage_one (Ch06 Sec2)` or `Prove six lemmas in Ch05 Sec3b (Mellin integral, flat Schwartz)`. Never use triage ratings, campaign or branch names (`hunt/w5`), or vague nouns like "average" or "batch" without saying of what. Do not mention the 1-5 ratings in titles or descriptions.
+
+## Slow-compile trap (added 2026-11-22, from w5/w8/w9)
+Definitions built with `Classical.choose` (e.g. `sLocalZetaPair`, anything from an `existsUnique_*`): NEVER `unfold` them and `exact …choose_spec`, `rw … rfl` or `simp` through them; module builds went from about 1 min to 13–25 min. Instead `have h := (existsUnique_… ).exists.choose_spec f; exact h` (fast), or use the `*_mk`/`*_apply` lemmas. Run module builds under `timeout 300`; on a blow-up revert to `sorry`, note it, move on.
+
+
+## Final report file (added 2026-11-22, binding)
+Before you finish, ALSO write your final report (the same lines you would return) to `/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/notes/report-<your name>.md` (e.g. `report-w12.md`, `report-crit1526.md`). Your returned answer may reach a different agent than the coordinator; the file is what the coordinator reads.

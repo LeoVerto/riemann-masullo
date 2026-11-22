@@ -114,3 +114,7 @@ Your model tag <M> is given in your launch prompt (default: hunters/fixers `Clau
 
 ## Current project docs (added 2026-11-22)
 Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main (`git -C /mnt/faststorage/math/riemann-masullo show origin/main:<file>`), not from the possibly stale working tree. The section "Read the CURRENT project docs; false statements and gaps" at the end of HUNTER.md is binding for you too.
+
+
+## Final report file (added 2026-11-22, binding)
+Before you finish, ALSO write your final report (the same lines you would return) to `/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/notes/report-<your name>.md` (e.g. `report-w12.md`, `report-crit1526.md`). Your returned answer may reach a different agent than the coordinator; the file is what the coordinator reads.
