@@ -1,416 +1,213 @@
-# Coordinator handover: critical path, sieve and hunters
+# Coordinator handover: low-hanging campaign
 
-State as of 2026-11-22 04:35Z. **Time zones:** the shell, `status.sh` and the service logs use CET (UTC+1); the cron tool uses UTC. Earlier notes from this day give times about one hour too late when they say "Z". This
-branch (`coordination/low-hanging-campaign` on the `LeoVerto` fork) is **not meant to be merged**:
+Rewritten 2026-11-22 ~15:45Z from the live state in `.agent/`. Earlier layered updates are folded
+in; superseded rules are gone (see git history of this file if you need them).
+
+This branch (`coordination/low-hanging-campaign` on the `LeoVerto` fork) is **not for merging**:
 `scripts/` and `prompts/` are integrator-owned, and `lean/Sweep*.lean.txt` define tactic macros,
-which the project bans from the library. It records the strategy, tools and state needed to take
-over the coordinator role.
+which the library bans. The folders here (`tools/`, `state/`, `critical/`, `sieve/`, `shortlist/`,
+`memory/`, `lean/`) are snapshots of the live copies in `/mnt/faststorage/math/riemann-masullo/.agent/`
+(persistent, git-ignored): `sweeptools/` (tools, state; below `S`), `wt/` (worktrees), `memory/`
+(Claude memory). Edit the live copies, then refresh the snapshot.
 
-**Live copies are in `/mnt/faststorage/math/riemann-masullo/.agent/`**, which is persistent and
-ignored by git: `sweeptools/` (tools and state), `wt/` (worktrees) and `memory/` (Claude memory).
-The folders here (`tools/`, `state/`, `critical/`, `sieve/`, `memory/`, `lean/`) are snapshots of
-them. `/home/agent/{sweeptools,wt}` are compatibility symlinks, and they are lost when the sandbox
-is recreated.
+**Time zones:** the shell, `status.sh` and service logs use CET (UTC+1); the cron tool uses UTC.
 
-## LOW-HANGING MODE (user instruction, 2026-11-22 04:40Z)
+## Current state (2026-11-22 ~15:45Z)
 
-**Amended ~06:05Z by the user: "Only resume opus when you're out of low-hanging fruits."** Resume Opus
-(one critical prover at a time) WITHOUT asking once no unclaimed rows rated 1–3 remain in any
-triage file and there are no new issues to triage; go back to Sonnet hunters when new quick wins
-appear. This supersedes "ask the user before resuming Opus" anywhere below.
+- **Campaign halted since 11:32Z:** the account hit its monthly spend limit ("weekly limit resets
+  2026-11-23 13:00 UTC"). No agent has worked since. The old coordinator session (`00d88758`) and
+  its hourly cron are being stopped for a fresh coordinator; the services were stopped with it
+  (restart them, startup step 3).
+- **All claims released:** the watchdog released our 12 claims at 12:03Z; `claims.txt` is empty
+  and `agents.txt` has no live agents. Each released issue's notes are in
+  `S/notes/released/<n>-20261122T1303.md` (also posted on the issue). Re-read the thread before
+  re-claiming: others may have taken them since.
 
-- **Run several Sonnet agents on quick wins and start NO Opus agents** until the problem space
-  changes again (no quick wins left, or a new chapter needs mapping). Ask the user before
-  returning to Opus. The #3484 Opus prover that was already running may finish.
-- **Every check looks for new proof issues first.** Run the quick-win loop (shortlist, Haiku
-  triage, Sonnet hunters), aiming for 2–3 Sonnet hunters at once while leads last, with no issue
-  overlap between them (`claims.txt`). Use rated-3 rows once the rows rated 1–2 run out.
-- Sonnet agents run on usage credits (user-approved). The usage pause ended at the 05:40Z reset;
-  a one-shot cron at 05:45Z (session-only) re-creates the hourly check below. If the session
-  died, do that by hand.
+  | Agent (model) | Issues | Where it stopped |
+  |---|---|---|
+  | crit2526 (Opus) | #2526 `infiniteEigendistribution_normalized`, Ch03 Sec4 | plan = SPLIT (assembly with sorried helpers); no code in `wt/crit-2526` beyond `.agent/` probes |
+  | esc-sec5 (Opus escalation) | Ch05 Sec5 #4408 #4420 #4423 #4429 #4431 (+ #4409 #4411) | cause found, see "Elaboration traps" in HUNTER.md (`with_reducible_and_instances exact …`); worktree clean |
+  | w12 (Sonnet) | Ch05 Sec4 #4344 #4352 #4356 | uncommitted 7-line edit in `wt/hunt-w12` (Sec4.lean); #4356: `Submodule.ext` alone builds in 63 s, the full attempt ran >1.5 h |
+  | (queued, never started) | #4338 Ch05 Sec4 (SchwartzBergman ext) | Opus escalation after w12 |
+
+- **New issues not yet shortlisted:** about 357 open proof issues were created after 10:00Z (up to
+  #5344); the shortlist covers issues up to #4616 (last triage files `triage6a.tsv` Ch07 Sec2,
+  `triage6b.tsv` Ch07 Sec3a). **First job of the new coordinator: shortlist and triage those.**
+- **Unused leads** (`state/leads.txt`): Ch07 Sec2 #4535 (the rest of triage6a is crowded by other
+  contributors); Ch05 Sec5 #4409 #4411 (rated 3, unattempted).
+- **Open LeoVerto PRs:** none. 76 merged in total. Critical-path results
+  are in `critical/status.txt`; the latest is #5045 (proves #1526).
+- **Held for the user, not posted upstream:** #4255 `sLocalArchimedeanPoleMultiplicity_eq_sum`
+  possibly unprovable (needs simple poles; `S/notes/4255.md`); Ch05 Sec5
+  `globalThetaTranspose_range` / `globalHomogeneousThetaTranspose_range` SUSPECT (`Set.range` vs
+  closure of span); refutations #4574/#4575 may duplicate one printed claim; #4603 (Ch07 Sec3a)
+  released by w15 as needing hypotheses the statement lacks.
+- **Not handed in:** #2517 proved on local branch `hunt/ch03n-1` (1f3ce84), but jcosmos0 claimed it
+  first (`state/pending_handins.txt`). Keep the branch in case they release it.
+- **Saved partial proofs:** `S/patches/` (w10 Sec5 transposes, w13).
+- `S/no-resume` exists, so the watchdog never auto-resumes a session.
+- Docs on origin/main: the last AGENTS.md change is 3de969e (named instances in `_Printed.lean`).
 
 ## Standing instructions from the user
 
-- **Read the current project docs from origin/main** (user, 2026-11-22): AGENTS.md, CONTRIBUTING.md
-  and ERRATA.md (`git show origin/main:<file>`). The main checkout's working tree lags behind
-  upstream. Their gap handling binds our agents: AGENTS "False statements and gaps", CONTRIBUTING
-  "When the paper is wrong", summarized at the end of HUNTER.md. Re-read them at each session
-  start and when upstream changes them (`git log origin/main -- AGENTS.md CONTRIBUTING.md
-  ERRATA.md`), and keep the briefs in line.
+- **Coordinator only.** No proofs, builds or long log reads in the main session; delegate and
+  relay short reports. Do not call `advisor` from the coordinator: it is for subagents.
+- **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning.
+  Agents wait on builds with one blocking wait, never polling turns. Keep wake-ups sparse.
+- **Quick-wins mode** (since 04:40Z, amended 06:05Z, 07:30Z, 08:30Z):
+  1. Sonnet hunters on quick wins first: 2–3 at once, rows rated 1–2, then 3.
+  2. **Escalation:** issues a Sonnet released as *stuck* (tried and failed, not merely unattempted)
+     go to an Opus escalation prover (HUNTER.md brief, Opus tag), one file per prover, once our
+     Sonnet has left that file.
+  3. With no quick wins and no escalations, ONE Opus prover on **any** open unclaimed proof issue
+     (CRITICAL_PROVER.md; not `gap`/`refutation`/ERRATA/`TODO(paper-gap)`, not sweep-held). No
+     cone remapping ("the cone doesn't matter at this point"). Do not ask before resuming Opus.
+  4. At most 2 Opus agents at once (coordinator's assumption).
+- **Claim what we work on or have queued.** Escalated issues are re-claimed at once as
+  `Claiming (Claude Opus 5.5, default effort)`, noting they are queued, and listed in the leads.txt
+  ESCALATION QUEUE. Stale-claim releases skip that queue. Upstream auto-releases a claim with no PR
+  after 8 h, so re-claim queued issues that wait longer. After a usage halt (when the watchdog
+  releases everything), re-claim what the resumed agents hold.
+- **Collaborative, not a race.** No pre-proving of sorries without an issue (the sieve may compute
+  hits on CPU only). Do not race other contributors or the upstream sweepers. Help on held files
+  with hints, not competing PRs. Step back when someone else claimed first.
+- **One PR per touched Lean file.** Don't crowd a file that 2–3 others hold.
+- **Models and tags:** hunters, sievers and fixers run on Sonnet, effort medium, until 4 PRs or
+  about 3 h. Opus runs with no effort override. Triage and the nagger run on Haiku. Tag `<M>` =
+  `Claude Sonnet 5.5, effort medium` / `Claude Opus 5.5, default effort`. Claims start
+  `Claiming (<M>)`; PR bodies carry `Prover: <M>` above the 🤖 line.
+- **Read the thread before claiming** (earlier approaches). Release only via `release.sh`, which
+  posts the agent's `notes/<n>.md` (failed approaches first).
+- **Token:** only for `mccorvie/riemann-masullo` (`origin`) and `LeoVerto/riemann-masullo`
+  (`fork`). It must be a CLASSIC token (repo, workflow, read:org); check with `tokencheck.sh`.
+- **Upstream posting:** ask the user before posting anything new. Standing exceptions: normal
+  Claiming/Releasing; sieve hints on open `sweep` issues; extensions of #1288, #561 and #3230.
+  **Never raise BLOCKERS §0** (Main.lean integration is wave 4+, by the project's choice).
+- **Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main** (`git show origin/main:<file>`)
+  at each session start and when they change; keep the briefs compliant. Checked 2026-11-22 ~16:00Z:
+  HUNTER.md follows AGENTS (Lean rules, false statements and gaps), CONTRIBUTING "Working
+  efficiently" (private helpers in the issue's file only, no `maxHeartbeats`, no routine rebase,
+  keep the file fast) and ERRATA (`TODO(paper-gap)` marks). One deliberate difference: findings
+  about the paper are held for the user instead of posted on the issue (user's posting rule).
+- **State lives in `.agent/`**, never only under `/home/agent`.
+- **Notes nagger out of session:** one long-running Haiku loop (`NAGGER.md`), never cron ticks in
+  the coordinator session. The coordinator only keeps `agents.txt` in sync and relaunches it.
 
-- **Coordinator only:** no proofs, builds or long log reads in the main session. Delegate them and
-  relay short reports.
-- **CPU time is cheap; tokens are the bottleneck.** Prefer automation, such as the sieve and
-  `exact?` runs, over agent reasoning. Agents wait on builds with one blocking wait, not polling.
-- **Models:**
-  - Hunters, sievers and fixers run on Sonnet at effort medium, until 4 PRs or about 3 h.
-  - Critical-path provers run on Opus with no effort override, one issue each, but are
-    **suspended in low-hanging mode** (see above).
-  - The `advisor` tool is for subagents to escalate to; the coordinator does not call it.
-- **Attribution:** claims read `Claiming (<M>)`. PR bodies carry `Prover: <M>` above the 🤖 line.
-  <M> is e.g. `Claude Sonnet 5.5, effort medium` or `Claude Opus 5.5, default effort`.
-- **Read the issue thread before claiming,** for earlier approaches. Release only through
-  `release.sh`, which posts the agent's `notes/<n>.md` with failed approaches first.
-- **Token:** use it only for `mccorvie/riemann-masullo` (remote `origin`) and
-  `LeoVerto/riemann-masullo` (remote `fork`). It must be a CLASSIC token with `repo`, `workflow`
-  and `read:org`. A fine-grained PAT gets 403 on upstream comments and PRs, and its pushes to the
-  fork are rejected. Check with `sweeptools/tokencheck.sh`.
-- **Upstream posting:** ask the user before posting anything new upstream. Approved standing
-  exceptions:
-  - sieve hints on open upstream `sweep` issues;
-  - extensions of #1288 (instance timeouts), #561 (`ApproxProp`) and #3230 (issue-sync damage).
-- **Do NOT raise BLOCKERS §0** (no library link to `Main.lean`). Main.lean integration is wave 4
-  or later, by decision of the project's human coordinator; focus on the earlier parts.
-- **State lives in `.agent/`,** never only under `/home/agent`.
-- **Collaborative, not a race.** Many closed issues are welcome, but:
-  - no pre-proving of sorries that have no issue yet;
-  - no racing other contributors or the upstream sweepers for claims;
-  - help on held files through hints, not competing PRs;
-  - step back when someone else claimed first.
-- **Use `lake lean <file>`, never `lake env lean`.** AGENTS.md changed on 2026-11-22: only
-  `lake lean` applies lakefile.toml's leanOptions (`maxSynthPendingDepth = 3`,
-  `autoImplicit = false`, `linter.unusedSectionVars = false`; that linter took 20 min on one AppD
-  proof). All our earlier sweeps (res1–res4) and the hunters' fail-fast probes used
-  `lake env lean`. The #2663 prover confirmed that the Ch04 "elaboration timeouts" were this
-  artifact (about 30 s under `lake lean`), so re-test any "blocked by #1288 timeouts" verdict.
-  Also never print raw `Expr`s: `repr` has used 70 GB here.
+## Environment (sandbox `riemann-masullo-faststorage`)
 
-## Environment (sandbox `riemann-masullo-faststorage`, recreated 2026-11-22)
+- Repo `/mnt/faststorage/math/riemann-masullo` (writable, ~65 GB free; its parent is not writable).
+  The overlay root (~16 GB) does not survive a sandbox recreation.
+- 16 GB RAM, 24 cores. **RAM is the limit:** one prover, one hunter or siever, and the sieve is the
+  ceiling. memguard kills (rc 137) are cheap; an OOM of the host is not.
+- elan in `~/.elan`; `/etc/sandbox-persistent.sh` sets its PATH and `LAKE_ARTIFACT_CACHE=true`,
+  `LAKE_CACHE_DIR=<repo>/.lake/artifact-cache`, `LAKE_RESTORE_ARTIFACTS=true` (tested: restores
+  leave real local `.olean`s; concurrent builds are fine).
+- poppler-utils (for `scripts/paper.sh`) comes from apt.
+- Claude memory: `~/.claude/projects/-mnt-faststorage-math-riemann-masullo/memory` is a symlink to
+  `<repo>/.agent/memory`.
 
-- Repo: `/mnt/faststorage/math/riemann-masullo`. It is writable and has about 65 GB free; its
-  parent is NOT writable. The overlay root has about 16 GB free.
-- RAM is 15 GB with 24 cores. **RAM is the real limit:** the sandbox was OOM-killed once with a
-  prover build, a hunter build and a sweep running together.
-- elan is in `~/.elan`, with its PATH line in `/etc/sandbox-persistent.sh`. That file also exports
-  `LAKE_ARTIFACT_CACHE=true`, `LAKE_CACHE_DIR=<repo>/.lake/artifact-cache` and
-  `LAKE_RESTORE_ARTIFACTS=true`.
-  - The cache is ON and tested: restored modules leave real local `.olean`s, two concurrent
-    builds are fine, and Mathlib stays up to date.
-  - Restore is a copy, not a hardlink.
-- poppler-utils is installed through apt; the overlay root does not survive a recreation.
-- Claude memory: `~/.claude/projects/-mnt-faststorage-math-riemann-masullo/memory` is a SYMLINK
-  to `<repo>/.agent/memory`. Re-create the symlink first after a recreation.
+## Startup checklist
 
-## Startup checklist for a fresh coordinator session
-
-1. **Memory symlink and tools.**
-   - If `/home/agent` was wiped: re-link the memory dir, re-create the `/home/agent/{sweeptools,wt}`
-     symlinks, and reinstall elan (toolchain from `lean-toolchain`) and poppler-utils.
-   - Check `/etc/sandbox-persistent.sh`: PATH plus the three cache exports.
-   - `git worktree prune`. If a worktree's path is gone, re-create it with `newwt.sh`.
-2. **Token:** run `sweeptools/tokencheck.sh`. It needs `TOKEN OK`. On `TOKEN FAIL` ask the user:
+1. **After a recreation** (`/home/agent` wiped): re-link the memory dir and the
+   `/home/agent/{sweeptools,wt}` compatibility symlinks; reinstall elan (toolchain from
+   `lean-toolchain`) and poppler-utils; check `/etc/sandbox-persistent.sh`. Then `git worktree prune`.
+2. **Token:** `S/tokencheck.sh` must print `TOKEN OK`. On `TOKEN FAIL` ask the user to run
    `sbx secret set github --sandbox riemann-masullo-faststorage -t <classic token>`.
-3. **Services** (`ps -eo pid,args | grep -E '^ *[0-9]+ bash ./(warm|watchdog|memguard|sieve).sh'`).
-   Restart any that are missing with `cd <S> && setsid nohup ./<name>.sh >> <name>.log 2>&1 < /dev/null &`.
-   For the sieve see `SIEVE.md`. Check that `warm.log` says "ready" at a recent main.
-   - The watchdog's auto-resume uses a hard-coded old `SESSION`. Leave `no-resume` in place unless
-     you restart it with `SESSION=<your id>`.
-4. **One hourly check.** Run `CronList` first, because duplicates happen. Then create it at minute
-   17 with the prompt in "Hourly check" below.
-5. **Relaunch work:**
-   - Critical-path prover: one Opus agent ("Critical path" below), but **not in low-hanging
-     mode**.
-   - 2–3 Sonnet hunters on triaged quick wins (quick-win loop under "State at handoff").
-   - A siever when the sieve shows READY or HINT lines.
-   - Hunters only on concrete leads.
+3. **Services:** start any missing one with
+   `cd S && setsid nohup ./<name>.sh >> <name>.log 2>&1 < /dev/null &` for warm, watchdog, memguard
+   and sieve (sieve details in `SIEVE.md`). Check that `warm.log` says "ready" at a recent main. The
+   watchdog's auto-resume uses a hard-coded old `SESSION`: leave `no-resume` in place unless you
+   restart it with `SESSION=<your id>`.
+4. **One hourly check:** `CronList` first (duplicates have happened), then create it with the
+   one-line prompt under "Hourly check".
+5. **Relaunch:** the nagger (if any agent runs), the quick-win loop on the new issues, and
+   escalations or Opus per quick-wins mode. Never resume long dead transcripts with SendMessage
+   (an uncached replay is expensive): start fresh agents from `notes/` and `notes/released/`.
 
-## State at handoff
+## Hourly check
 
-### Update 2026-11-22 ~06:00Z (user asleep from here; work autonomously, post nothing new upstream)
-- Crons (session-only; recreate on restart, CronList first): hourly check **9dc215ca** at :17
-  (text below); notes nagger **5d728683** every 15 min (:04/:19/:34/:49), see workstream 5.
-- Docs on origin/main unchanged since 02f36f8/15e78ca. HUNTER.md gained "One file at a time"
-  (**ONE PR PER TOUCHED FILE**, user instruction; don't crowd a file with 2–3 other claimants) and
-  "PR titles" (user-edited: name the declarations/file; "easy"/"trivial" are fine; no ratings,
-  branch names, or internal jargon like "average"/"batch"). TRIAGE.md rates ERRATA/`Gap:`/
-  `TODO(paper-gap)` declarations `-` (skip).
-- New issues Ch05 Sec4 (#4333–#4369) and Sec5 (#4382–#4432) triaged: `shortlist/triage4a.tsv`,
-  `triage4b.tsv`. Last shortlisted issue: #4432.
-- Hunters running (roster with agent IDs in `state/agents.txt`): **w6** (Ch05 Sec3a + Sec2b, told
-  to split into one PR per file), **w8** (Ch05 Sec4, 8 issues), **w9** (Ch05 Sec5, 16 issues).
-- w5 finished: PR #4434 (Ch05 Sec3b, 6 issues), PR #4466 (Ch06 Sec2, #4309 #4312); released #4304
-  (`choose_spec` unfolding blew the build up to >25 min); handoff in `notes/handoff-hunt-w5.md`.
-  w7 finished: PR #4440 (Ch06 Sec1, 8 issues).
-- Unassigned: Ch06 Sec2 #4313 (Haar translation) #4314. Held for the user (not posted):
-  #4255 `sLocalArchimedeanPoleMultiplicity_eq_sum` possibly unprovable (needs simple poles;
-  `notes/4255.md`); SUSPECT Sec5 `globalThetaTranspose_range`, `globalHomogeneousThetaTranspose_range`
-  (`Set.range` vs closure of span; local analogue has closure on both sides).
+The checklist lives in **`S/HOURLY.md`** (snapshot `tools/HOURLY.md`), and the scheduled run reads
+it on every tick. Change the hourly behaviour by editing that file, never the cron. Create the
+cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
+`Read /mnt/faststorage/math/riemann-masullo/.agent/sweeptools/HOURLY.md and follow it.`
 
-**Update 05:30Z:** finished: w3 (PRs #4323 #4329 #4371 #4374, 8 issues), w4 (PR #4377, 6
-issues), the Opus #3484 prover (SPLIT, PR #4375; stopped after hand-in). Running: Sonnet hunters
-w5 (triage3b: Ch05 Sec3b, Ch06 Sec2), w6 (triage3a: Ch05 Sec2b/3a), w7 (rated-3 Ch06 Sec1 + #4075).
-Triage files: `shortlist/triage.tsv`, `triage2.tsv`, `triage3a.tsv`, `triage3b.tsv`; every row
-with an issue in the seven new files is triaged. One-shot cron e984e9ca (05:45Z) re-reads the docs,
-re-creates the hourly check and continues in low-hanging mode.
+## Workstreams and launch prompts
 
-**Running at 04:35Z:**
-- **Opus prover on #3484** (`schwartzBruhat_fourier_equiv`, AppD Sec1c, 11 dependents). It started
-  from sweep #3792's failure report. Worktree `.agent/wt/crit-3484`.
-- **Sonnet hunter `hunt/w3`** on the 12 issues the Haiku triage rated 1–2 in the new sections:
-  #4042 #4043 #4066 #4068 #4076 (Ch07 Sec1b), #4144 #4166 #4179 #4187 (Ch05 Sec3a), #4195
-  #4213 (Ch05 Sec3b), #4080 (Ch05 Sec2b), plus #4035 (Ch07 Sec1a, closed by the sieve's unfold
-  pass with `simp [defs]`).
-  - First PR: #4323 (four sanity lemmas, Ch07 Sec1b).
-  - Its claims are in `claims.txt`. Its report includes how accurate the triage was.
-- **Sonnet hunter `hunt/w4`** (started 04:42Z) on the rated-3 rows: #4050 #4051 (Ch07 Sec1b),
-  #4185 #4189 (Ch05 Sec3a), #4214 #4215 (Ch05 Sec3b). After those it takes the rows rated 1–2 in
-  Ch06 Sec1 from `shortlist/triage2.tsv`.
-- **Haiku triage** (started 04:42Z) of the 42 untriaged rows with issues
-  (`shortlist/untriaged.tsv`: Ch06 Sec1 18, Ch07 Sec1a 2, Sec1b 22), written to
-  `shortlist/triage2.tsv`. Its rated 1–2 rows **outside Ch06 Sec1** are free for the next
-  Sonnet hunter.
-- **The sieve v2:**
-  - Its queue ranks files with open issues first (Ch07 Sec1a, Sec1b, Ch05 Sec2b, Sec3a, Sec3b),
-    then the slow Ch06 Sec1, which takes >60 min per run and gets at most 2 chunks per cycle.
-  - Passes: cheap, exact, grind, unfold.
-  - Retries rc 124/137, then splits. A completed pass shows rc 1.
+- **Quick-win loop** (main source of work):
+  1. `shortlist.py <files>` scores every sorry without Lean (statement size, name patterns,
+     docstring hints, red flags, the paper's proof length) into `shortlist/latest.tsv`.
+  2. Haiku triage: `Read S/TRIAGE.md and follow it. N = 60.` (model haiku) rates rows 1–5, or `-`
+     for ERRATA/gap items, and flags SUSPECT statements.
+  3. Sonnet hunters on exactly the rows rated 1–2, then 3. Prefer files low in the import order and
+     nearly finished (CONTRIBUTING).
+  Rated-3 rows in Ch05 Sec4/Sec5 hit slow-compile traps (w10, w12, w13) and ended in escalations.
+- **Hunter:** `Read S/HUNTER.md and follow it exactly. Your name is w<k>, your branch prefix <P> is
+  hunt/w<k>, your model tag <M> is Claude Sonnet 5.5, effort medium. Your issues: …` (Sonnet, effort
+  medium). Opus escalation provers get the same brief with the Opus tag, the issue's notes and its
+  release comments.
+- **Opus prover:** `Read S/critical/CRITICAL_PROVER.md and follow it. Your issue is #<n>. Your model
+  tag <M> is Claude Opus 5.5, default effort.` Worktree `wt/crit-<n>`, branch `crit/<n>`, result
+  line in `critical/status.txt`. A prover that finishes with a warm cache may get ONE related issue
+  by SendMessage, then retire it.
+- **Sieve and siever:** the sieve service (`SIEVE.md`) tries cheap, `exact?`, `grind` and
+  unfold-defs passes on every new or changed file, one Lean process at a time, and writes
+  `sieve/hits.tsv`. `status.sh` classifies hits READY / HINT / CLAIMED / WAIT / DONE. A siever
+  (`Read S/SIEVER.md and follow it. Your model tag <M> is …; your hits: <lines>`) hands in READY
+  hits and posts HINT hits on the sweep issue. Its yield so far is low (e.g. #4035).
+- **Nagger:** see `NAGGER.md`; stop it with `touch S/nagger.stop`.
+- `scripts/agent.sh` does not work here: it assumes the integrator's layout and pushes to `origin`.
 
-**New issues dropped ~04:05Z:** 176 proof issues #4034–#4213 (Ch07 Sec1a 8, Sec1b 38, Ch05 Sec2b 52,
-Sec3a 59, Sec3b 18), plus #4033 (AppD Sec1c). Ch06 Sec1 issues (#4264–#4279) appeared by 04:40Z;
-Ch06 Sec2 has none yet (no pre-proving). `shortlist.py` was re-run on
-these files (223 rows, 182 with an issue), and Haiku rated the top 49 (`shortlist/triage.tsv`).
-Rows rated 3 are the next candidates for Sonnet hunters if the w3 ratings prove accurate.
-
-**Quick-win loop for each new batch of issues:**
-1. Run `shortlist.py <files>`.
-2. Haiku triage: `Read <S>/TRIAGE.md and follow it. N = 60.` with `model: haiku`.
-3. Run a Sonnet hunter on exactly the rows rated 1–2 (list them in its prompt).
-
-**Open PRs:** #4323 (hunt/w3).
-
-**Merged today:**
-- #4021: proves #2663 (Ch04 Sec5); the integrator accepted the false signature diff caused by #2693.
-- #3823: fully proves #1219.
-- #3978: proves #1902.
-- #3993: fully proves #1885.
-
-**Not handed in:** #2517 is proved on local branch `hunt/ch03n-1` (1f3ce84). jcosmos0 had claimed it
-first. Keep the branch in case they release it (see `state/pending_handins.txt`).
-
-**Upstream sweepers** (label `sweep`, `prompts/sweeper.md`, codex agents at xhigh effort) each
-claim a whole file's remaining sorries, and they claim fast.
-- At handoff they held ~18 files: all of Ch03 Sec2/Sec3/Sec3b, Ch04 Sec5 (#3999), Ch05 Sec1/Sec2,
-  Ch09 Sec2/Sec3, much of AppD and Ch02, and others.
-- Only **8 free critical-path sorries** remain outside held files. All are hard leftovers the
-  sweepers did not close: #3484, #783, #1698, #1700, #1724, #3492, #1155, #1014.
-- An overlap audit found zero issue-level duplication with our PRs. Rules in the briefs:
-  - claim publicly first;
-  - re-check the open sweep list before pushing;
-  - never edit held files;
-  - if a file becomes held mid-work, move new helpers out of it.
-
-**Blind hunters no longer pay.**
-- ch03 hunter: 0 PRs. appB hunter: 0 PRs, since all 46 unclaimed appB issues are deep.
-- Launch Sonnet agents only on concrete leads: sieve hits, or shortlist rows that Haiku rated 1–2.
-
-**Wave 3:** the user expected it to be seeded within hours of ~04:00Z. Ch06 Sec 6.1/6.2 and Ch07
-Sec1a/1b are stated but had no proof issues yet. The sieve pre-computes hits on CPU only;
-hand-ins happen at a normal pace once the issues exist.
-
-### Update 2026-11-22 ~07:20Z: quick wins exhausted, ONE Opus prover running
-- w6 PR #4439 (Ch05 Sec3a: #4133 #4142 #4173; released #4121 #4122, quotient-map elaboration
-  timeout); w9 PR #4472 (Ch05 Sec5: #4383 #4384; 7 Sec5 issues held by factory-davidgu);
-  w11 found Ch06 Sec3 quick wins (#4445 #4452 #4453) claimed by CalebAlbers (PR #4474).
-- Running: w8 (Ch05 Sec4), w10 (Ch05 Sec5 rated-3 + Ch06 Sec2 #4313/#4314), **crit/1526 (Opus)**.
-- Old critical queue fully closed upstream. Sonnet remap wrote a new `critical/QUEUE.md` (12 entries;
-  old kept as `QUEUE-2026-11-21.md`): #1526, #2526, #2667, #4070(+#4072), #3895, ... Cone 91 sorries,
-  21 eligible. Pipeline caveats: mapper scripts hardcode `wt/crit-map` (path edits not saved),
-  `anchors.py` still treats Ch5.2–8 as undigested (cone is a lower bound), `emit.py` doesn't apply
-  claim/ERRATA/paper-gap exclusions. Fix before the next remap (Sonnet job).
-- Next Opus item after #1526: next QUEUE entry, one at a time; back to Sonnets when new issues bring quick wins.
-
-### Update 2026-11-22 ~07:30Z (user): nagger out of session; Opus on any open issue
-- **Nagger** is now ONE long-running Haiku (`tools/NAGGER.md`) looping in a single turn on
-  `tools/nag-wait.sh` (blocks ≤10 min per call, 15-min per-hunter cooldown, logs to `nag.log`),
-  SendMessaging stale hunters. The 15-min nagger cron is DELETED — never nag via cron ticks in the
-  coordinator session (user: keep it entirely out of this session). Coordinator only keeps
-  `agents.txt` in sync and relaunches the nagger if it ends; stop it with `touch sweeptools/nagger.stop`.
-- **Opus**: "The cone doesn't matter at this point ... Just pick any open issue for Opus." Any open,
-  unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held); no remapping. The
-  mapper-fix job is dropped.
-- Crons now: only the hourly check **d6366fe2** at :17.
-- **Claim what we work on or queue (user, ~08:45Z).** Escalated stuck issues are re-claimed at once
-  under the Opus tag ("queued for an Opus prover"); #4338 and #4408 claimed 08:45Z. Stale-claim
-  releases skip the ESCALATION QUEUE; watchdog.sh releases everything only when the whole session
-  is idle (correct).
-- **Escalation (user, ~08:30Z): "If sonnet gets stuck on the proofs, hand them off to opus."** Issues a
-  Sonnet released as stuck go to an Opus escalation prover (HUNTER.md brief, one file each, after our
-  Sonnet leaves the file); max 2 Opus at once (assumption). Running: **esc-sec2b** (Opus, Ch05 Sec2b
-  #4121 #4122). Queue in `state/leads.txt` "ESCALATION QUEUE": #4338 (Sec4, after w12), #4408 (Sec5,
-  after w13). #4304 is now troyjlee's. w10 finished with no PR (Sec5 proofs too slow);
-  **w13** (Sonnet) is timing and handing in its saved proofs (`patches/w10-*.lean`).
-- **Report files (07:50Z):** an agent woken by a nagger message reports to the nagger, not the
-  coordinator (happened to crit/1526). So every hunter/siever/prover also writes its final report to
-  `notes/report-<name>.md` (HUNTER.md, CRITICAL_PROVER.md, SIEVER.md end sections); the hourly check
-  reads those and moves them to `notes/reports-done/`. w8 finished: PR #4488 (Ch05 Sec4 #4336 #4347
-  #4353); w12 (Sonnet) now on Sec4 #4344 #4352 #4356. HUNTER.md has a "Slow-compile trap" section.
-- Running at 07:35Z (user asleep): Sonnet hunters **w8** (Ch05 Sec4) and **w10** (Ch05 Sec5 rated-3,
-  then Ch06 Sec2 #4313/#4314); Opus **crit/1526**; long-running Haiku nagger; services warm/watchdog/
-  memguard/sieve. Open LeoVerto PRs awaiting Verdict/merge: #4377 #4434 #4439 #4440 #4466 #4472 (and
-  earlier ones in status.sh). Held for the user, not posted: #4255; Sec5 SUSPECT `*_range` pair.
-  On restart: CronList, recreate the hourly check from the section below, relaunch the nagger if
-  not running (`pgrep -f nag-wait.sh`), and continue; never resume long transcripts (notes/ instead).
-
-## Workstreams
-
-### 1. Critical path (`critical/`)
-
-- **Prover launch prompt:** `Read <S>/critical/CRITICAL_PROVER.md and follow it. Your issue is
-  #<n>. Your model tag <M> is Claude Opus 5.5, default effort.` Add fail-fast notes as needed.
-- **Brief:** worktree `.agent/wt/crit-<n>`, branch `crit/<n>`. The prover proves the issue or
-  splits it faithfully (prompts/prover.md), and appends to `critical/status.txt`.
-- **One prover at a time.** If it finishes with a warm cache, you may hand it ONE more related
-  issue by SendMessage. That saves re-reading; it worked for #1885 after #1902. Then retire it
-  (it was at about 180k tokens by then).
-- **Picking the next issue:**
-  - `critical/graph.tsv` (cone with dependents) minus the files held by open sweep issues
-    (`gh issue list --label sweep --state open`), minus claimed issues, and only declarations still
-    `sorry` on origin/main.
-  - Ranking at handoff: only 8 free cone sorries remain outside held files (listed above); #3484
-    is the top one. As sweepers finish files, their leftovers become free again: re-run the
-    ranking (graph.tsv filtered by `gh issue list --label sweep --state open` and claimed
-    labels).
-  - `QUEUE.md` is older (built at 0ef6aa7) and its top items are now held by sweepers. Regenerate
-    the cone with the scripts in `critical/mapper/` if new sections add anchors.
-- `scripts/agent.sh` is unusable here: it is built for the integrator's layout and pushes to
-  `origin`.
-
-### 2. Sieve (`tools/SIEVE.md`, `tools/SIEVER.md`)
-
-The **sieve** is our automated tactic screen. It is named so as not to be confused with upstream's
-`sweeper`.
-- `sieve.sh` and `sieve.py` form a service with its own worktree `.agent/wt/sieve`.
-- On every warm-base advance it queues files with `sorry` that are new or changed, newest first,
-  with `sieve/priority.txt` first.
-- It runs the cheap macro pass, then `exact?`, with long timeouts. A file that times out is split
-  using `sweep.py --only` into chunks and then single sorries.
-- **One sieve Lean process at a time, globally.** It waits for more than 6 GB free and runs at
-  `nice 10`.
-- Passes: cheap, `exact?`, `grind`, unfold-defs (the last two were being added at handoff).
-  It runs `lake lean <file> -- --json`. A killed or timed-out run (rc 137/124) is retried, then
-  split.
-- Hits go to `sieve/hits.tsv`. `status.sh`'s `== sieve` section (from `sieve_status.py`) labels
-  each hit:
-  - `READY #issue`: unclaimed and the file is not held;
-  - `HINT #sweep-issue`: the file is held by an upstream sweeper;
-  - `CLAIMED`;
-  - `WAIT`: no issue yet;
-  - `DONE`: no longer `sorry` on main.
-  The READY, HINT, CLAIMED and WAIT classes are **not yet tested on real issues**; verify them on
-  the first real hits.
-- **Siever:** a Sonnet medium agent launched on READY and HINT lines. Prompt: `Read <S>/SIEVER.md
-  and follow it. Your model tag <M> is ...; your hits: <lines>`. It hands in READY hits in batches
-  per file, and posts HINT hits as one batched comment per sweep issue (user-approved).
-- History:
-  - res1, res2 and res3 are the old one-off sweeps; their 4 res3 hits were all already proved.
-  - The one-off `sweep4` agent was retired: it was too slow and its stuck Lean process blocked the
-    sieve.
-
-### 3. Quick-win finder: shortlist and Haiku triage (`tools/TRIAGE.md`)
-
-- `shortlist.py [files]` (default: files changed in the last 48 h) writes `shortlist/latest.tsv`
-  without running Lean. It scores each sorry by statement size and binders, name patterns
-  (`_apply`, `_zero`, `_mem`, `_iff`, …), docstring hints, red-flag notions (∫, `Tendsto`,
-  `Meromorphic`, `∃!`, …) and the PAPER's proof length ("Proof. Clear/Immediate" is a strong
-  signal).
-- Haiku triage (`TRIAGE.md`, `model: haiku`) rates the top N 1–5 from docstring and statement
-  only, flags SUSPECT statements, and writes `shortlist/triage.tsv`.
-- Sonnet agents take rows rated 1–2 that have unclaimed issues in files nobody holds.
-
-### 4. Hunters (`tools/HUNTER.md`)
-
-- Hunters now run only on concrete leads.
-- Launch prompt: `Read <S>/HUNTER.md and follow it exactly. Your label <L> is X, your branch prefix
-  <P> is hunt/X<n>, your model tag <M> is Claude Sonnet 5.5, effort medium.` Add leads and
-  exclusions.
-- HUNTER.md's end sections are binding: token check, upstream sweepers, token thrift, sweeper overlap,
-  helper placement, and claims/notes/attribution.
-
-### 5. Notes nagger (`tools/NAGGER.md`, `tools/notes-stale.sh`, user request 2026-11-22)
-Every 15 min the cron runs `notes-stale.sh 20`; if a hunter in `agents.txt` has no note
-(`notes/<issue>.md` or `notes/handoff-<name>.md`) newer than 20 min, it launches one short Haiku
-that SendMessages the stale hunters (sibling SendMessage by agentId works) and logs to `nag.log`.
-Purpose: notes stay current in case of a usage-limit hit. **Keep `agents.txt` in sync**: add every
-new hunter (`name agentId start_epoch issues...`), remove finished ones.
-
-## Hourly check (cron prompt)
-
-`Hourly riemann-masullo coordinator check (coordinator only; CPU cheap, tokens scarce).
-S=<repo>/.agent/sweeptools.`
-0. `git fetch origin`; if AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
-   last check, re-read the change and update the briefs (HUNTER.md end section).
-1. `status.sh` and `cleanup.sh`, under timeout, with the output tailed.
-2. Fix failing Verdicts or review comments with short Sonnet fixers; re-check the PR's state first.
-3. Release orphan or stale claims only via `release.sh`.
-4. Relay finished agents in one line each; TaskStop them after checking no Lean process remains
-   in their worktree; record in hunters.txt and remove their line from `agents.txt`.
-5. Services: warm, watchdog, memguard and sieve.
-6. If READY or HINT lines appear, launch ONE siever unless one is running. No blind hunters.
-7. **New issues first (low-hanging mode).** Check for proof issues newer than the last
-   shortlist. If there are any, run `shortlist.py` and a Haiku triage of the untriaged rows.
-   Keep 2–3 Sonnet hunters running on rows rated 1–2 (then 3) with unclaimed issues, one file per hunter, ONE PR PER TOUCHED FILE, each listed explicitly in its prompt, no overlap;
-   add each new hunter to `agents.txt`.
-8. **Opus only when the quick wins are out** (no unclaimed rated 1–3 rows, no new issues): then,
-   without asking, ONE Opus critical prover at a time (cone sorries outside held files, recorded
-   in `hunted.txt`, added to `agents.txt`). Back to Sonnets when new quick wins appear.
-9. Report in one or two lines.
-
-## Infrastructure (`<repo>/.agent/sweeptools`; copies in `tools/`)
+## Infrastructure (`S`; copies in `tools/`)
 
 | Piece | What it does |
 |---|---|
-| `warm.sh` + `.agent/wt/base` | Keeps a worktree built at origin/main and publishes `base/{COMMIT,sig.txt}`. Falls back to building failed index modules one at a time. |
-| `newwt.sh <branch> <dir>` | New worktree at the warm commit, with a copied `.lake/build` and baseline signatures in `<dir>-before.txt`. |
-| `build.sh <wt>` | `lake build` with its exit status in `<wt>/.agent/build.exit`. |
-| `status.sh` | RAM, disk, **token check**, cache size, PR verdicts, claims, orphan and stale claims, warm base, label census, `== sieve`. |
-| `cleanup.sh` | Removes worktrees whose PR merged. Run it on every check. |
-| `tokencheck.sh` | Classic token with repo, workflow and read:org? Step 0 of every brief. |
-| `release.sh <n> "<reason>"` | `Releasing (<M>): reason` plus `notes/<n>.md` (failed approaches first). Updates claims.txt and archives to `notes/released/`. Used by agents, the watchdog and the coordinator. |
-| `watchdog.sh` | When all transcripts are idle for 20 min, releases claims via release.sh. Auto-resumes after 2 h unless `no-resume` exists (it does). |
-| `memguard.sh` | Below 3 GB available, kills the newest Lean process whose cwd is under `.agent/wt/sieve*`, otherwise the newest Lean process of any kind. |
-| `shortlist.py`, `TRIAGE.md` | Quick-win scorer and Haiku triage brief (see workstream 3). |
-| `sieve.sh`, `sieve.py`, `sieve_status.py`, `sweep.py` | The sieve (see above). `sweep.py` has `--only L1,L2` and kills the whole process group on timeout. |
-| `HUNTER.md`, `SIEVER.md`, `critical/CRITICAL_PROVER.md` | Agent briefs. |
+| `warm.sh` + `wt/base` | Keeps a worktree built at origin/main; publishes `base/{COMMIT,sig.txt}`; rebuilds failed index modules one at a time. |
+| `newwt.sh <branch> <dir>` | New worktree at the warm commit with a copied build and baseline signatures in `<dir>-before.txt`. |
+| `build.sh <wt>` | `lake build`, exit status in `<wt>/.agent/build.exit`. |
+| `status.sh` | RAM, disk, token, cache, PR verdicts, claims, orphan and stale claims, warm base, label census, `== sieve`. |
+| `cleanup.sh` | Removes worktrees whose PR merged. |
+| `tokencheck.sh` | Classic token with the right scopes? Step 0 of every brief. |
+| `release.sh <n> "<reason>"` | Posts `Releasing (<M>): reason` plus `notes/<n>.md`, updates `claims.txt`, archives to `notes/released/`. |
+| `watchdog.sh` | When every transcript has been idle for 20 min, releases all claims via `release.sh`; auto-resume after 2 h is disabled by `no-resume`. |
+| `memguard.sh` | Below 1000 MB available (`LOW`), kills the newest sieve Lean process, otherwise the newest Lean process. |
+| `shortlist.py`, `TRIAGE.md` | Quick-win scorer and Haiku triage brief. |
+| `sieve.sh`, `sieve.py`, `sieve_status.py`, `sweep.py` | The sieve. |
+| `nag-wait.sh`, `notes-stale.sh`, `NAGGER.md` | Notes nagger. |
+| `HUNTER.md`, `SIEVER.md`, `critical/CRITICAL_PROVER.md` | Agent briefs; HUNTER.md holds the rules shared by all three. |
+| `HOURLY.md` | The hourly check's instructions, read by the cron on every tick. |
 
-## Lessons (read before changing anything)
+State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims.txt`, `hunters.txt`
+(agent log), `hunted.txt` (launch log), `leads.txt` (leads and ESCALATION QUEUE), `dispatched.txt`
+(sieve hits handed out), `pending_handins.txt`, `notes/` (per-issue notes, `report-*.md`,
+`released/`, `reports-done/`).
 
-- **RAM, not CPU, limits parallelism.** One prover, one siever (or hunter) and the sieve is the
-  ceiling. memguard kills are expected and cheap; an OOM-killed sandbox is not (every agent then
-  replays its transcript).
-- **After a sandbox kill:** the services die, the cron may survive, and agents restart from their
-  transcripts on their own. Check `ps`, `CronList` and `claims.txt`.
-- **After a sandbox recreation:** everything outside the repo is gone. See startup step 1.
-- **The `claimed` label lags; claim comments do not.** Read the whole thread. A plain
-  `Claiming` by another contributor counts.
-- **jcosmos0 and elmismisimoxhunca** are active upstream provers on ch03. Upstream sweepers move
-  fast: whole chapters were claimed within minutes.
-- **Census counts lie about difficulty.** Unclaimed does not mean short.
-- **Helper placement** (prover.md, merger.md, proof_review.sh):
-  - Same file by default.
-  - ForMathlib only for lemmas with no paper objects that Mathlib ought to have.
-  - Reuse across chapters by making the lemma public in the earliest file and importing it.
-    Imports are routine; only the import order limits this.
-  - Don't copy helpers.
-- Bound every build with `timeout`. Never `pgrep`/`pkill -f` a pattern from your own command line.
-  Kill only PIDs you started.
-- After a pause, don't resume long subagents with SendMessage; start fresh ones from STATE.md and
-  notes. Continuing a just-finished agent while its cache is warm is fine.
-- Re-check a PR's state right before editing it or commenting on it.
-- **`gh` caches responses, including 401s:** `rm -rf ~/.cache/gh`. `tokencheck.sh` does that.
-- **The "PR check" Verdict is the merge gate.** Cancelled "Lean Action CI" runs are expected; do
-  not re-run them.
-- Issues of merged PRs stay open until the merger's `scripts/issues.py --apply`; they are not
-  orphans.
+## Lessons
+
+- **Usage halts kill everything at once.** The watchdog then releases every claim, and the agents do
+  not come back by themselves. Agents that update `notes/` after every step lose little.
+- **After a sandbox kill** the services die, the cron may survive, and agents restart from their
+  transcripts. After a recreation everything outside the repo is gone (startup step 1).
+- **Upstream sweepers** (label `sweep`, codex agents) claim whole files within minutes and hold most
+  of the hard tails. Never edit a held file. Census counts lie about difficulty, and blind hunters
+  on "unclaimed=N" returned 0 PRs: send agents only on concrete leads.
+- **The `claimed` label lags; claim comments do not.** Read the whole thread; a plain `Claiming`
+  counts.
+- **Use `lake lean`, never `lake env lean`:** only the former applies the lakefile options. The
+  "elaboration timeouts" reported on Ch02/Ch04/AppD before 2026-11-22 05:00Z were mostly this
+  artifact, so re-test such verdicts.
+- Real slow-compile traps are listed in HUNTER.md: `Classical.choose`/`existsUnique` unfolding, and
+  default-transparency unification on quotient and pullback goals.
+- Re-check a PR's state right before editing it or commenting on it (a merged PR was edited once).
+- `gh` caches responses, including 401s: `rm -rf ~/.cache/gh` (`tokencheck.sh` does it).
+- The "PR check" Verdict is the merge gate. Cancelled "Lean Action CI" runs are expected; do not
+  re-run them. Issues of merged PRs stay open until the merger runs `issues.py --apply`; they are
+  not orphans.
+- Never `pgrep`/`pkill -f` a pattern from your own command line; kill only PIDs you started.
 
 ## Upstream reports (integrator decides)
 
-- **#3230:** issue-sync damage. The malformed batch #3183–#3322 has fragment titles; 124 issues
-  were wrongly closed; 6 sorries have no issue.
-- **#1288:** consolidated instance-timeout report.
+- **#3230:** issue-sync damage (fragment batch #3183–#3322, 124 issues wrongly closed, 6 sorries
+  without issue). Details in `critical/BLOCKERS.md`.
+- **#1288:** consolidated instance-timeout report (much of it turned out to be the `lake env lean`
+  artifact).
 - **#561:** `ApproxProp` false statements, repaired by #3330.
-
-## Results so far
-
-- About 55 PRs from LeoVerto merged, closing roughly 200 proof issues.
-- Critical path: #3660 (#1223), #3681 (#1906), #3823 (#1219), #3978 (#1902), #3993 (#1885), and
-  #4021 (#2663).

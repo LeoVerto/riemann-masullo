@@ -1,0 +1,47 @@
+rating	file:line	decl	issue	note
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:233	sLocalThetaPoleBound_full_eq_polarFree_false	4567	Mellin pole analysis of Gaussian times Z_p indicator
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:157	sLocalThetaPoleBound_low_coefficients_exact_false	4564	explicit bump; Mellin Taylor coefficient and residue computation
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:307	sLocalThetaPoleBound_zero_equiv_decay	4547	continuous linear equiv with Schwartz-decay topology; construction
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:214	sLocalMellin_surjective_divisorBounded_false	4566	needs vertical decay of Schwartz-Bruhat Mellin transforms
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:195	sLocalThetaPoleBound_printed_mellin_sequence_false	4565	multiplicity computation at 2pi i/log p; unfold selected/full
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:192	sLocalPolePlaces_one	4538	Gamma and Euler factor poles at trivial character, meromorphicOrderAt
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:214	sLocalFinitePoleMultiplicity_one	4540	filter_true with finite-pole lemma at trivial character
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:199	sLocalRhoPoleOrder_eq_card_polePlaces	4539	relate idelic order bound (Sec1b) to place counts
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:261	sLocalThetaRemovedPrincipalParts_mk	4543	unfold def; coefficient is sLocalZLaurentCoeff (see TODO note)
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:427	sLocalPolarPrincipalValue_tfae_exact_order_false	4575	zero test, global order top; check hypotheses of statement
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:296	sLocalThetaPoleBound_zero	4546	GAP
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:357	sLocalRhoFactor_eq_div_fourierEulerProduct	4550	local functional equation identity on codiscrete set
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:280	sLocalThetaRemovedPrincipalParts_quotient	4545	LinearMap.quotKerEquivRange after ker lemma
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:269	sLocalChangeOfChart_pureNormBase_false	4569	quadratic character on 5-adic units; S-unit kernel and norm twist
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:336	sLocalPrincipalPartCoeff_lower_literal_false	4572	explicit bump, zeta entire, convolution and Taylor coefficient
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:357	sLocalFunctionalEquation_extra_epsilon_false	4573	epsilon factor values and zeta integral at exponent 1/4
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:299	sLocalPrincipalPartCoeff_leading_literal_false	4570	Mellin derivative of explicit bump at trivial center
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:313	sLocalPrincipalPartCoeff_leading_unscaled_false	4571	explicit Gaussian tensor; constants and epsilon at center
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:98	sLocalPrincipalPartCoeff_eigendistribution_false	4561	dilation and Mellin residue computation over Q
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:111	sLocalPrincipalPartCoeff_universal_pole_bound_false	4562	positive Mellin derivative of explicit bump, no pole
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:271	sLocalThetaRemovedPrincipalParts_ker	4544	ker of removed coefficient map equals bounded subspace
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:484	sAdeleSchwartzToGlobal_mem_polarSubspace	4557	global evaluations of insertion equal local ones with integer indicators
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:326	sLocalFourierEulerProduct_eq_zeta	4548	Tate-type Fourier identity on a component
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:79	sLocalPrincipalPartCoeff_apply	4530	unfold coefficient functional; rfl
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:494	sLocalPolarPrincipalValue_tfae	4558	28-line four-way TFAE with principal-value images
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:103	sLocalThetaPrincipalPartCoeff_mk	4532	liftQL_apply plus sLocalPrincipalPartCoeff_apply
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:128	sLocalPrincipalPartCoeff_ne_zero_imp_pole	4534	GAP
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:341	sLocalFourierEulerProduct_eq_zeta_standardGaussian	4549	Fourier transform of Gaussian tensor, product over places
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:391	sLocalPrincipalValue_tfae_exact_order_false	4574	same counterexample as the polar variant; near-duplicate
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:144	mem_sLocalThetaPoleBound_iff	4535	unfold membership; descend coefficients to theta classes
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:465	sAdelePolarValues_isLinear	4555	linearity of evaluation and Fourier transform
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:58	sLocalZLaurentCoeff_continuous_linear	4529	GAP
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:370	sLocalPrincipalPartCoeff_leading_formula	4551	GAP
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:252	sLocalCoordinate_closedEmbedding_false	4568	instantiate Q and S; show coordinate map not injective
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:78	sLocalPrincipalPartCoeff_any_contour_false	4559	contour residues of Gamma_R; explicit Gaussian
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean:135	sLocalThetaPoleBound_eigen_annihilator_false	4563	positive Mellin derivative of explicit bump under dilation
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:232	sLocalSelectedPoleMultiplicity_full	4542	rw card_polePlaces lemma; simp on univ filters
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:151	sLocalThetaPoleBound_isClosed	4536	isClosed of kernels of continuous coefficient functionals
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:227	sLocalSelectedPoleMultiplicity_finite	4541	unfold; arch inter empty; simp
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:394	sLocalPrincipalPartCoeff_lower_formula	4553	Leibniz and Taylor expansion of product with Laurent coefficients
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:476	mem_sAdelePolarSubspace	4556	LinearMap.mem_ker and unfold polarValues
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:112	sLocalPrincipalPartCoeff_translate	4533	translation formula on Laurent coefficients with log-norm terms
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:91	sLocalPrincipalPartCoeff_ker	4531	GAP
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:384	sLocalPrincipalPartCoeff_leading_eigendistribution	4552	weight equation for leading coefficient under units
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:437	sLocalPrincipalValue_tfae	4554	GAP
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec2.lean:159	sLocalThetaPoleBound_annihilator	4537	duality: annihilator equals strong closure of span

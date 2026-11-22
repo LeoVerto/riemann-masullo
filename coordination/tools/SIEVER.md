@@ -1,7 +1,7 @@
 # Siever brief
 
 You hand in what the **sieve** found. The sieve is our automated tactic screen: it replaces each
-`sorry` in the library with a tactic macro (cheap chain, then `exact?`) and records which ones close.
+`sorry` in the library with a tactic macro (passes: cheap chain, `exact?`, `grind`, unfold-defs) and records which ones close.
 
 Principle: **CPU time is cheap, tokens are the bottleneck.** The machine has done the search, and
 your job is to turn its hits into clean pull requests with as little reasoning and output as
@@ -11,10 +11,10 @@ Paths: R=/mnt/faststorage/math/riemann-masullo (main checkout, never build or ed
 S=$R/.agent/sweeptools, worktrees under $R/.agent/wt.
 
 ## Read first
-- `$R/AGENTS.md` (project rules).
-- `S/HUNTER.md`, all of it, including the sections at its end: token check, upstream sweepers,
-  token thrift, sweeper overlap, helper placement, and claims/notes/attribution. It defines how you
-  claim, build, check and hand in. This brief only adds what is specific to sieve hits.
+- AGENTS.md from origin/main (project rules; see HUNTER.md).
+- `S/HUNTER.md`, all of it. Its rules bind you: docs from origin/main, token check, pre-claim
+  checks, claims and notes, builds and memguard, sweepers, helper placement, paper errors and gaps,
+  checks, PR format, report file. This brief only adds what is specific to sieve hits.
 - `S/SIEVE.md` (how the sieve service works, where its results are).
 
 ## Your inputs
@@ -70,19 +70,13 @@ Your model tag <M> is given in the launch prompt (default `Claude Sonnet 5.5, ef
 2. `S/sweep.py <wt> <file> <out.json> [--exact]` per file with a `sorry`, cheap pass then `--exact`,
    newest files first, with generous timeouts (tens of minutes per file). If a whole file times out,
    split it rather than give up. Run at most ONE sweep Lean process at a time (an `exact?` process
-   needs 3–5 GB; memguard kills the newest sweep Lean process, or any Lean process if none, below 1 GB free; if yours is killed, see the memguard section in HUNTER.md and change approach rather than retrying). Run it in the
+   needs 3–5 GB; on memguard kills see HUNTER.md). Run it in the
    background and wait with one blocking wait.
 3. Triage the hits as above (READY / HINT / drop), then hand in and post hints.
 4. Remove the manual worktree with `git worktree remove --force` when done.
 
 ## Stop and report
-Stop after 4 PRs, about 3 h, or when the list is done. Report at most 12 lines: PRs (URL, issues
+Stop after 4 PRs, about 3 h, or when the list is done. Report at most 12 lines (also written to
+`S/notes/report-<your name>.md`): PRs (URL, issues
 closed), hints posted (comment URLs), hits dropped and why (stale, claimed, failed on new main), and
 anything wrong with the sieve output you noticed (false hits, timeouts, missing files).
-
-## Current project docs (added 2026-11-22)
-Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main (`git -C /mnt/faststorage/math/riemann-masullo show origin/main:<file>`), not from the possibly stale working tree. The section "Read the CURRENT project docs; false statements and gaps" at the end of HUNTER.md is binding for you too.
-
-
-## Final report file (added 2026-11-22, binding)
-Before you finish, ALSO write your final report (the same lines you would return) to `/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/notes/report-<your name>.md` (e.g. `report-w12.md`, `report-crit1526.md`). Your returned answer may reach a different agent than the coordinator; the file is what the coordinator reads.

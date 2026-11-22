@@ -12,6 +12,9 @@ signals. Take the top N rows (N is given in your prompt; default 50). Skip rows 
 column says the file is held by an upstream sweep issue.
 
 ## For each row
+Once, before the first row: `git -C $R show origin/main:ERRATA.md > /tmp/errata-$$.md`.
+0. If the decl is in that ERRATA copy, its docstring has a `Gap:` line, or a `TODO(paper-gap)` sits
+   next to it, rate it `-` with note `ERRATA`/`GAP` and move on: hunters skip those.
 1. Read the declaration and its docstring only: `sed -n '<start>,<end>p' $R/<file>` from the
    docstring's `/--` to the `:= by sorry` line. Read at most about 40 lines; if the statement is
    longer than that, rate it 5.
@@ -29,13 +32,10 @@ column says the file is held by an upstream sweep issue.
    - **5:** deep (analysis, convergence, existence of non-trivial objects) or unclear.
 
    Also flag `SUSPECT` when the statement looks false, vacuous or mistranscribed. Say why in a few
-   words.
+   words. SUSPECT is only a note for the coordinator; nothing is posted upstream.
 
 ## Output
-Write `S/shortlist/triage.tsv` with the columns rating, file:line, decl, issue, and a note of at
+Write the triage file named in your prompt (default `S/shortlist/triage.tsv`) with the columns rating, file:line, decl, issue, and a note of at
 most 15 words naming the route (e.g. `unfold f; simp`, `exact foo.trans bar`,
 `needs Haar uniqueness`). Then report the rows rated 1–2 (at most 25 lines) and any `SUSPECT`
 rows. Do not report on the rest.
-
-## Errata and gaps (added 2026-11-22)
-Before rating, `git -C $R show origin/main:ERRATA.md > /tmp/errata-$$.md` once and grep it for each decl name. If the decl is in ERRATA, its docstring has a `Gap:` line, or a `TODO(paper-gap)` sits next to it, rate it `-` with note `ERRATA`/`GAP` instead of 1–5: hunters skip those. SUSPECT is only a note for the coordinator; nothing is posted upstream.

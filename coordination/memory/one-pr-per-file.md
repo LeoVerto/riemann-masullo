@@ -11,4 +11,4 @@ metadata:
 Every hunter/siever PR covers exactly one Lean file; a batch spanning several files is handed in as one PR per file (user instruction, 2026-11-22 ~05:50Z).
 
 **Why:** matches CONTRIBUTING "Take a file, not an issue": per-file PRs don't collide and merge independently.
-**How to apply:** assign hunters one file each where possible; written into HUNTER.md "One file at a time". See [[low-hanging-mode]].
+**How to apply:** assign hunters one file each where possible; written into HUNTER.md "One file at a time". See [[quick-wins-mode]].

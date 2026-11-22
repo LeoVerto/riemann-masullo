@@ -1,18 +1,18 @@
 - [GitHub token scope](github-token-scope.md) — use token only for LeoVerto fork and mccorvie upstream
-- [Sandbox quirks](riemann-masullo-sandbox-quirks.md) — open-file limit on parallel Mathlib imports, low disk, gh GraphQL 401
-- [Low-hanging sweep](low-hanging-sweep.md) — campaign state; handover doc on fork branch coordination/low-hanging-campaign
+- [Sandbox quirks](riemann-masullo-sandbox-quirks.md) — lake lean not lake env lean, open-file limit, Lake cache with RESTORE, memguard 1000 MB, gh 401 cache, time zones
+- [Low-hanging sweep](low-hanging-sweep.md) — campaign pointer: HANDOVER.md on fork branch coordination/low-hanging-campaign; halted 2026-11-22 11:32Z (spend limit)
 - [Subagent resume cost](subagent-resume-cost.md) — after a halt, start fresh agents from notes/<n>.md handoffs; never resume long transcripts
-- [Subagent model and effort](subagent-model-effort.md) — Sonnet, effort medium; hunters run for 4 PRs (latest user instruction)
+- [Subagent model and effort](subagent-model-effort.md) — Sonnet medium until list done / 4 PRs / ~3 h; Opus no override; Haiku for triage and nagger
 - [Advisor is for subagents](advisor-for-subagents.md) — coordinator does not call advisor; Sonnet hunters escalate to it
-- [Critical-path workstream](critical-path-workstream.md) — Opus mapper + one-issue Opus provers from critical/QUEUE.md; coordinator only
+- [Critical-path workstream](critical-path-workstream.md) — Opus provers on any open unclaimed issue (no cone since 07:30Z); results; never raise BLOCKERS §0
 - [Coordinator only](coordinator-only.md) — main session delegates everything; on restart, settle caching with one subagent first
 - [State lives in .agent](state-in-dot-agent.md) — sweeptools, worktrees, memory all under <repo>/.agent; memory dir is a symlink
 - [CPU cheap, tokens scarce](cpu-cheap-tokens-scarce.md) — prefer sweeps/automation and background waits over agent reasoning and polling
-- [Helper-lemma placement](formathlib-convention.md) — same file by default; public+import for reuse; ForMathlib only for Mathlib-worthy lemmas
-- [Claims, notes, attribution](claims-notes-attribution.md) — read threads first; notes/<n>.md with failed approaches; release.sh; tag model+effort
+- [Helper-lemma placement](formathlib-convention.md) — private helpers in the issue's file only (CONTRIBUTING); ForMathlib only for Mathlib-worthy lemmas
+- [Claims, notes, attribution](claims-notes-attribution.md) — read threads first; claim worked-on and queued issues; notes/<n>.md; release.sh; tag model+effort
 - [Sieve naming](sieve-naming.md) — our tactic screen = "sieve" (sieve.sh, SIEVER.md hand-in brief), not upstream "sweeper"
 - [Collaborative, not a race](collaborative-not-race.md) — no pre-proving before issues exist; no racing others or sweepers; help via hints
-- [Low-hanging mode](low-hanging-mode.md) — since 2026-11-22 04:40Z: several Sonnet hunters on new issues, NO Opus until quick wins run out (then resume without asking)
+- [Quick-wins mode](quick-wins-mode.md) — Sonnet hunters on quick wins first; Opus escalation of stuck issues; else one Opus on any open issue; max 2 Opus
 - [Read docs from origin/main](read-docs-origin-main.md) — AGENTS/CONTRIBUTING/ERRATA via git show origin/main; gap handling binds hunters
 - [One PR per file](one-pr-per-file.md) — hunter/siever PRs each cover exactly one Lean file (user, 2026-11-22)
 - [Nagger out of session](nagger-out-of-session.md) — notes nagger = one long-running Haiku loop (NAGGER.md), never cron ticks in this session

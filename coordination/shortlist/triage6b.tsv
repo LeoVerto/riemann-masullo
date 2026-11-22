@@ -1,0 +1,37 @@
+rating	file:line	decl	issue	note
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:217	sLocalPrimaryPoleMultiplicity_one	4593	unfold; exact sLocalFinitePoleMultiplicity_one (Sₚ p) (hₚ p)
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:97	sLocalOrbitalIndex_one_iff	4584	rw sLocalFinitePoleMultiplicity_one; onComponent(1,1) by simp
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:205	sLocalPrimaryOrbitalQuotient_mk_eq_zero	4592	Submodule.Quotient.mk_eq_zero + mem iff of row 129
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:508	sLocalOrbitalFourierJet_mem_fourierSystem	4611	unfold system; Set.mem_range_self
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:502	sLocalOrbitalPrincipalPart_mem_polarSystem	4610	unfold system; Set.mem_range_self
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:55	isSaturatedPlaceSet_empty	4580	intro v w hv; simp at hv
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:71	sLocalPrimaryPlaces_subset	4582	Finset.filter_subset
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:66	mem_sLocalPrimaryPlaces	4581	Finset.mem_filter
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:120	sLocalOrbitalPrincipalValue_eq_poleBound	4586	GAP
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:76	mem_sLocalPrimaryPlaces_of_saturated	4583	take w in primary part from hp; saturation gives v in S
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:109	sLocalOrbitalPrincipalPart_mk_top	4585	unfold two defs, liftQL_mk; needs link to sLocalZLaurentCoeff
+1	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:346	sLocalOrbitalFourierJet_mk	4602	unfold; liftQL_mk
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:129	mem_sLocalOrbitalPrincipalValue_iff	4587	needs range characterization of principal-value operator
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a_Printed.lean:49	Printed.sLocalOrbitalPrincipalParts_eigendistributions_false	4615	explicit zeta germ and Gaussian leading coefficient computation
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a_Printed.lean:75	Printed.sLocalOrbitalPhase_sub_false	4616	local phase computation over Q(cbrt 2)
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:283	existsUnique_sLocalOrbitalPhase	4596	local character on uniformizer; unique t in [0,period)
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:322	sLocalOrbitalFourierJet_continuous_linear	4600	Schwartz continuity of zeta transform; iteratedDeriv linearity
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:333	sLocalOrbitalFourierJet_ker	4601	kernel of theta map vs vanishing of zeta jet
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:162	sLocalOrbitalPrincipalValue_biorthogonal	4590	GAP
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:316	sLocalOrbitalFourierZeta_analyticAt	4599	analytic continuation at pole cancellation
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:138	sLocalOrbitalPrincipalValue_isClosed	4588	closed range of PV operator on Frechet space
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:366	sLocalOrbitalFourierJet_range_le_ker	4604	Fourier jet kills PV image; analytic argument
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:358	sLocalOrbitalPrincipalPart_range_le_ker	4603	PV range kills selected coefficients; check no PicTrivial needed
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:374	sLocalOrbitalIndex_enumerable_or_empty	4605	countability of polar index set
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:458	sLocalOrbitalFourierJet_lattice_schwartz	4609	Schwartz estimate along lattice
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:412	sLocalFourierOrbital_bases	4607	GAP
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:438	sLocalFourierOrbital_biorthogonal_growth	4608	polynomial growth along pole lattice
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:299	sLocalOrbitalPhase_sub	4598	global-to-local character relation over places above p
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:289	existsUnique_sLocalOrbitalLatticeIndex	4597	chart injectivity along pole lattice
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:147	sLocalOrbitalPrincipalValue_annihilator	4589	Hahn-Banach / closed-span duality on Frechet space
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:568	sLocalOrbitalSystem_quotient_basis_properties	4614	GAP
+-	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:548	sLocalOrbitalSystem_strongDual_basis_properties	4612	GAP
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:390	sLocalPolarOrbital_bases_of_laurent_bounds	4606	Schauder basis theory with growth bounds
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:174	sLocalOrbitalPrincipalPart_hasSum_unique	4591	needs biorthogonal family (row 162 is a gap)
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:234	orbitalQuotient_lift_bases	4594	nuclear Frechet Schauder basis lifting
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec3a.lean:254	orbitalQuotient_lift_growth	4595	open mapping for Frechet quotient gives continuous inverse

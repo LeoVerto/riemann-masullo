@@ -1,4 +1,4 @@
-# sieve: standing background sweep of every sorry (replaces nothing; sweep.py and macros unchanged)
+# sieve: standing background tactic screen of every sorry
 - Start: cd S && setsid nohup ./sieve.sh >> sieve.log 2>&1 < /dev/null &   Stop: kill $(cat sieve/wrapper.pid) and the python child (pid in sieve/state.json).
 - sieve.py: worktree $R/.agent/wt/sieve (detached, follows base/COMMIT, build copied from base/build, Sweep*.lean installed only there, untracked).
 - Queue: files with `sorry` whose git blob differs from the last completed pass in sieve/swept.tsv; tier 0 = changed since last sweep or touched <12h, then backlog; newest commit first. Per file, passes in order: cheap (60 min), exact? (180 min), grind (120 min), unfold (180 min). Everything runs `lake lean <file> -- --json` (applies lakefile leanOptions; never `lake env lean`).

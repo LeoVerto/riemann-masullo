@@ -44,3 +44,5 @@ w3  2026-11-22T04:23Z  hunt/w3 started (sonnet medium) on 12 Haiku-triaged quick
 3484 opus SPLIT -> PR #4375 (agent stopped after hand-in; low-hanging mode)
 remap 2026-11-22T06:46Z Sonnet critical-queue refresh started (old QUEUE all closed upstream)
 crit  2026-11-22T06:51Z  queue remapped (Sonnet; 12 entries, cone 91, 21 eligible; mapper path edits unsaved, anchors.py treats Ch5.2-8 undigested); crit/1526 started (opus, quick wins exhausted per user rule)
+crit  2026-11-22T11:24Z  crit/1526 finished: PR #5045 PROVED
+crit  2026-11-22T11:24Z  crit/2526 started (opus)

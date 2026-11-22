@@ -1,14 +1,13 @@
 ---
 name: formathlib-convention
-description: Where helper lemmas go in riemann-masullo (same file / public in earliest file + import / ForMathlib only for Mathlib-worthy lemmas without paper objects)
+description: Where helper lemmas go in riemann-masullo - private, directly above use, in the issue's own file (CONTRIBUTING); ForMathlib only for Mathlib-worthy lemmas; no public helpers in other paper files
 metadata:
   type: project
 ---
 
-Settled 2026-11-22 from prompts/prover.md (lines ~40-44), prompts/merger.md ("read" verdict list) and scripts/proof_review.sh (imports of Mathlib.* and RiemannMasullo.* are "routine", not flagged). The user worried that cross-chapter reuse was blocked, and also did not want ForMathlib polluted.
-- Same file, directly above first use, private: the default.
-- ForMathlib at the Mathlib path: only lemmas that mention no RiemannMasullo definition and that Mathlib ought to have. The merger treats these as ordinary.
-- Cross-file reuse of paper-object helpers: make them public in the earliest file that defines the objects, then import it. The only limit is the import DAG (no cycles), not a rule. Don't copy helpers.
-- Earlier file held by an upstream sweep: copy privately and flag it for deduplication in the PR body.
-- Siblings with no import path: generalise into ForMathlib, or report it. A new shared paper file needs the integrator.
-Written into HUNTER.md and CRITICAL_PROVER.md. Related: [[critical-path-workstream]].
+First settled 2026-11-22 from prompts/prover.md, prompts/merger.md and scripts/proof_review.sh. The user worried that cross-chapter reuse was blocked, and also did not want ForMathlib polluted. Revised the same day (~16:00Z) after the user asked for a compliance check against CONTRIBUTING.md ("Build as little as possible", "Get merged without waiting").
+- Edit only the file your issues are in. Helpers are `private theorem`/`private lemma` directly above the declaration they serve, with all arguments written out and named after it. A public lemma, def, instance, attribute, or new variable/open/section/set_option line sends the PR to a human reader.
+- Reuse: importing a module to use an EXISTING public lemma is routine. Do not add public helpers to other (lower) paper files: that recompiles everything above them. Report the reuse opportunity in the PR body instead.
+- ForMathlib at the Mathlib path: only lemmas that mention no RiemannMasullo definition and that Mathlib ought to have.
+- Search main for an existing helper before writing one (duplicates fail on the name).
+Written into HUNTER.md "Where helper lemmas go". Related: [[critical-path-workstream]], [[read-docs-origin-main]].

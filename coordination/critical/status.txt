@@ -4,3 +4,5 @@
 1902 PROVED https://github.com/mccorvie/riemann-masullo/pull/3978 by gluing Z on Re>0 with rho*Z(f^,dual) on Re<1; rests on sorried #1885 analyticOn, #1901 FE, #1900 rho meromorphic; axioms incl. sorryAx via those
 1885 PROVED https://github.com/mccorvie/riemann-masullo/pull/3993 differentiation under the integral with log*r^x <= 4/σ(r^{σ/4}+r^{7σ/4}) majorant from sLocalIdelicZetaIntegral_integrable; axioms clean
 2663 PROVED https://github.com/mccorvie/riemann-masullo/pull/4021 id - ρ γ⁻¹ via translation action (cites sorried D.3.3.12); signature compare flags 2 hcover:sorry decls (line shift artifact, #2693); Sec5 now under sweep #3999
+3484 SPLIT https://github.com/mccorvie/riemann-masullo/pull/4375 equiv proved from new sorry schwartzBruhat_fourier_continuousLinear (transform is SB + continuous); stage-lemma reduction blocked by whnf timeouts
+1526 PROVED https://github.com/mccorvie/riemann-masullo/pull/5045 separable via metrizable nuclear SchwartzBruhat(G/k) + countable closed embedding; inline version hung, factored into hypothesis lemma

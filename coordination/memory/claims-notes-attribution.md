@@ -1,20 +1,22 @@
 ---
 name: claims-notes-attribution
-description: Agents read full issue threads before claiming, keep per-issue approach notes (failed approaches first) posted on release, and tag claims/PRs with model and effort
+description: Agents read full issue threads before claiming, claim everything we work on or queue, keep notes/<n>.md (failed approaches first) posted on release, and tag claims/PRs with model and effort
 metadata:
   type: feedback
 ---
 
-The user, 2026-11-22: read issue comments for earlier approaches when claiming; when the watchdog returns an issue, leave hints for the next solver ("Failed approaches are especially relevant for the watchdog hint"); mention model and effort in comments and PRs.
+The user, 2026-11-22:
+- Read issue comments for earlier approaches when claiming.
+- When the watchdog returns an issue, leave hints for the next solver ("Failed approaches are especially relevant for the watchdog hint").
+- Mention model and effort in comments and PRs.
+- ~08:45Z: "Why are we not claiming these if we're working on them?"
 
-**Why:** released issues get re-attempted from scratch otherwise, and the project wants to know which model produced what.
+**Why:** released issues otherwise get re-attempted from scratch, the project wants to know which model produced what, and unclaimed queued work invites collisions.
 
 **How to apply:**
-- Rules are in the last section of HUNTER.md and CRITICAL_PROVER.md. Launch prompts give the tag <M>, e.g. `Claude Sonnet 5.5, effort medium` or `Claude Opus 5.5, default effort`.
-- Claim with first line `Claiming (<M>)`. Upstream's claims.yml only parses the first word, so this is safe.
-- Notes live in .agent/sweeptools/notes/<n>.md and are the ONLY handoff file (STATE.md dropped 2026-11-22 as duplicate): Model, Status, Failed approaches (first), Blocked by, Useful, Next idea. Agents must update it after every build/failed approach, since the watchdog posts it on the issue and stale notes lose hours of work.
-- Release ONLY via .agent/sweeptools/release.sh <n> "<reason>": it posts `Releasing (<M>): reason` plus the notes, updates claims.txt and archives to notes/released/. watchdog.sh calls it, and so should the coordinator for stale or orphan claims.
-- PR bodies carry `Prover: <M>` above the 🤖 line.
-Related: [[low-hanging-sweep]], [[critical-path-workstream]].
-
-Update (user, 2026-11-22 ~08:45Z): "Why are we not claiming these if we're working on them?" — claim every issue we work on OR have queued for one of our agents. When a Sonnet releases an issue as stuck and it is escalated to Opus, re-claim it immediately ("Claiming (Claude Opus 5.5, default effort)", noting it is queued), add to claims.txt; never leave queued work released. Stale-claim releases must skip the ESCALATION QUEUE in leads.txt.
+- Tag <M> = `Claude Sonnet 5.5, effort medium` / `Claude Opus 5.5, default effort`. Claims start `Claiming (<M>)` (upstream parses only the first word). PR bodies carry `Prover: <M>` above the 🤖 line.
+- Claim every issue we work on OR have queued for one of our agents. An escalated issue is re-claimed for Opus at once ("queued for an Opus prover") and added to claims.txt. Stale-claim releases skip the ESCALATION QUEUE.
+- `.agent/sweeptools/notes/<n>.md` is the only handoff file: Model, Status, Failed approaches (first), Blocked by, Useful, Next idea. Update it after every build or failed approach.
+- Release ONLY via `release.sh <n> "<reason>"`: it posts the notes, updates claims.txt and archives to notes/released/. The watchdog uses it too.
+- The watchdog releases ALL claims when every session is idle, as at the usage halts (10:03Z and 12:03Z on 2026-11-22). After resuming, re-claim what the resumed agents and the escalation queue hold.
+Related: [[quick-wins-mode]], [[low-hanging-sweep]].
