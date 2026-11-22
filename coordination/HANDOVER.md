@@ -229,6 +229,12 @@ hand-ins happen at a normal pace once the issues exist.
   unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held); no remapping. The
   mapper-fix job is dropped.
 - Crons now: only the hourly check **9dc215ca** at :17.
+- Running at 07:35Z (user asleep): Sonnet hunters **w8** (Ch05 Sec4) and **w10** (Ch05 Sec5 rated-3,
+  then Ch06 Sec2 #4313/#4314); Opus **crit/1526**; long-running Haiku nagger; services warm/watchdog/
+  memguard/sieve. Open LeoVerto PRs awaiting Verdict/merge: #4377 #4434 #4439 #4440 #4466 #4472 (and
+  earlier ones in status.sh). Held for the user, not posted: #4255; Sec5 SUSPECT `*_range` pair.
+  On restart: CronList, recreate the hourly check from the section below, relaunch the nagger if
+  not running (`pgrep -f nag-wait.sh`), and continue; never resume long transcripts (notes/ instead).
 
 ## Workstreams
 
