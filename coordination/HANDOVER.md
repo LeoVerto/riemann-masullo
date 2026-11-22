@@ -45,15 +45,16 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
         our claim; an escalation prover (HUNTER.md "Escalators") takes the oldest file with QUEUED
         `opus` rows in `escalations.txt` that our Sonnet has left; one file per prover.
      b. **Prior work** ("If we have prior work on an issue, we should strive to build on top of
-        it"): `resumable.sh` lists open unclaimed issues we tried and released. The coordinator
-        re-claims a file's rows, adds them to `claims.txt` and queues them with `escalate.sh`
-        (which restores the archived notes), so they go to an escalator as in a.
+        it"; others' attempts count too): `resumable.sh` lists open unclaimed issues with earlier
+        attempts, ours first, then others' `Releasing` write-ups. The coordinator re-claims a
+        file's rows, adds them to `claims.txt` and queues them with `escalate.sh … --prior`
+        (restores our archived notes or seeds a stub), so they go to an escalator as in a.
      c. **Last resort, an Opus hunter** on a fresh open unclaimed proof issue (CRITICAL_PROVER.md;
         not `gap`/`refutation`/ERRATA/`TODO(paper-gap)`, not sweep-held), preferring triage rows
         rated 3–4 that no Sonnet holds. No cone remapping.
-  3. **Every agent starts from prior work** (HUNTER.md "Prior work first"): `prior.sh <n>` lists
-     our notes, released notes, reports, patches, commits and worktrees for the issue, and the
-     issue's `Releasing` comments hold upstream attempts.
+  3. **Every agent starts from prior work** (HUNTER.md "Prior work first"): `prior.sh <n>` shows
+     the current claim, every comment in full, the PRs referencing the issue, and our notes,
+     released notes, reports, patches, commits and worktrees for it.
   4. **1 Fable consultant at a time** (user, 2026-11-22 ~16:00Z, Fable allowance; outside the
      standing slots): issues an Opus agent tried and failed go `--to fable` with a stuck packet
      (HUNTER.md). The consultant (`FABLE.md`, model fable) reads only the packet, may probe a
@@ -179,9 +180,9 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
 | `status.sh` | RAM, disk, token, cache, PR verdicts, claims, orphan and stale claims, warm base, label census, `== sieve`. |
 | `cleanup.sh` | Removes worktrees whose PR merged. |
 | `tokencheck.sh` | Classic token with the right scopes? Step 0 of every brief. |
-| `escalate.sh <n> "<reason>"` | Hands a stuck issue to the next tier (`--to opus` default, `--to fable` with a stuck packet) without releasing it: no comment, stays in `claims.txt`, row in `escalations.txt`, note appended; restores archived notes for a re-claimed issue. |
-| `prior.sh <n>` | Our earlier work on an issue (notes, released notes, reports, patches, queue lines, commits, worktrees). |
-| `resumable.sh` | Open unclaimed issues we tried and released, with their last Status and any agents.txt holder: HOURLY.md step 8b. |
+| `escalate.sh <n> "<reason>"` | Hands a stuck issue to the next tier (`--to opus` default, `--to fable` with a stuck packet) without releasing it: no comment, stays in `claims.txt`, row in `escalations.txt`, note appended; `--prior` (coordinator) restores archived notes or seeds a stub for a re-claimed issue. |
+| `prior.sh <n> [--local]` | All earlier work on an issue: current claim, full comments, referencing PRs; our notes, released notes, reports, patches, queue lines, commits, worktrees. |
+| `resumable.sh [max]` | Open unclaimed issues with earlier attempts (ours first, then others'), by file, with any agents.txt holder: HOURLY.md step 8b. ~1.5 min. |
 | `release.sh <n> "<reason>"` | Posts `Releasing (<M>): reason` plus `notes/<n>.md`, updates `claims.txt`, archives to `notes/released/`. |
 | `watchdog.sh` | When every transcript has been idle for 20 min, releases all claims via `release.sh`; auto-resume after 2 h is disabled by `no-resume`. |
 | `memguard.sh` | Below 1000 MB available (`LOW`), kills the newest sieve Lean process, otherwise the newest Lean process. |

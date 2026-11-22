@@ -42,10 +42,11 @@ agents.
    a. Escalation: the oldest file with QUEUED `opus` rows in `S/escalations.txt` that our Sonnet
       has left and no escalator holds.
    b. Prior work (user: "If we have prior work on an issue, we should strive to build on top of
-      it"): `resumable.sh` lists open unclaimed issues we tried and released. Skip rows whose
-      agents.txt agent still runs. Take a file's rows together: post `Claiming (Claude Opus 5.5,
-      default effort): continuing an earlier attempt` on each, add them to `claims.txt`, and run
-      `escalate.sh <n> "continuing prior work: <status>"` (it restores the notes). They are now a.
+      it", including others' attempts): `resumable.sh` lists open unclaimed issues with earlier
+      attempts, ours first, then others' write-ups, by file. Skip rows whose agents.txt agent still
+      runs. Take a file's rows together: post `Claiming (Claude Opus 5.5, default effort):
+      continuing an earlier attempt` on each, add them to `claims.txt`, and run
+      `escalate.sh <n> "continuing prior work: <source> <summary>" --prior`. They are now a.
    c. Last resort: an Opus hunter on a fresh issue, only when a and b are empty.
    Both kinds run on model opus, tag "Claude Opus 5.5, default effort"; add each to `agents.txt`.
    - Escalator, one file each: "Read S/HUNTER.md and follow it exactly; you are an escalator (see

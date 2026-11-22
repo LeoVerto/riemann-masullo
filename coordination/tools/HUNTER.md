@@ -22,9 +22,9 @@ a little thought. Skip anything deep.
    `gh issue list --repo mccorvie/riemann-masullo --label proof --label <L> --state open --limit 400 --json number,title,labels,body --jq '.[] | select([.labels[].name] | (index("claimed") or index("blocked") or index("stuck")) | not) | "\(.number)\t\(.title)\t\(.body | capture("<!-- sorry: (?<f>[^ ]+) -->").f? // "-")"'`
    and prefer the newest (highest numbers): fresh sections carry the easy sanity lemmas.
 2. **Before claiming each issue**, check all of these:
-   - The full thread: `gh api repos/mccorvie/riemann-masullo/issues/<n>/comments --jq '.[] | "\(.user.login) \(.created_at[:16]): \(.body[:600])"'`.
+   - The full thread and all prior work: `$S/prior.sh <n>` (every comment in full, the PRs that
+     reference the issue, and our notes, patches, commits and worktrees for it).
      An unreleased `Claiming`/`Claimed` by anyone means hands off (the `claimed` label lags).
-     Earlier `Releasing` comments say what failed: start from there.
    - The issue is not in `$S/claims.txt` (our other agents).
    - Its file is not held by an open upstream sweep issue:
      `gh issue list -R mccorvie/riemann-masullo --label sweep --state open --json title --jq ".[].title"`.
@@ -62,10 +62,10 @@ a little thought. Skip anything deep.
   Next idea: <what you would try next>
   ```
   Failed approaches come first and matter most.
-- **Prior work first** (user, 2026-11-22): before working on an issue, run `$S/prior.sh <n>` and
-  read the issue's `Releasing` comments. Build on what they list (notes, released notes, saved
-  patches, worktrees, commits) instead of starting over: reuse the proof text, skip the failed
-  approaches. Name the earlier attempt in the PR body.
+- **Prior work first** (user, 2026-11-22): build on everything `$S/prior.sh <n>` lists, ours and
+  others' (notes, patches, worktrees, commits, `Releasing` write-ups, closed PRs), instead of
+  starting over: reuse the proof text, skip the failed approaches. Name the earlier attempt in the
+  PR body.
 - **Stuck** (you tried and failed, and nobody else holds the issue): do NOT release it. Update the
   notes, then run `$S/escalate.sh <n> "<one-line reason>"`. It keeps our upstream claim (posts
   nothing), keeps the issue in `claims.txt`, and queues it in `$S/escalations.txt` for an Opus
