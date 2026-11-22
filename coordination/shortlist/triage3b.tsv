@@ -1,0 +1,100 @@
+rating	file:line	decl	issue	note
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:600	sAdelePolarFree_eq_span_tmul	4242	sAdelePolarFree slice vs span; needs inductive tensor equiv
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:540	exists_finitePlaceSchwartz_zeroExtension_iff	4238	build Schwartz ext of locally constant compact-support tests
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:149	sLocalThetaIsotypeSum_complete	4297	locally convex direct sum completeness
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:160	globalThetaIsotypeSum_complete	4298	locally convex direct sum completeness
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:556	archimedeanSchwartz_coe_isLinear	4239	coe of Schwartz map linear; rfl-level
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:579	sAdeleFiniteZeroSchwartz_tmul_iff	4240	tensor iff via equiv and finite-coordinate vanishing
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:590	sAdeleFiniteZeroSchwartz_eq_span_tmul	4241	span description of finite zero Schwartz space
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:324	archimedeanFlatSchwartz_one_complex	4223	build equiv from jet conditions; Wirtinger identification
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:76	sLocalHomogeneousThetaToGlobal_equiv_of_unramified	4291	Theorem 6.2.1.1(2) topological iso; needs Picard triviality route
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:622	sAdelePolarFree_eq_of_models	4245	polar-free subspace independent of models
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:63	sLocalHomogeneousThetaTransition_equiv_of_unramified	4290	Theorem 6.2.1.1(1) transition iso
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:178	sLocalThetaIsotypeSum_inherited_properties	4299	SUSPECT: body is placeholder sumProperties(D), not Lean; check
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:188	globalThetaIsotypeSum_inherited_properties	4300	SUSPECT: body is placeholder sumProperties(D), not Lean; check
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:385	realArchimedeanMellin_eq_integral	4229	unfold realArchimedeanMellin; integral over positive half-plane
+4	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:296	finitePlaceUnitAverage_eq_zero_iff	4283	coinvariant kernel characterization of unit averages
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:408	complexArchimedeanMellin_eq_integral	4231	unfold complexArchimedeanMellin; integral identity
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:707	sLocalArchimedeanPoleMultiplicity_eq_sum	4255	unfold pole multiplicity; push_cast; sum of min
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:318	archimedeanFlatSchwartz_one_real	4222	build real flat equiv from jet conditions
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:262	sLocalStandardThetaTensor_toGlobal_openQuotient	4305	open quotient map; Theorem 6.2.2.1 descent
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:345	archimedeanFlatSchwartz_restrict_equiv	4226	weighted-space equiv; needs density/extension-by-zero
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:415	realArchimedeanMellin_eq_infiniteLocalIdelicZFunction	4232	existential Mellin identification via Euler parameters
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:427	complexArchimedeanMellin_eq_infiniteLocalIdelicZFunction	4233	existential Mellin identification via Euler parameters
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:639	sAdelePolarFree_quasiCharacter_mul	4247	construct continuous linear equiv by multiplication
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:699	sLocalArchimedeanPoleMultiplicity_pos_iff	4254	unfold pole multiplicity; order negative iff pole
+3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:333	finiteProductUnitAverage_zero	4285	unfold product average at zero; product of masses
+2	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:251	sLocalStandardThetaTensor_apply	4304	unfold tensor evaluation; rfl/simp
+4	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:310	finitePlaceUnitAverage_coinvariants_equiv	4284	build homeomorphism from coinvariant quotient
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:82	realCoordinate_mul_puncturedTest	4198	multiply by real coordinate, inverse on punctured tests
+3	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:365	finiteStandardThetaAverage_eq_character_mul_integral	4313	unfold finite Mellin average; integral identity
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:735	sAdeleFiniteZeroSchwartz_isClosed	4259	closedness from finite zero-coordinate conditions
+4	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:356	finiteProductUnitAverage_coinvariants_equiv	4288	build homeomorphism from product coinvariants
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:336	archimedeanFlatSchwartz_isClosed	4225	closedness of all-jets-zero subspace; estimates
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:128	sLocalThetaIsotypeSum_dense	4295	dense range and continuity of direct sum map
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:140	globalThetaIsotypeSum_dense	4296	dense range and continuity of direct sum map
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:285	archimedeanWeightedSchwartz_tensor	4220	completed tensor embedding; deep infrastructure
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:304	archimedeanSchwartzJet_isLinear	4221	iteratedFDeriv linearity lemmas
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:247	archimedeanWeightedSchwartz_frechet	4216	Frechet from weighted seminorms; estimates
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:88	complexCoordinate_mul_puncturedTest	4199	multiply by complex coordinate, inverse on punctured tests
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:105	realCoordinate_mul_allExponentialDecay	4202	multiply by real coordinate, decay estimates
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:252	archimedeanWeightedSchwartz_separable	4217	separability from weighted Schwartz structure
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:93	realCoordinate_mul_exponentialDecay	4200	multiply by real coordinate on half-line, decay estimates
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:422	sLocalStandardThetaTensor_quotient_equiv	4317	quotient identification via Mellin kernel; Theorem 6.2.2.1(1)
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:120	iteratedDeriv_puncturedTest_closedRange	4204	closed range of derivative operator; estimates
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:149	iteratedDeriv_allExponentialDecay	4209	derivative operator decay estimates
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:330	mem_archimedeanFlatSchwartz_of_tsupport	4224	tsupport away from walls implies flatness
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:132	iteratedDeriv_exponentialDecay	4206	derivative shifts decay interval; estimates
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:658	sLocalIdelicZFunction_entire_iff_eq_polarFree	4251	analytic iff polar-free agreement; deep
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:111	complexCoordinate_mul_allExponentialDecay	4203	multiply by complex coordinate, decay estimates
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:99	complexCoordinate_mul_exponentialDecay	4201	multiply by complex coordinate on half-line, decay estimates
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:676	sLocalIdelicZFunction_principalValue	4253	meromorphic identity via Euler factor division
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:611	sAdelePolarFree_isClosed	4243	closedness in S-adelic Schwartz topology
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:162	realExponentialDecay_contDiffOn	4211	smoothness on punctured line from weighted decay
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:84	globalHomogeneousThetaSpace_nuclearFrechet	4292	nuclear Frechet structure; deep
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:168	complexExponentialDecay_contDiffOn	4212	smoothness on punctured plane from weighted decay
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:211	globalThetaToHomogeneousProduct_not_isInducing	4302	nonisInducing needs explicit construction; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:460	realArchimedeanMellin_monomial_functionalEquation	4235	Fourier relation, meromorphic identity; deep
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:764	sLocalHomogeneousThetaPrincipalValue_isClosedEmbedding	4261	restrict closed embedding from Lemma 5.3.1.5
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:204	globalThetaToHomogeneousProduct_not_isClosed_range	4301	nonclosed range needs construction; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:771	sLocalPrincipalValue_homogeneousTheta_range	4262	range identification needs principal value analysis
+4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:378	finiteStandardThetaAverage_isClosed_ker	4315	kernel closed; continuity of average map
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:68	realSchwartz_restrict_positiveDecay	4196	continuous injective restriction with weights
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:75	complexSchwartz_restrict_positiveDecay	4197	continuous injective restriction with weights
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:126	wirtinger_puncturedTest_closedRange	4205	closed range of Wirtinger operators; estimates
+3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:349	finiteProductSchwartz_unitInvariants_isClosed	4287	invariants as intersection of closed kernels
+4	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:289	finitePlaceUnitAverage_continuous_schwartzBruhat	4282	continuity of unit average in Schwartz-Bruhat topology
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:742	sAdelePrincipalValue_preserves_homogeneousThetaKernel	4260	principal value commutes with theta kernel
+3	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:372	infiniteStandardThetaAverage_isClosed_ker	4314	closed kernel of continuous map into Hausdorff space
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:616	sAdelePolarFree_translate	4244	translation invariance of polar-free subspace
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:453	realArchimedeanMellin_monomial	4234	change of variables in Mellin integral
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:156	iteratedWirtinger_allExponentialDecay	4210	continuous operator via iterated Wirtinger; estimates
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:482	complexArchimedeanMellin_monomial_functionalEquation	4237	complex Fourier relation, meromorphic identity; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:718	sLocalIdelicZFunction_principalValue_pole_bound	4256	pole order bound via Euler factors; deep
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:143	iteratedWirtinger_exponentialDecay	4207	continuous operator with decay shift; estimates
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:470	complexArchimedeanMellin_monomial	4236	change of variables in Mellin integral
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:727	exists_sLocalIdelicZFunction_principalValue_attaining_poles	4257	existence of test with prescribed pole divisor; deep
+3	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:309	infiniteStandardThetaAverage_apply	4309	archimedean evaluation of integral average; unfold and integral lemmas
+2	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:357	finiteStandardThetaAverage_one	4312	unfold at 1; inv_one and simp
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:455	infiniteStandardThetaAverage_logBound	4319	log-bound near norm zero; deep
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:41	continuous_archimedeanUnitModulation	4194	continuity of norm power; fun_prop-level
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:668	sLocalIdelicZFunction_entire_iff_theta_exponentialDecay	4252	analytic iff theta decay; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:257	archimedeanWeightedSchwartz_nuclear	4218	nuclearity of weighted Schwartz space; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:778	sLocalPrincipalValue_homogeneousTheta_range_unramified	4263	range identity via unramified places; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:650	sLocalHomogeneousTheta_trivial_exists_polarFree	4249	lift log-Schwartz to polar-free test; deep
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:49	existsUnique_sLocalNormOneQuotientTransition	4289	unique continuous open quotient map; deep
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:353	archimedeanFlatSchwartz_quasiCharacter_mul	4227	unique linear homeomorphism from quasi-character
+4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:393	exists_infiniteStandardThetaMellinAverage	4316	continuous linear map from archimedean integral
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:443	infiniteStandardThetaAverage_forwardDecay	4318	semi-exponential decay with log derivatives; deep
+4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:290	exists_infiniteStandardThetaAverage	4308	continuous linear map from archimedean integrals
+4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:342	exists_finiteStandardThetaAverage	4311	continuous linear map from finite-place integral
+3	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:335	finiteStandardThetaAverage_integrable	4310	integrability from compact support and bounded character
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:631	sLocalIdelicZFunction_entire_of_polarFree	4246	analytic zeta transform of polar-free test; deep
+3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:340	finiteProductUnitAverage_integrable	4286	integrability on finite product; compact support
+4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:280	infiniteStandardThetaAverage_integrable	4306	absolute integrability of archimedean term
+4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:230	finiteStandardGaussian_zeta_of_ramified	4303	zeta integral identities for ramified characters
+5	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:467	ratTrivialHomogeneousTheta_quotient	4320	open quotient map over Q; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:373	realArchimedeanMellin_existsUnique	4228	meromorphic continuation uniqueness; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3b.lean:394	complexArchimedeanMellin_existsUnique	4230	meromorphic continuation uniqueness; deep
+4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:93	sLocalThetaAction_tendstoUniformly	4293	uniform convergence over compact quotient
+4	RiemannMasullo/Ch06_LocalGlobal/Sec2.lean:101	sLocalThetaAction_twist_tendstoUniformly	4294	uniform convergence over compact quotient, twisted

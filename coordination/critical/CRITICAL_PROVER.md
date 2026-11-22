@@ -111,3 +111,6 @@ Your model tag <M> is given in your launch prompt (default: hunters/fixers `Clau
 - Do not retry the identical command in a loop. Retry once if free RAM is high again (`free -m`), otherwise **change approach**: build a smaller module or only the file you edited (not the whole project), avoid `exact?`/`apply?`/`aesop` over big contexts, split a heavy proof into smaller lemmas, replace expensive `simp`/`fun_prop` calls with explicit terms.
 - Do not kill other agents' processes or touch memguard.sh.
 - Record it in `notes/<n>.md` under Failed approaches ("killed by memguard: <command/proof step>, memory-heavy because ...") so the next solver does not repeat it. If the same step is killed twice even in isolation, split it into smaller `sorry`s or release the issue with that reason.
+
+## Current project docs (added 2026-11-22)
+Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main (`git -C /mnt/faststorage/math/riemann-masullo show origin/main:<file>`), not from the possibly stale working tree. The section "Read the CURRENT project docs; false statements and gaps" at the end of HUNTER.md is binding for you too.

@@ -1,0 +1,43 @@
+rating	file:line	decl	issue	note
+5	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:110	sLocalThetaToGlobal_range_eq_invariants	4269	SUSPECT: hPic unused in statement; paper-gap TODO on Thm 6.1.2.1
+5	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:100	sLocalThetaTransition_range_eq_invariants	4268	SUSPECT: hPic unused; needs Pic argument, paper-gap TODO
+3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:60	mem_outsideIntegralIdeleUnits_iff	4264	unfold membership in intersection and ker; idele inverse coords
+3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:75	mem_relativeIntegralIdeleUnits_iff	4265	Subgroup.mem_map; construct preimage, then as above
+4	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:82	outsideIntegralIdeleUnits_isCompact	4266	compact restricted product of local units; needs compactness lemma
+4	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:87	relativeIntegralIdeleUnits_isCompact	4267	compact finite product of local units; image under continuous map
+3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:170	finitePlaceBallIndicator_at_power	4273	uniformizer valuation computation; split on n<=m
+4	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:180	finitePlaceSchwartz_invariants_laurent_free	4274	build linear equiv from Laurent basis; several invariant checks
+3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:191	finitePlaceSchwartz_invariants_isClosed	4275	intersection of kernels of continuous ρ(g)-1
+5	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:197	finitePlaceSchwartz_invariants_laurent_equiv	4276	finest locally convex topology; homeomorphism; LocallyConvex red flag
+1	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:130	schwartzBruhatUnitRepresentation_map_one	4270	ext f; simp unfolding translate
+2	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:135	schwartzBruhatUnitRepresentation_map_mul	4271	ext f; unfold translate; compose funLeft, mul_assoc
+1	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:148	schwartzBruhatUnitRepresentation_apply	4272	rfl after unfolding the representation
+2	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:267	finitePlaceUnitAverage_zero	4279	unfold; simp zero_mul; integral_const on restricted measure
+3	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:274	finitePlaceUnitAverage_integrable	4280	continuous integrand on compact U(w); finite measure
+4	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:281	finitePlaceUnitAverage_continuous_uniform	4281	build C_c map; uniform continuity estimate
+5	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:226	sLocalSchwartz_invariants_laurent_equiv	4277	unique tensor identification; inductive topology; LocallyConvex red flag
+4	RiemannMasullo/Ch06_LocalGlobal/Sec1.lean:255	finitePlaceSchwartz_unitRelations_closure_eq	4278	closure of relation span; needs topological argument
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:197	sLocalRhoPoleOrder_le_of_re_neg_odd	4055	paper-gap TODO on real sign factors; Finset card bound
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:207	sLocalRhoPoleOrder_exceptions_encard_le	4056	encard of exceptional poles; Euler factor analysis
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:179	sLocalRhoPoleOrder_le_card	4053	pole count bound from local factors, needs proof
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:88	reciprocalEulerProduct_over_split_prime	4046	product over primes above p, each factor identical
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:108	split_rationalPrimes_pos_dirichletDensity	4048	Chebotarev-type density of split primes
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:120	infinite_split_primes_reciprocalEulerProduct_normTwist	4049	infinitude of split primes with unramified character; deep
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:167	finiteHeckeEulerFactors_common_pole_subsingleton	4052	common poles of two Euler factors at distinct primes
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:236	sLocalHomogeneousAdelicTheta_log_bound	4058	log-growth estimate of homogeneous theta; deep
+2	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:286	entireContinuousMap_subalgebra_properties	4061	Differentiable.add/mul and const
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:316	regularizedCompletedHeckeL_differentiable	4063	removable singularities of meromorphic normal form; analysis
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:343	regularizedCompletedHeckeL_ne_zero_at_canceled_poles	4064	SUSPECT?: nonvanishing at canceled poles unverified; Meromorphic red flag
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:355	entireJet_properties	4065	continuity of iteratedDeriv in compact-open; Cauchy estimates
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:383	entireJetSpace_finrank	4067	linear independence of jets; Hermite interpolation
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:411	spectralAnnihilator_directSum	4069	direct sum of jet spaces; large argument
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:428	exists_schwartzBergman_entireInclusion	4070	continuous inclusion Schwartz-Bergman into compact-open entire; deep
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:449	schwartzBergmanDivisible_isClosed	4071	closedness of principal ideal preimage; needs continuity
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:456	exists_schwartzBergman_jetRestriction	4072	injective dense-range restriction; deep
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:496	schwartzBergman_normalizedJets	4074	equicontinuity and boundedness of normalized jets; deep
+3	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:511	orbitalHeckeGenerator_differentiable	4075	product of differentiable factors; needs reciprocal product differentiable
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:535	orbitalHeckeGenerator_order_at_canceled_pole	4077	SUSPECT?: paper-gap TODO on jet count at canceled poles; order computation
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:547	orbitalAnnihilator_directSum	4078	direct sum of jets for orbital ideal; large
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b.lean:567	orbitalSchwartzBergman_biorthogonal	4079	existence of biorthogonal Schwartz-Bergman family; deep
+5	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:39	exists_heights_reciprocalPartialHeckeEulerProduct_strip_boundedBelow	4034	SUSPECT?: heights lower bound; paper-gap TODO on reflections; deep
+4	RiemannMasullo/Ch07_SchauderBasesZeta/Sec1a.lean:122	sLocalRhoFactor_orderAt_pole	4038	order additivity over places; each local factor simple pole

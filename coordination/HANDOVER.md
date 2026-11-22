@@ -26,6 +26,13 @@ is recreated.
 
 ## Standing instructions from the user
 
+- **Read the current project docs from origin/main** (user, 2026-11-22): AGENTS.md, CONTRIBUTING.md
+  and ERRATA.md (`git show origin/main:<file>`). The main checkout's working tree lags behind
+  upstream. Their gap handling binds our agents: AGENTS "False statements and gaps", CONTRIBUTING
+  "When the paper is wrong", summarized at the end of HUNTER.md. Re-read them at each session
+  start and when upstream changes them (`git log origin/main -- AGENTS.md CONTRIBUTING.md
+  ERRATA.md`), and keep the briefs in line.
+
 - **Coordinator only:** no proofs, builds or long log reads in the main session. Delegate them and
   relay short reports.
 - **CPU time is cheap; tokens are the bottleneck.** Prefer automation, such as the sieve and
@@ -103,6 +110,13 @@ is recreated.
    - Hunters only on concrete leads.
 
 ## State at handoff
+
+**Update 05:30Z:** finished: w3 (PRs #4323 #4329 #4371 #4374, 8 issues), w4 (PR #4377, 6
+issues), the Opus #3484 prover (SPLIT, PR #4375; stopped after hand-in). Running: Sonnet hunters
+w5 (triage3b: Ch05 Sec3b, Ch06 Sec2), w6 (triage3a: Ch05 Sec2b/3a), w7 (rated-3 Ch06 Sec1 + #4075).
+Triage files: `shortlist/triage.tsv`, `triage2.tsv`, `triage3a.tsv`, `triage3b.tsv`; every row
+with an issue in the seven new files is triaged. One-shot cron e984e9ca (05:45Z) re-reads the docs,
+re-creates the hourly check and continues in low-hanging mode.
 
 **Running at 04:35Z:**
 - **Opus prover on #3484** (`schwartzBruhat_fourier_equiv`, AppD Sec1c, 11 dependents). It started
@@ -247,6 +261,8 @@ The **sieve** is our automated tactic screen. It is named so as not to be confus
 
 `Hourly riemann-masullo coordinator check (coordinator only; CPU cheap, tokens scarce).
 S=<repo>/.agent/sweeptools.`
+0. `git fetch origin`; if AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
+   last check, re-read the change and update the briefs (HUNTER.md end section).
 1. `status.sh` and `cleanup.sh`, under timeout, with the output tailed.
 2. Fix failing Verdicts or review comments with short Sonnet fixers; re-check the PR's state first.
 3. Release orphan or stale claims only via `release.sh`.

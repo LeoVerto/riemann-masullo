@@ -1,0 +1,12 @@
+# Live hunter subagents at the 2026-11-21 ~05:05Z token halt (resume them with SendMessage "continue"):
+ch02 (finished: #2415 #2424 merged, #2745 open)
+appD (finished: #2372 #2453 merged, #2750 open)
+ch03 #2 (finished: PR #2455; ch03 has no low-hanging issues left, do not relaunch)
+appA #2 (finished: #2462 merged, #2749 open)
+appC #3 (finished: #2460 merged, #2748 open; found #561 false)
+w4 (running 04:42Z: rated-3 leads #4050 #4051 #4185 #4189 #4214 #4215, then triage2.tsv Ch06 Sec1 rows 1–2)
+w3 (finished ~05:05Z: PRs #4323 #4329 #4371 #4374, 8 issues; released #4144; #4043 #4080 #4166 #4187 claimed by others)
+w5 (running ~05:20Z: triage3b leads Ch05 Sec3b #4239 #4221 #4194 +3s #4224 #4229 #4231 #4254 #4255; Ch06 Sec2 #4304 #4312 +3s #4309 #4310 #4313 #4314)
+w6 (running ~05:25Z: triage3a leads Ch05 Sec3a #4154 #4155 #4133 #4164 #4173 +3 #4142; Sec2b #4085 #4093 +3s #4083 #4087 #4121 #4122)
+w4 (finished ~05:35Z: PR #4377 closes #4050 #4051 #4214 #4270 #4272 #4279; released #4215; #4185 #4189 #4061 #4271 claimed by others)
+w7 (running ~05:37Z: rated-3 Ch06 Sec1 #4264 #4265 #4273 #4275 #4280 #4285 #4286 #4287; Ch07 Sec1b #4075)

@@ -1,0 +1,90 @@
+rating	file:line	decl	issue	note
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:92	normOneCharacterUnramifiedOutside_iff	4082	iff with existsUnique descent; needs integrality argument
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:399	globalThetaIsotypicAverage_equiv	4112	topological equivalence onto closed isotype; deep
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:213	sLocalHomogeneousThetaToGlobal_mk	4093	unfold def; mapQ_apply; rfl-style
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:625	globalThetaFourier_mem_isotype	4132	Fourier exchanges isotypes; needs Fourier involution facts
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:48	finitePlaceDifference_integerIndicator	4134	local indicator computation at uniformizer
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:619	sLocalThetaFourier_mem_isotype	4131	Fourier exchanges isotypes; local
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:408	sLocalThetaIsotypicAverage_equiv	4113	topological equivalence onto closed isotype; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:496	realSchwartzTaylor_equiv	4171	Taylor iso of flat quotient; analysis
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:295	globalThetaPrincipalValue_mk	4155	unfold; mapQ_apply; mk
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:289	sLocalThetaPrincipalValue_mk	4154	unfold; mapQ_apply; mk
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:779	complexSchwartzFlatQuotient_strongDual	4191	embedding and range of dual; analysis
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:47	meromorphicWithPoleBound_equiv_components	4081	product decomposition of meromorphic space
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:360	globalThetaPrincipalValue_equivariant	4161	commutation with idele translation
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:814	complexSchwartzTaylor_equiv	4193	two-variable Taylor iso; analysis
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:145	finitePlacePrincipalValue_isLinear	4142	IsLinearMap of pvBundle; linearity of formula
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:402	distributionOrderLE_eval	4164	unfold DistributionOrderLE; C=1 and sup bound at x
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:470	realSchwartzFlatAtOrigin_isClosed	4169	closedness via continuity of iterated derivatives at 0
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:773	complexSchwartzFlatAtOrigin_isClosed	4190	closedness via continuity of Wirtinger derivatives
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:187	finitePlacePrincipalValue_isClosedEmbedding	4146	Weil local principal value embedding with closed range
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:639	coordinateDerivative_testFunction_toSchwartz	4181	derivatives commute with toSchwartz; induction
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:351	sLocalThetaPrincipalValue_equivariant	4160	commutation with S-idele translation on classes
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:562	exists_schwartz_coordinatePlaneRestriction	4175	construct continuous restriction CLM on Schwartz
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:36	finitePlaceDifference_isLinear	4133	IsLinearMap.mk; translation is linear
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:421	temperedSupport_eq_bruhatSupport_preimage	4165	support transport; heavy distribution defs
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:555	exists_testFunction_coordinatePlaneRestriction	4174	construct continuous restriction CLM on test functions
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:518	exists_globalAlgebraicCoinvariants_to_theta	4122	liftQ through V ≤ kernel; surjective
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:729	schwartzWirtingerZBar_sub_z	4186	Wirtinger identity; fderiv computation
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:419	exists_globalThetaToHomogeneousProduct	4114	injectivity needs norm-one character uniqueness
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:375	globalThetaPrincipalValue_isotypicAverage	4163	commutation with isotypic average
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:510	exists_sLocalAlgebraicCoinvariants_to_theta	4121	liftQ through V ≤ kernel; surjective
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:331	globalThetaPrincipalValue_isClosedEmbedding	4157	file TODO(paper-gap): closed-range proof step fails at larger stages
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:55	finitePlaceDifference_isEmbedding	4135	local embedding for uniformizer
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:535	coordinateDerivative_single	4173	unfold coordinateDerivative; Finset.prod_pi_single
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:426	exists_sLocalThetaToHomogeneousProduct	4115	injectivity needs norm-one character uniqueness
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:261	adelePrincipalValue_isClosedEmbedding	4151	global principal value closed embedding
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:271	adelePrincipalValue_preserves_thetaKernel	4153	kernel preservation; needs commutation with averages
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:603	distribution_coordinatePlane_decomposition_apply_tmul	4178	tensor computation with derivatives and sign conventions
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:223	sLocalHomogeneousTheta_inductiveLimit	4094	locally convex final topology; deep
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:157	sLocalHomogeneousThetaTransition_spec	4087	descent via quotient plus uniqueness from surjectivity
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:139	sLocalHomogeneousThetaTransition_preserves_kernel	4086	kernel transport under test-function transition
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:199	sLocalHomogeneousThetaToGlobal_preserves_kernel	4092	kernel transport under insertion
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:460	sLocalThetaToHomogeneous_commutes	4118	depends on Pettis averages and product maps
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:193	finitePlacePrincipalValue_range	4147	range characterization; analytic
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:61	finitePlaceDifference_isClosed_range	4136	closed range on full test space
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:248	adelePrincipalValue_tmul	4149	tensor-level computation via stage equivalence
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:322	sLocalThetaPrincipalValue_isClosedEmbedding	4156	file TODO(paper-gap): closed-range argument flagged; hypothesis hn
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:368	sLocalThetaPrincipalValue_isotypicAverage	4162	commutation with isotypic average
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:256	sAdelePrincipalValue_isClosedEmbedding	4150	closed embedding; analytic
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:266	sAdelePrincipalValue_preserves_thetaKernel	4152	kernel preservation
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:336	sLocalThetaPrincipalValue_transition	4158	commutation with stage transition
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:238	sAdelePrincipalValue_tmul	4148	pure-tensor computation via equivalence
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:344	sLocalThetaPrincipalValue_toGlobal	4159	commutation with insertion
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:438	exists_globalHomogeneousThetaMellin	4116	Mellin injectivity; analytic
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:610	sLocalThetaFourier_toGlobal	4130	Fourier commutation with insertion; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:447	exists_sLocalHomogeneousThetaMellin	4117	Mellin injectivity; analytic
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:79	finitePlaceDifference_range_on_unitInvariants	4139	range on unit invariants; ERRATA R7 restriction
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:596	sLocalThetaFourier_transition	4129	Fourier commutation under stage enlargement
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:378	existsUnique_globalThetaIsotypicAverage	4110	existence and uniqueness of Pettis average
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:385	existsUnique_sLocalThetaIsotypicAverage	4111	existence and uniqueness of Pettis average
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:307	globalHomogeneousThetaSpace_strongDual_complete	4103	completeness of strong dual; analytic
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:150	finitePlacePrincipalValue_continuous	4143	continuity of orbit-integral formula
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:278	globalHomogeneousThetaSpace_complete	4097	completeness of quotient; analytic
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:312	sLocalHomogeneousThetaSpace_strongDual_complete	4104	completeness of strong dual; analytic
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:533	globalTheta_bornological	4124	bornological quotient; functional analysis
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:185	sLocalHomogeneousThetaTransition_equivariant	4091	equivariance of transition with descended actions
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:110	sLocalNormOneCharacter_apply	4083	unfold descent; uniqueness of character from hypothesis
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:283	sLocalHomogeneousThetaSpace_complete	4098	completeness of quotient; analytic
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:525	sLocalTheta_bornological	4123	bornological quotient; functional analysis
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:582	existsUnique_globalThetaFourier	4128	Fourier descent; existence and uniqueness
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:572	existsUnique_sLocalThetaFourier	4127	Fourier descent; existence and uniqueness
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:125	finitePlacePrincipalValue_integrable	4140	integrability of local orbit integral; Haar mass finite
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:297	globalHomogeneousThetaSpace_montel	4101	Montel property; analytic
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:338	sLocalHomogeneousTheta_projections	4109	continuous idempotents; uniform convergence
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:302	sLocalHomogeneousThetaSpace_montel	4102	Montel property; analytic
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:327	globalHomogeneousThetaSpace_strongDual_montel	4107	Montel dual; analytic
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:168	sLocalHomogeneousThetaTransition_isClosedEmbedding	4089	closed embedding of stage transition
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:129	NormOneCharacterUnramifiedOutside.mono	4085	monotone inclusion of unramified-outside subgroups
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:481	realDiracDerivatives_polynomialEquiv	4170	polynomial equivalence with dual; order bounds; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:332	sLocalHomogeneousThetaSpace_strongDual_montel	4108	Montel dual; analytic
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:794	complexDiracDerivatives_polynomialEquiv	4192	two-variable polynomial equivalence; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:587	distribution_coordinatePlane_decomposition	4177	structure theorem for distributions; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec3a.lean:651	distribution_coordinatePlane_decomposition_tempered	4182	tempered extension of decomposition; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:288	globalHomogeneousThetaSpace_nuclear	4099	nuclearity; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:317	globalHomogeneousThetaSpace_strongDual_nuclear	4105	nuclearity of dual; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:252	globalHomogeneousThetaSpace_nuclearFrechetPresentation	4095	nuclear Frechet presentation; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:292	sLocalHomogeneousThetaSpace_nuclear	4100	nuclearity; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:322	sLocalHomogeneousThetaSpace_strongDual_nuclear	4106	nuclearity of dual; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:258	sLocalHomogeneousThetaSpace_nuclearFrechetPresentation	4096	nuclear Frechet presentation; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec2b.lean:175	existsUnique_sLocalHomogeneousThetaAction	4090	joint continuity of idele action; analytic

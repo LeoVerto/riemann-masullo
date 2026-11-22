@@ -143,3 +143,25 @@ Your model tag <M> is given in your launch prompt (default: hunters/fixers `Clau
 - Do not retry the identical command in a loop. Retry once if free RAM is high again (`free -m`), otherwise **change approach**: build a smaller module or only the file you edited (not the whole project), avoid `exact?`/`apply?`/`aesop` over big contexts, split a heavy proof into smaller lemmas, replace expensive `simp`/`fun_prop` calls with explicit terms.
 - Do not kill other agents' processes or touch memguard.sh.
 - Record it in `notes/<n>.md` under Failed approaches ("killed by memguard: <command/proof step>, memory-heavy because ...") so the next solver does not repeat it. If the same step is killed twice even in isolation, split it into smaller `sorry`s or release the issue with that reason.
+
+## Read the CURRENT project docs; false statements and gaps (added 2026-11-22, binding)
+The main checkout's working tree can lag behind upstream. Read the docs from origin/main, not from
+the working tree: `git -C /mnt/faststorage/math/riemann-masullo fetch -q origin && git -C /mnt/faststorage/math/riemann-masullo show origin/main:AGENTS.md`
+(likewise `CONTRIBUTING.md` and `ERRATA.md`). AGENTS.md "False statements and gaps" and
+CONTRIBUTING.md "When the paper is wrong" are binding. In short:
+- Before working on a declaration, `grep` ERRATA.md (origin/main) for its name. If it is listed as
+  false, imprecise or a placeholder, skip it unless the entry says what to do.
+- Skip issues labelled `gap`: they have left the provers' queue. `refutation` issues (prove
+  `¬ Printed.<name>` in a `Sec<N>_Printed.lean` file) are fair game if short.
+- Never change a statement, and never prove something else in its place. If a statement looks
+  false or mis-transcribed, the finding is: the paper item and page, which of the three cases it
+  is (the Lean statement is false; the Lean does not say what the paper says; a step of the
+  printed proof fails), and evidence (an explicit counterexample, the exact failing step, or best
+  a Lean proof of the negation). Put the finding in your notes and your report; the coordinator
+  asks the user before anything new is posted upstream. "I could not prove it" is not a finding:
+  release with notes as usual.
+- Never leave a `sorry` in the middle of a larger proof. When you split, the missing piece is its
+  own named theorem (with its own docstring) and the rest is proved from it by name.
+- Only the integrator declares gaps or changes statements. If you see a `Gap:` line or a
+  `TODO(paper-gap)` comment near your declaration, read it before you start; it often explains
+  why the obvious route fails.

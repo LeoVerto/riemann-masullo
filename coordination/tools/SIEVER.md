@@ -79,3 +79,6 @@ Your model tag <M> is given in the launch prompt (default `Claude Sonnet 5.5, ef
 Stop after 4 PRs, about 3 h, or when the list is done. Report at most 12 lines: PRs (URL, issues
 closed), hints posted (comment URLs), hits dropped and why (stale, claimed, failed on new main), and
 anything wrong with the sieve output you noticed (false hits, timeouts, missing files).
+
+## Current project docs (added 2026-11-22)
+Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main (`git -C /mnt/faststorage/math/riemann-masullo show origin/main:<file>`), not from the possibly stale working tree. The section "Read the CURRENT project docs; false statements and gaps" at the end of HUNTER.md is binding for you too.
