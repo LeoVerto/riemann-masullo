@@ -257,10 +257,79 @@ def divisorialThetaStage (ω : PontryaginDual C₁) (T : Finset V) : Submodule �
   Submodule.span ℂ (Set.range fun f : P ↦ (Submodule.Quotient.mk
     ⟨adelePrincipalValue F T f.val, adelePrincipalValue_mem_polarSubspace T f⟩ : Θ(ω)))
 
+/-- Conjugating `map id Q` by an equivalence gives the identity when `Q` fixes every vector.
+Stated in the shape of `sAdelePrincipalValue`, so that it applies syntactically. -/
+private theorem divisorialThetaStage_empty_conj_left {E G N : Type*} [AddCommGroup E]
+    [Module ℂ E] [TopologicalSpace E] [AddCommGroup G] [Module ℂ G] [TopologicalSpace G]
+    [AddCommGroup N] [Module ℂ N] [TopologicalSpace N]
+    (e : InductiveTensor E G ≃L[ℂ] N) (Q : G →ₗ[ℂ] G) (hQ : ∀ x, Q x = x) :
+    e.toLinearMap.comp ((TensorProduct.map (LinearMap.id : E →ₗ[ℂ] E) Q).comp
+      e.symm.toLinearMap) = LinearMap.id := by
+  have hQ' : Q = LinearMap.id := LinearMap.ext hQ
+  subst hQ'
+  refine LinearMap.ext fun x ↦ ?_
+  have h := LinearMap.congr_fun (TensorProduct.map_id (R := ℂ) (M := E) (N := G)) (e.symm x)
+  exact (congrArg e h).trans (e.apply_symm_apply x)
+
+/-- Conjugating `map Q id` by an equivalence gives the identity when `Q` fixes every vector.
+Stated in the shape of `adelePrincipalValue`, so that it applies syntactically. -/
+private theorem divisorialThetaStage_empty_conj_right {E G N : Type*} [AddCommGroup E]
+    [Module ℂ E] [TopologicalSpace E] [AddCommGroup G] [Module ℂ G] [TopologicalSpace G]
+    [AddCommGroup N] [Module ℂ N] [TopologicalSpace N]
+    (e : InductiveTensor E G ≃L[ℂ] N) (Q : E →ₗ[ℂ] E) (hQ : ∀ x, Q x = x) :
+    e.toLinearMap.comp ((TensorProduct.map Q (LinearMap.id : G →ₗ[ℂ] G)).comp
+      e.symm.toLinearMap) = LinearMap.id := by
+  have hQ' : Q = LinearMap.id := LinearMap.ext hQ
+  subst hQ'
+  refine LinearMap.ext fun x ↦ ?_
+  have h := LinearMap.congr_fun (TensorProduct.map_id (R := ℂ) (M := E) (N := G)) (e.symm x)
+  exact (congrArg e h).trans (e.apply_symm_apply x)
+
+open scoped TensorProduct in
+/-- A tensor power of identity maps fixes every vector of the finest locally convex copy. -/
+private theorem divisorialThetaStage_empty_piMap {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M : ι → Type*} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)]
+    (f : ∀ i, M i →ₗ[ℂ] M i) (hf : ∀ i, f i = LinearMap.id)
+    (x : FinestLocallyConvex (⨂[ℂ] i, M i)) :
+    (PiTensorProduct.map f : FinestLocallyConvex (⨂[ℂ] i, M i) →ₗ[ℂ]
+      FinestLocallyConvex (⨂[ℂ] i, M i)) x = x := by
+  have : f = fun _ ↦ LinearMap.id := funext hf
+  subst this
+  rw [PiTensorProduct.map_id]
+  rfl
+
+/-- With no selected places the S-local principal value is the identity. -/
+private theorem divisorialThetaStage_empty_sPV (h : (∅ : Finset V) ⊆ ∅) :
+    sAdelePrincipalValue F h = LinearMap.id := by
+  unfold sAdelePrincipalValue
+  exact divisorialThetaStage_empty_conj_left _ _
+    (divisorialThetaStage_empty_piMap _ fun w ↦ absurd w.2 (Finset.notMem_empty _))
+
+/-- With no selected places the global principal value is the identity. -/
+private theorem divisorialThetaStage_empty_PV :
+    adelePrincipalValue F (∅ : Finset V) = LinearMap.id := by
+  unfold adelePrincipalValue
+  exact divisorialThetaStage_empty_conj_right _ _ fun x ↦
+    LinearMap.congr_fun (divisorialThetaStage_empty_sPV _) x
+
+private theorem divisorialThetaStage_empty_span {α M : Type*} [AddCommMonoid M] [Module ℂ M]
+    (f g : α → M) (hfg : f = g) (hg : Function.Surjective g) :
+    Submodule.span ℂ (Set.range f) = ⊤ := by
+  subst hfg
+  rw [hg.range_eq]
+  exact Submodule.span_univ
+
 /-- Paper: (11.3.1.3), p. 494. With no principal values the stage is the entire
 polar homogeneous theta space. -/
 theorem divisorialThetaStage_empty (ω : PontryaginDual C₁) :
-    divisorialThetaStage ω ∅ = ⊤ := by sorry
+    divisorialThetaStage ω ∅ = ⊤ := by
+  unfold divisorialThetaStage
+  refine divisorialThetaStage_empty_span _ (fun p : P ↦ (Submodule.Quotient.mk p : Θ(ω))) ?_
+    (Submodule.Quotient.mk_surjective _)
+  funext p
+  have e : (⟨adelePrincipalValue F ∅ p.val, adelePrincipalValue_mem_polarSubspace ∅ p⟩ : P) = p :=
+    Subtype.ext (LinearMap.ext_iff.mp divisorialThetaStage_empty_PV p.val)
+  exact congrArg (fun y : P ↦ (Submodule.Quotient.mk y : Θ(ω))) e
 
 /-- Paper: (11.3.1.3), p. 494. Adding places decreases the principal-value image
 of the polar theta space. -/
