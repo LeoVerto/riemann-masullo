@@ -12,39 +12,20 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 
 **Time zones:** the shell, `status.sh` and service logs use CET (UTC+1); the cron tool uses UTC.
 
-## Current state (2026-11-22 ~15:45Z)
+## Current state (2026-11-22 ~16:35Z, coordinator session 09ff2a64)
 
-- **Campaign halted since 11:32Z:** the account hit its monthly spend limit ("weekly limit resets
-  2026-11-23 13:00 UTC"). No agent has worked since. The old coordinator session (`00d88758`) and
-  its hourly cron are being stopped for a fresh coordinator; the services were stopped with it
-  (restart them, startup step 3).
-- **All claims released:** the watchdog released our 12 claims at 12:03Z; `claims.txt` is empty
-  and `agents.txt` has no live agents. Each released issue's notes are in
-  `S/notes/released/<n>-20261122T1303.md` (also posted on the issue). Re-read the thread before
-  re-claiming: others may have taken them since.
-
-  | Agent (model) | Issues | Where it stopped |
-  |---|---|---|
-  | crit2526 (Opus) | #2526 `infiniteEigendistribution_normalized`, Ch03 Sec4 | plan = SPLIT (assembly with sorried helpers); no code in `wt/crit-2526` beyond `.agent/` probes |
-  | esc-sec5 (Opus escalation) | Ch05 Sec5 #4408 #4420 #4423 #4429 #4431 (+ #4409 #4411) | cause found, see "Elaboration traps" in HUNTER.md (`with_reducible_and_instances exact …`); worktree clean |
-  | w12 (Sonnet) | Ch05 Sec4 #4344 #4352 #4356 | uncommitted 7-line edit in `wt/hunt-w12` (Sec4.lean); #4356: `Submodule.ext` alone builds in 63 s, the full attempt ran >1.5 h |
-  | (queued, never started) | #4338 Ch05 Sec4 (SchwartzBergman ext) | Opus escalation after w12 |
-
-- **New issues not yet shortlisted:** about 357 open proof issues were created after 10:00Z (up to
-  #5344); the shortlist covers issues up to #4616 (last triage files `triage6a.tsv` Ch07 Sec2,
-  `triage6b.tsv` Ch07 Sec3a). **First job of the new coordinator: shortlist and triage those.**
-- **Unused leads** (`state/leads.txt`): Ch07 Sec2 #4535 (the rest of triage6a is crowded by other
-  contributors); Ch05 Sec5 #4409 #4411 (rated 3, unattempted).
-- **Open LeoVerto PRs:** none. 76 merged in total. Critical-path results
-  are in `critical/status.txt`; the latest is #5045 (proves #1526).
-- **Findings queued for the Opus evaluator** (`state/findings.txt`, earlier held for the user):
-  #4255 (closed since), #4430/#4432 Ch05 Sec5 `*_range` SUSPECT, #4574/#4575 possible duplicate
-  refutations (closed since), #4603 missing hypotheses. Launch the evaluator once the slots are up.
-- **Not handed in:** #2517 proved on local branch `hunt/ch03n-1` (1f3ce84), but jcosmos0 claimed it
-  first (`state/pending_handins.txt`). Keep the branch in case they release it.
-- **Saved partial proofs:** `S/patches/` (w10 Sec5 transposes, w13).
-- `S/no-resume` exists, so the watchdog never auto-resumes a session.
-- Docs on origin/main: the last AGENTS.md change is 3de969e (named instances in `_Printed.lean`).
+- **Campaign resumed ~16:05Z.** Services (warm, watchdog, memguard, sieve) restarted; `no-resume`
+  kept. Hourly cron at minute 17 (job in this session). Nagger running.
+- **Running (agents.txt):** crit2526 (the one Opus hunter, #2526 SPLIT plan); esc-sec5 (Opus,
+  Ch05 Sec5 #4408 #4420 #4423 #4429 #4431 #4409 #4411); esc-sec4 (Opus, Ch05 Sec4 #4344 #4352 #4356
+  #4338); Sonnet w17 Ch11 Sec1b, w18 Ch10 Sec4a (not #5248: FleckiBunti), w19 Ch10 Sec3, w20 Ch10
+  Sec4b #5298 + Ch07 Sec5 #5131; Opus findings evaluator on #5108.
+- **Triage 7a–7d done** (top 240 of `shortlist/untriaged7.tsv`, issues >4616); 182 rows (untriaged7
+  rows 242+) still untriaged. Rated-3 rows outside the hunters' files are in `triage7*.tsv`.
+- **Findings:** #4255 #4574 #4575 DONE (closed/proved), #4430 #4432 #4603 REJECTED
+  (`notes/report-findings-1.md`); #5108 under evaluation.
+- #4535 released by w16 (rate 4–5). #2517 still on local branch `hunt/ch03n-1` (jcosmos0 holds it).
+- Saved partial proofs: `S/patches/`.
 
 ## Standing instructions from the user
 

@@ -34,6 +34,6 @@ Unassigned rated-3 leads: Ch06 Sec1 #4285 #4286 #4287 (triage3b); give to w4 or 
 07:18Z Ch06 Sec2 #4313 #4314 unassigned again (w10 didn't start) [assigned to w14]
 07:37Z ESCALATION QUEUE (user: stuck Sonnet proofs -> Opus; max 2 Opus at once): #4338 Ch05 Sec4 (SchwartzBergman ext from overlap; after w12 finishes Sec4), #4408 Ch05 Sec5 (choose_spec build blowup; after w13 finishes Sec5), plus anything w12/w13 release as stuck. #4304 now claimed by troyjlee. [#4338 #4408 CLAIMED for Opus at 07:38Z]
 08:10Z all triaged quick wins done/claimed; remaining: w12 (Sec4), w13 (Sec5), escalations #4338/#4408 when they finish
-08:45Z Ch07 Sec2 (triage6a): 1-2: #4543 #4545 #4530 #4532 #4542 #4541 #4556 | 3: #4540 #4535 #4555 #4568 #4536 | note: refutations #4574/#4575 may duplicate one printed claim (not posted) [next free Sonnet slot]
+08:45Z Ch07 Sec2 (triage6a): 1-2: #4543 #4545 #4530 #4532 #4542 #4541 #4556 | 3: #4540 #4535 #4555 #4568 #4536 | note: refutations #4574/#4575 may duplicate one printed claim (not posted) [next free Sonnet slot]  [w16: released, rate 4-5]
 10:50Z ESCALATION: Sec5 now free -> esc-sec5 Opus on #4408 #4420 #4423 #4429 #4431 (all claimed Opus). Sonnet leads: Sec5 #4409 #4411 (unattempted, released). Watchdog released ALL claims at 10:03 during the limit; re-claimed ours at 10:50Z.
-10:51Z Ch07 Sec2 leads DROPPED: crowded (emanuelelongoni, troyjlee, matchabowl hold 11/12); #4535 alone unclaimed
+10:51Z Ch07 Sec2 leads DROPPED: crowded (emanuelelongoni, troyjlee, matchabowl hold 11/12); #4535 alone unclaimed  [w16: released, rate 4-5]

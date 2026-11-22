@@ -34,3 +34,6 @@ w15 (finished 10:50Z: PR #5002 Ch07 Sec3a closes 11 (#4580-#4585 #4592 #4593 #46
 esc-sec5 (running 10:51Z: Opus escalation Ch05 Sec5 #4408 #4420 #4423 #4429 #4431 (+#4409 #4411))
 crit1526 (finished 11:24Z: PR #5045 PROVED #1526 AppD Sec3a; sorryAx inherited from schwartzBruhat_nuclear/_complete, modulatedExponentialDecayStage_frechet)
 15:46Z roster cleared: w12, esc-sec5, crit2526 stopped by the 11:32Z spend limit (claims released 12:03Z, notes in notes/released/)
+16:10Z new coordinator: crit2526 (Opus, #2526 SPLIT plan), esc-sec5 (Opus, Ch05 Sec5 #4408 #4420 #4423 #4429 #4431 #4409 #4411), esc-sec4 (Opus, Ch05 Sec4 #4344 #4352 #4356 #4338), w16 (Sonnet, #4535 Ch07 Sec2); Haiku triage 7a-7d on 240 new rows (issues >4616)
+w16 (finished 16:05Z: released #4535, core of Thm 7.2.1.1 + depends on sorried sLocalPrincipalPartCoeff_ne_zero_imp_pole; rate 4-5)
+16:07Z triage7a-d done (19 rows rated 1-2, SUSPECT #5108 queued to findings). Launched w17 Ch11 Sec1b, w18 Ch10 Sec4a (not #5248, FleckiBunti), w19 Ch10 Sec3, w20 Ch10 Sec4b #5298 + Ch07 Sec5 #5131
