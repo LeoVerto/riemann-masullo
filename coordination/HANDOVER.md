@@ -56,19 +56,21 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   always keep two Opus hunters running plus 4 Sonnets and two Opus escalators". Keep these slots
   filled at every check (quick-wins mode now runs alongside Opus, not before it):
   1. **4 Sonnet hunters** on quick wins: triage rows rated 1–2, then 3 (HUNTER.md).
-  2. **2 Opus escalators:** issues a Sonnet released as *stuck* (tried and failed, not merely
-     unattempted) go to an Opus escalation prover (HUNTER.md brief, Opus tag), one file per prover,
-     once our Sonnet has left that file. A slot with nothing to escalate stays empty.
+  2. **2 Opus escalators:** a Sonnet that is *stuck* (tried and failed) hands the issue over with
+     `escalate.sh`, keeping our claim; an Opus escalation prover (HUNTER.md "Escalators") takes the
+     queued rows of `escalations.txt`, one file per prover, once our Sonnet has left that file. A
+     slot with nothing to escalate stays empty.
   3. **2 Opus hunters** on **any** open unclaimed proof issue (CRITICAL_PROVER.md; not
      `gap`/`refutation`/ERRATA/`TODO(paper-gap)`, not sweep-held), preferring triage rows rated
      3–4 that no Sonnet holds. No cone remapping ("the cone doesn't matter at this point").
   No two agents share a file. Interpretation of "Opus hunters" (CRITICAL_PROVER.md brief) is the
   coordinator's; confirm with the user if in doubt.
-- **Claim what we work on or have queued.** Escalated issues are re-claimed at once as
-  `Claiming (Claude Opus 5.5, default effort)`, noting they are queued, and listed in the leads.txt
-  ESCALATION QUEUE. Stale-claim releases skip that queue. Upstream auto-releases a claim with no PR
-  after 8 h, so re-claim queued issues that wait longer. After a usage halt (when the watchdog
-  releases everything), re-claim what the resumed agents hold.
+- **Claim what we work on or have queued.** Escalation keeps the claim (user, 2026-11-22 ~17:00Z:
+  no release and re-claim when an issue moves from Sonnet to Opus): `escalate.sh` posts nothing,
+  leaves the issue in `claims.txt` and queues it in `escalations.txt`; `status.sh` shows it as
+  ESCALATED, not STALE. Upstream auto-releases a claim with no PR after 8 h, so a queued claim
+  older than 7 h gets one refresh comment (`REFRESH-CLAIM`). After a usage halt (when the
+  watchdog releases everything), re-claim what the resumed agents and the queue hold.
 - **Collaborative, not a race.** No pre-proving of sorries without an issue (the sieve may compute
   hits on CPU only). Do not race other contributors or the upstream sweepers. Help on held files
   with hints, not competing PRs. Step back when someone else claimed first.
@@ -177,6 +179,7 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
 | `status.sh` | RAM, disk, token, cache, PR verdicts, claims, orphan and stale claims, warm base, label census, `== sieve`. |
 | `cleanup.sh` | Removes worktrees whose PR merged. |
 | `tokencheck.sh` | Classic token with the right scopes? Step 0 of every brief. |
+| `escalate.sh <n> "<reason>"` | Hands a stuck issue to the Opus escalators without releasing it: no comment, stays in `claims.txt`, row in `escalations.txt`, note appended. |
 | `release.sh <n> "<reason>"` | Posts `Releasing (<M>): reason` plus `notes/<n>.md`, updates `claims.txt`, archives to `notes/released/`. |
 | `watchdog.sh` | When every transcript has been idle for 20 min, releases all claims via `release.sh`; auto-resume after 2 h is disabled by `no-resume`. |
 | `memguard.sh` | Below 1000 MB available (`LOW`), kills the newest sieve Lean process, otherwise the newest Lean process. |
@@ -188,7 +191,8 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
 | `FINDINGS.md`, `findings.txt` | Opus findings-evaluator brief and its queue. |
 
 State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims.txt`, `hunters.txt`
-(agent log), `hunted.txt` (launch log), `leads.txt` (leads and ESCALATION QUEUE), `dispatched.txt`
+(agent log), `hunted.txt` (launch log), `leads.txt` (leads), `escalations.txt` (escalation queue, claims kept), `findings.txt`
+(findings queue), `dispatched.txt`
 (sieve hits handed out), `pending_handins.txt`, `notes/` (per-issue notes, `report-*.md`,
 `released/`, `reports-done/`).
 

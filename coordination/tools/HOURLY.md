@@ -15,9 +15,9 @@ issue we work on or have queued for one of our agents.
    and update "last seen" here.
 1. Run `status.sh` and `cleanup.sh` under timeout, output tailed.
 2. Fix failing Verdicts or review comments with short Sonnet fixers; re-check the PR's state first.
-3. Release orphan or stale claims only via `release.sh`, never those in the leads.txt ESCALATION
-   QUEUE. Queued claims with no PR are auto-released upstream after 8 h: re-claim them if still
-   queued.
+3. Release orphan or STALE claims only via `release.sh`. `ESCALATED` lines are not stale: leave
+   them. For `ESCALATED … REFRESH-CLAIM` (claim older than 7 h; upstream auto-releases after 8 h),
+   post `Claiming (Claude Opus 5.5, default effort): queued for an Opus escalator` once.
 4. Finished agents: read new `S/notes/report-*.md` (agents woken by the nagger report to it), relay
    each in one line, move the file to `notes/reports-done/`. TaskStop them once no Lean process
    remains in their worktree; record in `hunters.txt`; remove their line from `agents.txt`. If
@@ -36,12 +36,12 @@ issue we work on or have queued for one of our agents.
    rated 1–2 (then 3) with unclaimed issues: one file per hunter, ONE PR PER TOUCHED FILE, each
    issue listed in its prompt, no overlap (`claims.txt`, `hunters.txt`), no file crowded by 2–3
    other claimants or open PRs. Add each new hunter to `agents.txt`.
-8. Escalation: issues a Sonnet released as STUCK (tried and failed, not merely unattempted or taken
-   by others) go to Opus. Re-claim each at once if still free (`Claiming (Claude Opus 5.5, default
-   effort)`, noting it is queued for an Opus prover), add it to `claims.txt` and the ESCALATION
-   QUEUE, and launch one Opus escalation prover per file once our Sonnet has left it (HUNTER.md
-   brief + the issue's notes and release comments; report `notes/report-esc-<file>.md`). Up to 2
-   escalators; a slot with nothing to escalate stays empty.
+8. Escalation: Sonnets hand stuck issues over with `escalate.sh`, which keeps our claim; QUEUED rows
+   are in `S/escalations.txt`. Launch one Opus escalation prover per file once our Sonnet has left
+   it (model opus): "Read S/HUNTER.md and follow it exactly; you are an escalator (see
+   'Escalators'). Your name is esc-<file>, branch prefix esc/<file>, model tag Claude Opus 5.5,
+   default effort. Your escalated issues: <rows>." Report `notes/report-esc-<file>.md`. Up to 2
+   escalators; a slot with nothing to escalate stays empty. Never re-claim an escalated issue.
 9. Keep 2 Opus hunters (`critical/CRITICAL_PROVER.md`, tag "Claude Opus 5.5, default effort") on
    any open unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held), preferring
    triage rows rated 3–4 that no Sonnet holds, never in a file another of our agents works in.

@@ -62,10 +62,18 @@ a little thought. Skip anything deep.
   Next idea: <what you would try next>
   ```
   Failed approaches come first and matter most.
-- **Release only** with `$S/release.sh <n> "<one-line reason>"`. It posts `Releasing (<M>): …`
-  with your notes, removes the claim from `claims.txt` and archives the notes. Update the notes
-  first. Say whether you were *stuck* (tried and failed: such issues go to an Opus escalation) or
-  only did not get to it.
+- **Stuck** (you tried and failed, and nobody else holds the issue): do NOT release it. Update the
+  notes, then run `$S/escalate.sh <n> "<one-line reason>"`. It keeps our upstream claim (posts
+  nothing), keeps the issue in `claims.txt`, and queues it in `$S/escalations.txt` for an Opus
+  escalator, who continues from your notes under the same claim.
+- **Otherwise release** with `$S/release.sh <n> "<one-line reason>"` (not attempted, out of time,
+  someone else holds it, or the finding route below). It posts `Releasing (<M>): …` with your
+  notes, removes the claim from `claims.txt` and archives the notes. Update the notes first.
+- **Escalators** (Opus agents given escalated issues): the claim is already ours, so post no
+  `Claiming`. Mark the row `TAKEN <your name> <UTC>` in `escalations.txt`, change the `Model:` line
+  of `notes/<n>.md` to your tag, and read the Sonnet's notes before anything else. In the PR body
+  write `Prover: <M> (continuing an attempt by <Sonnet tag>)`. When done, mark the row `DONE <PR url>`
+  or release with `release.sh` (which then posts your notes).
 - After the PR is open, remove its issues from `claims.txt` and delete their `notes/<n>.md`.
 
 ## Builds and processes
