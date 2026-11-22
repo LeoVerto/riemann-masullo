@@ -18,7 +18,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 - **Restarted after a sandbox reboot** (~18:05Z): services restarted (watchdog with all-projects
   `PROJ`, memguard, warm and sieve at nice 19); the token needed `sbx secret set` again after the
   reboot. Hourly cron at minute 17 (session-only). Nagger running.
-- **Budget 12 units (user, 20:20Z), all in use:** Opus escalators esc-ch11sec1b (Ch11 Sec1b #5175
+- **Budget 10 units (user, 23:10Z; was 12), 12 in use until two agents finish:** Opus escalators esc-ch11sec1b (Ch11 Sec1b #5175
   #5177 #5181 #5184), esc-ch07sec4 (#5078 #5079 #5108), esc-ch10sec3 (#5207 #5208 #5204),
   esc-ch07sec3a (#4603, ours, prior work), esc-ch05sec3a2 (Ch05 Sec3a #4135 #4136 #4140 #4141
   #4174 #4175 #4181 #4184: elmismisimoxhunca's attempts built but their auditor gave no verdict);
@@ -51,7 +51,7 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
 - **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning; keep
   wake-ups sparse. Agents and the nagger wait in the FOREGROUND, every call under 170 s (HUNTER.md
   "Builds and processes"); never `run_in_background`.
-- **Staffing and Opus work** (2026-11-22): 12-unit budget (user, 20:20Z), at least 2 Opus, at most 6 Sonnets;
+- **Staffing and Opus work** (2026-11-22): 10-unit budget (user, 23:10Z, CPU pegged; was 12 from 20:20Z), at least 2 Opus, at most 6 Sonnets;
   Opus goes to escalation, then prior work (ours and others'), a fresh issue last; Fable
   consultants cost 2 units each, at most 2 at once (user, ~23:00Z), and come right after the 2-Opus minimum, before any new work (user,
   2026-11-22 ~22:30Z); the findings evaluator stays outside the budget. HOURLY.md steps 7–9. No two agents
