@@ -69,3 +69,5 @@ esc-ch05sec3a 2026-11-22T19:53Z proved #4144 PR #5542
 esc-ch07sec2 2026-11-22T20:05Z proved #4535 PR #5547
 w28 2026-11-22T20:14Z PR #5551 (5 of 6 Ch11 Sec3), released #5514 (Haar-null singleton needs >100 lines)
 w27 2026-11-22T20:19Z PR #5553 (7 Ch11 Sec2b); follow-up #5478
+w27 2026-11-22T20:20Z released #5478 (needs PV/convolution commutation, sorried equivariance)
+esc-ch10sec3 2026-11-22T20:29Z proved #5204 #5207 #5208 PR #5579

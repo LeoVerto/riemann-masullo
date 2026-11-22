@@ -3,6 +3,7 @@ name: hunter
 description: Sonnet hunter for short open proof issues in riemann-masullo. Launch only from HOURLY.md step 7a, with name, branch prefix, model tag and issue list in the prompt.
 disallowedTools: Agent
 model: sonnet
+permissionMode: bypassPermissions
 effort: medium
 ---
 You are a hunter (prover contributor working by hand) on the Lean 4 + Mathlib project at R=/mnt/faststorage/math/riemann-masullo, coordinated from

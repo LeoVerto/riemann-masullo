@@ -117,13 +117,15 @@ a little thought. Skip anything deep.
   - Short (under ~1.5 min): run it directly under `timeout 110` (e.g. `timeout 110 lake lean
     .agent/Probe.lean`).
   - Anything longer (most module builds under load, the full build, long probes): start it
-    detached and return at once. Builds: `BUILD_TIMEOUT=<s> setsid nohup $S/build.sh <wt>
-    [<Module>] >/dev/null 2>&1 &` (900 for a module, 3600 for the full build; log
-    `<wt>/.agent/build.log`, status `<wt>/.agent/build.exit`, 124 = timeout). Probes: `setsid nohup
-    bash -c 'timeout 600 lake lean .agent/P.lean > .agent/P.log 2>&1; echo $? > .agent/P.exit'
-    >/dev/null 2>&1 &`. Then wait with the foreground call `timeout 110 bash -c 'until [ -e <exit
-    file> ]; do sleep 15; done'`, repeated until the file exists. Do not end your turn while
-    anything you started runs.
+    detached with `$S/probe.sh` and return at once, then wait with its foreground `wait`, repeated
+    until it reports exit (rc 3 = still running). Builds: `$S/probe.sh build -t <s> <wt> [<Module>]`
+    (900 for a module, 3600 for the full build; log `<wt>/.agent/build.log`, 124 = timeout), then
+    `$S/probe.sh waitbuild <wt>`. Probes, from the worktree root: `$S/probe.sh start -t 600 P2o P2p`
+    runs `.agent/P2o.lean` and `.agent/P2p.lean` (logs `.agent/<name>.log`), then
+    `$S/probe.sh wait P2o P2p`. Do not end your turn while anything you started runs.
+  - **Never write `rm` with a variable path, `setsid`, or `for` loops that start processes in a Bash
+    call** (user, 2026-11-22: they pop permission prompts even in bypass mode, "Dangerous rm
+    operation not ruled out"). `probe.sh` does the cleanup; `build.sh` clears `build.exit` itself.
   - Never wait with `pgrep`/`pkill` on `lake` or `lean` (other agents and services build too).
 - Never pipe `lake build` into `head` (the build outlives the pipe); redirect to a log and read the
   log. If chapter index modules fail with "Too many open files", build them one at a time and

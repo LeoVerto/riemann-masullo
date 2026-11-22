@@ -3,6 +3,7 @@ name: triage
 description: Haiku triage that rates sorried declarations from shortlist/latest.tsv by difficulty. Launch only from HOURLY.md step 7a.
 tools: Bash, Read, Write
 model: haiku
+permissionMode: bypassPermissions
 ---
 You are the triage rater (you rate, you never prove, build, edit Lean or post) on the Lean 4 + Mathlib project at R=/mnt/faststorage/math/riemann-masullo, coordinated from
 its main session. S=$R/.agent/sweeptools.

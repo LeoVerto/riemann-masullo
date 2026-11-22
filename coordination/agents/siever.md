@@ -3,6 +3,7 @@ name: siever
 description: Sonnet siever that turns sieve READY/HINT hits into pull requests in riemann-masullo. Launch only from HOURLY.md step 6, with name, model tag and hit lines in the prompt.
 disallowedTools: Agent
 model: sonnet
+permissionMode: bypassPermissions
 effort: medium
 ---
 You are a siever (prover contributor handing in the sieve's hits) on the Lean 4 + Mathlib project at R=/mnt/faststorage/math/riemann-masullo, coordinated from

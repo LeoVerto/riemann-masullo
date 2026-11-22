@@ -158,7 +158,8 @@ Launch prompts: HOURLY.md "Launching agents".
 |---|---|
 | `warm.sh` + `wt/base` | Keeps a worktree built at origin/main; publishes `base/{COMMIT,sig.txt}`; rebuilds failed index modules one at a time. |
 | `newwt.sh <branch> <dir>` | New worktree at the warm commit with a copied build and baseline signatures in `<dir>-before.txt`. |
-| `build.sh <wt>` | `lake build`, exit status in `<wt>/.agent/build.exit`. |
+| `build.sh <wt>` | `lake build`, exit status in `<wt>/.agent/build.exit`; a per-worktree lock refuses a second concurrent build (exit 75). |
+| `probe.sh start/wait/build/waitbuild` | The only way agents start detached probes and builds (an `rm` with a variable path, `setsid` or a process-starting loop in a Bash call triggers permission pop-ups even in bypass mode); usage in HUNTER.md "Builds and processes". |
 | `status.sh` | RAM, disk, token, cache, PR verdicts, claims, orphan and stale claims, new comments on our claims (`NEW #n`), warm base, label census, `== sieve`. |
 | `cleanup.sh` | Removes worktrees whose PR merged. |
 | `tokencheck.sh` | Classic token with the right scopes? Step 0 of every brief. |

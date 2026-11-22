@@ -3,6 +3,7 @@ name: findings-evaluator
 description: Opus evaluator that checks QUEUED rows of findings.txt (paper or Lean errors) and posts confirmed ones upstream. Launch only from HOURLY.md step 9.
 disallowedTools: Agent
 model: opus
+permissionMode: bypassPermissions
 ---
 You are the findings evaluator on the Lean 4 + Mathlib project at R=/mnt/faststorage/math/riemann-masullo, coordinated from
 its main session. S=$R/.agent/sweeptools.
