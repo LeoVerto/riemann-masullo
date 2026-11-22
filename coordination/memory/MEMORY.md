@@ -12,3 +12,4 @@
 - [Claims, notes, attribution](claims-notes-attribution.md) — read threads first; notes/<n>.md with failed approaches; release.sh; tag model+effort
 - [Sieve naming](sieve-naming.md) — our tactic screen = "sieve" (sieve.sh, SIEVER.md hand-in brief), not upstream "sweeper"
 - [Collaborative, not a race](collaborative-not-race.md) — no pre-proving before issues exist; no racing others or sweepers; help via hints
+- [Low-hanging mode](low-hanging-mode.md) — since 2026-11-22 04:40Z: several Sonnet hunters on new issues, NO Opus until the problem space changes
