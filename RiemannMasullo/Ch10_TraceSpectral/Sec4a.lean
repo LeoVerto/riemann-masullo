@@ -76,6 +76,27 @@ def spectralProjection : W₀ →L[ℂ] W₀ :=
 local notation "Pgeom" => geometricProjection (F := F) a hα hs
 local notation "Pspec" => spectralProjection (F := F) a hα hs
 
+/-- Helper for `geometricTruncation_apply_of_mem` and `spectralTruncation_apply_of_mem`. -/
+private theorem w18_comp_apply_of_fix {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (T P : E →L[ℂ] E) (u : E) (h : P u = u) : (T.comp P) u = T u := by
+  simp [h]
+
+/-- Helper for the truncated convolutions. -/
+private theorem w18_comp_comp_apply_of_fix {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (T P A : E →L[ℂ] E) (u : E) (h : P (A u) = A u) : ((T.comp P).comp A) u = T (A u) := by
+  simp [h]
+
+/-- Helper for the restrictions. -/
+private theorem w18_comp_comp_apply_of_fix' {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (T P A : E →L[ℂ] E) (u : E) (h : P u = u) : (T.comp (A.comp P)) u = T (A u) := by
+  simp [h]
+
+/-- Helper for `geometricTruncation_add_spectralTruncation`. -/
+private theorem w18_comp_add_comp {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (T P Q : E →L[ℂ] E) (h : ∀ u, P u + Q u = u) : T.comp P + T.comp Q = T := by
+  ext u
+  simp [← map_add, h]
+
 /-- Paper: Definition 10.4.1.1(1), p. 456. The geometric projector fixes each
 vector in the theta subspace. -/
 theorem geometricProjection_apply_of_mem {u : W₀} (_hu : u ∈ Θ₀) :
@@ -84,7 +105,8 @@ theorem geometricProjection_apply_of_mem {u : W₀} (_hu : u ∈ Θ₀) :
 /-- Paper: Definition 10.4.1.1(2), p. 456. The spectral projector fixes each
 vector orthogonal to the theta subspace. -/
 theorem spectralProjection_apply_of_mem {u : W₀} (_hu : u ∈ (Θ₀).orthogonal) :
-    Pspec u = u := by sorry
+    Pspec u = u := by
+  exact Submodule.starProjection_eq_self_iff.mpr _hu
 
 /-- Paper: Lemma 10.4.1.2, p. 456. The spectral projection preserves the
 quotient class of every vector. -/
@@ -135,29 +157,34 @@ def spectralTruncatedConvolution (hρ : IsModulatedCutoff m𝔽 Λ ε ρ) (φ : 
 /-- Paper: Definition 10.4.1.3(1), p. 457. On the theta subspace, geometric
 truncation acts by multiplication by the cutoff. -/
 theorem geometricTruncation_apply_of_mem (hρ : IsModulatedCutoff m𝔽 Λ ε ρ) {u : W₀} (_hu : u ∈ Θ₀) :
-    geometricTruncation a hα hs hρ u = M(hρ) u := by sorry
+    geometricTruncation a hα hs hρ u = M(hρ) u :=
+  w18_comp_apply_of_fix _ _ _ (Submodule.starProjection_eq_self_iff.mpr _hu)
 
 /-- Paper: Definition 10.4.1.3(2), p. 457. On the orthogonal complement of
 theta, spectral truncation acts by multiplication by the cutoff. -/
 theorem spectralTruncation_apply_of_mem (hρ : IsModulatedCutoff m𝔽 Λ ε ρ) {u : W₀} (_hu : u ∈ (Θ₀).orthogonal) :
-    spectralTruncation a hα hs hρ u = M(hρ) u := by sorry
+    spectralTruncation a hα hs hρ u = M(hρ) u :=
+  w18_comp_apply_of_fix _ _ _ (Submodule.starProjection_eq_self_iff.mpr _hu)
 
 /-- Paper: Definition 10.4.1.3(1), p. 457. If an input's convolution belongs
 to theta, its geometric truncated convolution is just cutoff multiplication of the result. -/
 theorem geometricTruncatedConvolution_apply_of_mem (hρ : IsModulatedCutoff m𝔽 Λ ε ρ) (φ : BruhatCompactSupport C𝔽)
     {u : W₀} (_hu : A(φ) u ∈ Θ₀) :
-    geometricTruncatedConvolution a hα hs hρ φ u = M(hρ) (A(φ) u) := by sorry
+    geometricTruncatedConvolution a hα hs hρ φ u = M(hρ) (A(φ) u) :=
+  w18_comp_comp_apply_of_fix _ _ _ _ (Submodule.starProjection_eq_self_iff.mpr _hu)
 
 /-- Paper: Definition 10.4.1.3(2), p. 457. If an input's convolution is
 orthogonal to theta, its spectral truncated convolution is cutoff multiplication of the result. -/
 theorem spectralTruncatedConvolution_apply_of_mem (hρ : IsModulatedCutoff m𝔽 Λ ε ρ) (φ : BruhatCompactSupport C𝔽)
     {u : W₀} (_hu : A(φ) u ∈ (Θ₀).orthogonal) :
-    spectralTruncatedConvolution a hα hs hρ φ u = M(hρ) (A(φ) u) := by sorry
+    spectralTruncatedConvolution a hα hs hρ φ u = M(hρ) (A(φ) u) :=
+  w18_comp_comp_apply_of_fix _ _ _ _ (Submodule.starProjection_eq_self_iff.mpr _hu)
 
 /-- Paper: Remark 10.4.1.4, p. 457. The two truncation operators add up to
 multiplication by the common cutoff. -/
 theorem geometricTruncation_add_spectralTruncation (hρ : IsModulatedCutoff m𝔽 Λ ε ρ) :
-    geometricTruncation a hα hs hρ + spectralTruncation a hα hs hρ = M(hρ) := by sorry
+    geometricTruncation a hα hs hρ + spectralTruncation a hα hs hρ = M(hρ) :=
+  w18_comp_add_comp _ _ _ fun u ↦ Submodule.starProjection_add_starProjection_orthogonal u
 
 /-- Paper: Remark 10.4.1.4, p. 457. For the singleton base and positive even
 degree the translation operators are unbounded in operator norm along powers
@@ -204,13 +231,15 @@ def spectralRestriction (hρ : IsModulatedCutoff m𝔽 Λ ε ρ) (φ : BruhatCom
 restriction is convolution followed by cutoff multiplication. -/
 theorem geometricRestriction_apply_of_mem (hρ : IsModulatedCutoff m𝔽 Λ ε ρ) (φ : BruhatCompactSupport C𝔽)
     {u : W₀} (_hu : u ∈ Θ₀) :
-    geometricRestriction a hα hs hρ φ u = M(hρ) (A(φ) u) := by sorry
+    geometricRestriction a hα hs hρ φ u = M(hρ) (A(φ) u) :=
+  w18_comp_comp_apply_of_fix' _ _ _ _ (Submodule.starProjection_eq_self_iff.mpr _hu)
 
 /-- Paper: Definition 10.4.1.5(2), p. 458. On a spectral vector, the spectral
 restriction is convolution followed by cutoff multiplication. -/
 theorem spectralRestriction_apply_of_mem (hρ : IsModulatedCutoff m𝔽 Λ ε ρ) (φ : BruhatCompactSupport C𝔽)
     {u : W₀} (_hu : u ∈ (Θ₀).orthogonal) :
-    spectralRestriction a hα hs hρ φ u = M(hρ) (A(φ) u) := by sorry
+    spectralRestriction a hα hs hρ φ u = M(hρ) (A(φ) u) :=
+  w18_comp_comp_apply_of_fix' _ _ _ _ (Submodule.starProjection_eq_self_iff.mpr _hu)
 
 /-- Paper: (10.4.2.1), p. 458. Cutoff convolution is the sum of its geometric
 and spectral truncations.
