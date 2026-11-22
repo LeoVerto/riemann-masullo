@@ -37,11 +37,9 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   contributors); Ch05 Sec5 #4409 #4411 (rated 3, unattempted).
 - **Open LeoVerto PRs:** none. 76 merged in total. Critical-path results
   are in `critical/status.txt`; the latest is #5045 (proves #1526).
-- **Held for the user, not posted upstream:** #4255 `sLocalArchimedeanPoleMultiplicity_eq_sum`
-  possibly unprovable (needs simple poles; `S/notes/4255.md`); Ch05 Sec5
-  `globalThetaTranspose_range` / `globalHomogeneousThetaTranspose_range` SUSPECT (`Set.range` vs
-  closure of span); refutations #4574/#4575 may duplicate one printed claim; #4603 (Ch07 Sec3a)
-  released by w15 as needing hypotheses the statement lacks.
+- **Findings queued for the Opus evaluator** (`state/findings.txt`, earlier held for the user):
+  #4255 (closed since), #4430/#4432 Ch05 Sec5 `*_range` SUSPECT, #4574/#4575 possible duplicate
+  refutations (closed since), #4603 missing hypotheses. Launch the evaluator once the slots are up.
 - **Not handed in:** #2517 proved on local branch `hunt/ch03n-1` (1f3ce84), but jcosmos0 claimed it
   first (`state/pending_handins.txt`). Keep the branch in case they release it.
 - **Saved partial proofs:** `S/patches/` (w10 Sec5 transposes, w13).
@@ -84,14 +82,16 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 - **Token:** only for `mccorvie/riemann-masullo` (`origin`) and `LeoVerto/riemann-masullo`
   (`fork`). It must be a CLASSIC token (repo, workflow, read:org); check with `tokencheck.sh`.
 - **Upstream posting:** ask the user before posting anything new. Standing exceptions: normal
-  Claiming/Releasing; sieve hints on open `sweep` issues; extensions of #1288, #561 and #3230.
+  Claiming/Releasing; sieve hints on open `sweep` issues; extensions of #1288, #561 and #3230;
+  **paper findings that an Opus evaluator has confirmed** (user, 2026-11-22 ~16:45Z: "Paper
+  findings should be evaluated by Opus and then raised"; `FINDINGS.md`, queue `findings.txt`).
   **Never raise BLOCKERS §0** (Main.lean integration is wave 4+, by the project's choice).
 - **Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main** (`git show origin/main:<file>`)
   at each session start and when they change; keep the briefs compliant. Checked 2026-11-22 ~16:00Z:
   HUNTER.md follows AGENTS (Lean rules, false statements and gaps), CONTRIBUTING "Working
   efficiently" (private helpers in the issue's file only, no `maxHeartbeats`, no routine rebase,
-  keep the file fast) and ERRATA (`TODO(paper-gap)` marks). One deliberate difference: findings
-  about the paper are held for the user instead of posted on the issue (user's posting rule).
+  keep the file fast) and ERRATA (`TODO(paper-gap)` marks). Paper findings are reported on the
+  issue as CONTRIBUTING asks, after an Opus evaluator has checked them.
 - **State lives in `.agent/`**, never only under `/home/agent`.
 - **Notes nagger out of session:** one long-running Haiku loop (`NAGGER.md`), never cron ticks in
   the coordinator session. The coordinator only keeps `agents.txt` in sync and relaunches it.
@@ -143,7 +143,7 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
   1. `shortlist.py <files>` scores every sorry without Lean (statement size, name patterns,
      docstring hints, red flags, the paper's proof length) into `shortlist/latest.tsv`.
   2. Haiku triage: `Read S/TRIAGE.md and follow it. N = 60.` (model haiku) rates rows 1–5, or `-`
-     for ERRATA/gap items, and flags SUSPECT statements.
+     for ERRATA/gap items, and flags SUSPECT statements (leads for the findings evaluator).
   3. Sonnet hunters on exactly the rows rated 1–2, then 3. Prefer files low in the import order and
      nearly finished (CONTRIBUTING).
   Rated-3 rows in Ch05 Sec4/Sec5 hit slow-compile traps (w10, w12, w13) and ended in escalations.
@@ -160,6 +160,10 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
   `sieve/hits.tsv`. `status.sh` classifies hits READY / HINT / CLAIMED / WAIT / DONE. A siever
   (`Read S/SIEVER.md and follow it. Your model tag <M> is …; your hits: <lines>`) hands in READY
   hits and posts HINT hits on the sweep issue. Its yield so far is low (e.g. #4035).
+- **Findings evaluator:** agents report paper findings on a `Finding:` line; SUSPECT triage rows
+  are leads. Both go to `S/findings.txt`, and one Opus evaluator at a time (`Read S/FINDINGS.md
+  and follow it. Your findings: <rows>.`, on top of the 8 standing slots) re-checks each against
+  the page image and the Lean, then posts confirmed ones on the issue (HOURLY.md step 10).
 - **Nagger:** see `NAGGER.md`; stop it with `touch S/nagger.stop`.
 - `scripts/agent.sh` does not work here: it assumes the integrator's layout and pushes to `origin`.
 
@@ -181,6 +185,7 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
 | `nag-wait.sh`, `notes-stale.sh`, `NAGGER.md` | Notes nagger. |
 | `HUNTER.md`, `SIEVER.md`, `critical/CRITICAL_PROVER.md` | Agent briefs; HUNTER.md holds the rules shared by all three. |
 | `HOURLY.md` | The hourly check's instructions, read by the cron on every tick. |
+| `FINDINGS.md`, `findings.txt` | Opus findings-evaluator brief and its queue. |
 
 State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims.txt`, `hunters.txt`
 (agent log), `hunted.txt` (launch log), `leads.txt` (leads and ESCALATION QUEUE), `dispatched.txt`

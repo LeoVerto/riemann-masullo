@@ -172,8 +172,10 @@ declarations do not collide with the sweeper's).
 - If a statement looks false or mistranscribed, the finding is: paper item and page, which case it
   is (the Lean statement is false; the Lean does not say what the paper says; a printed proof step
   fails), and evidence (a counterexample, the failing step, or best a Lean proof of the negation).
-  Put it in your notes and report, and release the issue. Do not post it: the coordinator asks the
-  user first. "I could not prove it" is not a finding.
+  Put it in your notes and in your report on a line starting `Finding:`, and release the issue.
+  Do not post it yourself: the coordinator queues it in `$S/findings.txt`, and an Opus evaluator
+  (`$S/FINDINGS.md`) checks it against the page image and posts it on the issue if it holds.
+  "I could not prove it" is not a finding.
 
 ## Checks and pull request
 - **Checks before each PR:** full `lake build`, `scripts/lint.sh`, and

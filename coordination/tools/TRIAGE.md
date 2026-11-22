@@ -32,7 +32,8 @@ Once, before the first row: `git -C $R show origin/main:ERRATA.md > /tmp/errata-
    - **5:** deep (analysis, convergence, existence of non-trivial objects) or unclear.
 
    Also flag `SUSPECT` when the statement looks false, vacuous or mistranscribed. Say why in a few
-   words. SUSPECT is only a note for the coordinator; nothing is posted upstream.
+   words. SUSPECT is a lead, not a finding: the coordinator queues it for the Opus evaluator, who checks it
+   before anything is posted.
 
 ## Output
 Write the triage file named in your prompt (default `S/shortlist/triage.tsv`) with the columns rating, file:line, decl, issue, and a note of at

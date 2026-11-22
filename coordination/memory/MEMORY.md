@@ -16,3 +16,4 @@
 - [Read docs from origin/main](read-docs-origin-main.md) — AGENTS/CONTRIBUTING/ERRATA via git show origin/main; gap handling binds hunters
 - [One PR per file](one-pr-per-file.md) — hunter/siever PRs each cover exactly one Lean file (user, 2026-11-22)
 - [Nagger out of session](nagger-out-of-session.md) — notes nagger = one long-running Haiku loop (NAGGER.md), never cron ticks in this session
+- [Paper findings via Opus](paper-findings-opus.md) — findings go to findings.txt; an Opus evaluator (FINDINGS.md) checks them and posts confirmed ones on the issue

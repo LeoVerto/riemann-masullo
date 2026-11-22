@@ -46,4 +46,8 @@ issue we work on or have queued for one of our agents.
    any open unclaimed proof issue (not gap/refutation/ERRATA/paper-gap, not sweep-held), preferring
    triage rows rated 3–4 that no Sonnet holds, never in a file another of our agents works in.
    Record in `hunted.txt`, add to `agents.txt`.
-10. Report in one or two lines.
+10. Findings: add every `Finding:` line from new reports and every SUSPECT triage row to
+    `S/findings.txt` as QUEUED. If QUEUED rows exist and no evaluator runs, launch ONE Opus
+    evaluator (model opus, no effort override): "Read S/FINDINGS.md and follow it. Your findings:
+    <rows>." It runs on top of the 8 standing slots and posts confirmed findings itself.
+11. Report in one or two lines.

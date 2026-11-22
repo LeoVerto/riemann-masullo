@@ -1,0 +1,7 @@
+# Findings queue for the Opus evaluator (FINDINGS.md). One row per finding:
+# <issue> <decl> | <case 1/2/3 or ?> | <source agent, notes path> | <claim in a few words> | <status: QUEUED / CONFIRMED <url> / REJECTED <why> / UNCLEAR <what> / DROPPED <why>>
+4255 sLocalArchimedeanPoleMultiplicity_eq_sum | 1? | Sonnet hunter (not attempted), notes/4255.md | possibly unprovable: needs simple poles | QUEUED (issue closed since; check whether still relevant)
+4430 globalHomogeneousThetaTranspose_range | 2? | Haiku triage SUSPECT, Ch05 Sec5 | Set.range vs closure of span; local analogue has closure on both sides | QUEUED
+4432 globalThetaTranspose_range | 2? | Haiku triage SUSPECT, Ch05 Sec5 | as #4430 | QUEUED
+4574 sLocalPrincipalValue_tfae_exact_order_false | tracker | triage6a note | refutations #4574 and #4575 may refute the same printed claim | QUEUED (both closed since; check)
+4603 sLocalOrbitalPrincipalPart_range_le_ker | 2? | w15, notes/released/4603-*.md | statement needs hypotheses it lacks | QUEUED
