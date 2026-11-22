@@ -289,7 +289,23 @@ def IsSobolevHilbertSchmidtKernel (B : W(α, s) →L[ℂ] W(α, s))
 /-- Paper: Theorem 10.4.3.4(2), pp. 470–471, and Theorem 10.4.3.6(2), p. 473.
 The zero function represents the Hilbert-Schmidt kernel of the zero operator. -/
 theorem isSobolevHilbertSchmidtKernel_zero :
-    IsSobolevHilbertSchmidtKernel (0 : W(α, s) →L[ℂ] W(α, s)) 0 := by sorry
+    IsSobolevHilbertSchmidtKernel (0 : W(α, s) →L[ℂ] W(α, s)) 0 := by
+  have hk : MemLp (0 : C𝔽 × C𝔽 → ℂ) 2 ((ν(α, s)).prod (ν(α, s))) := MemLp.zero
+  refine ⟨hk, ?_⟩
+  ext f
+  have hz : hk.toLp (0 : C𝔽 × C𝔽 → ℂ) = 0 := MemLp.toLp_zero hk
+  have h := integralKernelOperator_apply (ν(α, s)) (hk.toLp (0 : C𝔽 × C𝔽 → ℂ)) f
+  rw [hz] at h ⊢
+  have h0 := Measure.ae_ae_of_ae_prod
+    (Lp.coeFn_zero ℂ 2 ((ν(α, s)).prod (ν(α, s))))
+  filter_upwards [h, h0, Lp.coeFn_zero ℂ 2 (ν(α, s))] with x hx hx0 hf
+  rw [hx.2, ContinuousLinearMap.zero_apply, hf]
+  have : (fun y ↦ ((0 : Lp ℂ 2 ((ν(α, s)).prod (ν(α, s)))) : C𝔽 × C𝔽 → ℂ) (x, y) * f y)
+      =ᵐ[ν(α, s)] fun _ ↦ 0 := by
+    filter_upwards [hx0] with y hy
+    rw [hy]; simp
+  rw [integral_congr_ae this]
+  simp
 
 -- Theorems 10.4.3.4 and 10.4.3.6 state s > 1. The measurable formulas work
 -- in that range once the mixed-weight spectral kernel exists.
