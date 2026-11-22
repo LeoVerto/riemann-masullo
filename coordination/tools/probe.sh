@@ -8,6 +8,10 @@
 #                                          (default 300 s); log .agent/<name>.log, status .agent/<name>.exit
 #   probe.sh wait [-t <s>] <name>...       wait up to <s> (default 100) until every .agent/<name>.exit
 #                                          exists; prints "<name> exit <n>" or "<name> running"
+#   probe.sh run [-t <s>] <name> -- <cmd> [<arg>...]   run from the worktree root: start any long
+#                                          command detached (default 900 s), e.g. `scripts/signatures.sh`;
+#                                          stdout .agent/<name>.out, stderr .agent/<name>.log, status
+#                                          .agent/<name>.exit; then `probe.sh wait <name>`
 #   probe.sh build [-t <s>] <wt> [<Module>...]  start S/build.sh detached (default 900 s;
 #                                          give 3600 for the full build); log/status <wt>/.agent/build.{log,exit}
 #   probe.sh waitbuild [-t <s>] <wt>       wait up to <s> (default 100) for <wt>/.agent/build.exit
@@ -38,6 +42,12 @@ case $cmd in
       if [ -s ".agent/$x.exit" ]; then echo "$x exit $(cat ".agent/$x.exit")"; else echo "$x running"; fi
     done
     [ $all = 1 ] || exit 3 ;;
+  run)
+    [ -d .agent ] && [ -f lakefile.toml ] || { echo "run from a worktree root" >&2; exit 2; }
+    x=$1; ok "$x"; shift; [ "$1" = -- ] && shift; [ $# -gt 0 ] || { echo "no command given" >&2; exit 2; }
+    rm -f ".agent/$x.exit"
+    setsid nohup bash -c 'n=$2; t=$1; shift 2; timeout "$t" "$@" > ".agent/$n.out" 2> ".agent/$n.log"; echo $? > ".agent/$n.exit"' _ "${t:-900}" "$x" "$@" >/dev/null 2>&1 < /dev/null &
+    echo "$x started: $* (timeout ${t:-900} s)" ;;
   build)
     wt=$1; shift; [ -d "$wt" ] || { echo "no worktree $wt" >&2; exit 2; }
     mkdir -p "$wt/.agent"
@@ -51,5 +61,5 @@ case $cmd in
     f=$1/.agent/build.exit; end=$((SECONDS + ${t:-100}))
     until [ -s "$f" ] || [ $SECONDS -ge $end ]; do sleep 5; done
     if [ -s "$f" ]; then echo "build exit $(cat "$f")"; else echo "build running"; exit 3; fi ;;
-  *) sed -n '2,15p' "$0"; exit 2 ;;
+  *) grep '^#' "$0" | tail -n +2; exit 2 ;;
 esac

@@ -122,7 +122,10 @@ a little thought. Skip anything deep.
     (900 for a module, 3600 for the full build; log `<wt>/.agent/build.log`, 124 = timeout), then
     `$S/probe.sh waitbuild <wt>`. Probes, from the worktree root: `$S/probe.sh start -t 600 P2o P2p`
     runs `.agent/P2o.lean` and `.agent/P2p.lean` (logs `.agent/<name>.log`), then
-    `$S/probe.sh wait P2o P2p`. Do not end your turn while anything you started runs.
+    `$S/probe.sh wait P2o P2p`. Any other long command (e.g. `scripts/signatures.sh` under load): from
+    the worktree root `$S/probe.sh run -t 900 sig -- scripts/signatures.sh` (stdout `.agent/sig.out`,
+    use it as the signatures file; stderr `.agent/sig.log`), then `$S/probe.sh wait sig`. Do not end
+    your turn while anything you started runs.
   - **Never write `rm` with a variable path, `setsid`, or `for` loops that start processes in a Bash
     call** (user, 2026-11-22: they pop permission prompts even in bypass mode, "Dangerous rm
     operation not ruled out"). `probe.sh` does the cleanup; `build.sh` clears `build.exit` itself.
@@ -143,6 +146,9 @@ a little thought. Skip anything deep.
   range (`scripts/paper.sh <p> <q>`, `--png <p>` for formulas).
 
 ## Elaboration traps and fixes that worked
+- **Quotient step and analysis in one lemma** (#4603, PR #5616): `rintro` on a PV range, `Quotient.mk_surjective`
+  and the analytic argument together ran 10+ min. Fix: a lemma about tests plus a generic module lemma
+  (`range L ≤ ker φ` if `φ (L (π f)) = 0` for all f).
 - **`abbrev` towers (AGENTS.md, origin/main ed9dbb7):** a space declared as an `abbrev` over a quotient,
   `SchwartzBruhat` or another synonym borrows its instances by unfolding, so instance terms grow
   exponentially and `whnf`/`isDefEq` time out on trivial goals (#5362, #5398; likely #4344's Θω(ω)). Do not
@@ -239,7 +245,9 @@ declarations do not collide with the sweeper's).
 ## Checks and pull request
 - **Checks before each PR:** full `lake build`, `scripts/lint.sh`, and
   `scripts/signatures.sh > $R/.agent/wt/<P>-<k>-after.txt && scripts/signatures.sh --compare $R/.agent/wt/<P>-<k>-before.txt $R/.agent/wt/<P>-<k>-after.txt`
-  (a proof must leave it empty; a split may only add declarations). Also `#print axioms` for each
+  (a proof must leave it empty; a split may only add declarations). Under load `signatures.sh` takes
+  over 110 s: run it as `$S/probe.sh run -t 900 sig -- scripts/signatures.sh`, `$S/probe.sh wait sig`,
+  and compare against `.agent/sig.out` instead of the `-after.txt` file. Also `#print axioms` for each
   proved declaration in `.agent/Check.lean` via `lake lean`: only `propext`, `Classical.choice`,
   `Quot.sound`. A `sorryAx` inherited from cited still-open lemmas is acceptable; say so.
 - **Commit** with a message ending in a blank line plus `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
