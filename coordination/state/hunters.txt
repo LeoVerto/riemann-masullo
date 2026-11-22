@@ -10,3 +10,7 @@ w5 (running ~05:20Z: triage3b leads Ch05 Sec3b #4239 #4221 #4194 +3s #4224 #4229
 w6 (running ~05:25Z: triage3a leads Ch05 Sec3a #4154 #4155 #4133 #4164 #4173 +3 #4142; Sec2b #4085 #4093 +3s #4083 #4087 #4121 #4122)
 w4 (finished ~05:35Z: PR #4377 closes #4050 #4051 #4214 #4270 #4272 #4279; released #4215; #4185 #4189 #4061 #4271 claimed by others)
 w7 (running ~05:37Z: rated-3 Ch06 Sec1 #4264 #4265 #4273 #4275 #4280 #4285 #4286 #4287; Ch07 Sec1b #4075)
+w7 (finished 05:29Z: PR #4440 closes #4264 #4265 #4273 #4275 #4280 #4285 #4286 #4287; #4075 claimed by troyjlee)
+w8 (running 05:48Z: triage4a Ch05 Sec4 #4336 #4347 #4355 #4338 #4353 +3s #4344 #4352 #4356)
+w5 (finished 06:00Z: PR #4434 Ch05 Sec3b closes #4239 #4194 #4224 #4229 #4231 #4254; PR #4466 Ch06 Sec2 closes #4309 #4312; released #4304 (choose_spec build blowup >25min); #4221 troyjlee, #4310 johndcobb; #4313 #4314 not attempted)
+w9 (running 06:00Z: triage4b Ch05 Sec5 #4383 #4406 #4382 #4413 #4392 #4401 #4422 #4384 #4407 +3s #4411 #4408 #4409 #4423 #4431 #4420 #4429)

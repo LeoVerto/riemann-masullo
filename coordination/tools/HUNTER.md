@@ -165,3 +165,12 @@ CONTRIBUTING.md "When the paper is wrong" are binding. In short:
 - Only the integrator declares gaps or changes statements. If you see a `Gap:` line or a
   `TODO(paper-gap)` comment near your declaration, read it before you start; it often explains
   why the obvious route fails.
+
+## One file at a time (CONTRIBUTING "Take a file, not an issue", added 2026-11-22 05:45Z)
+- ONE PR PER TOUCHED FILE (user instruction 2026-11-22): hand in all the issues you were given in a file in one pull request, with one `Closes #<n>` per proof; if your batch spans several files, open one PR per file (helpers and imports go with the file that needs them). Release what you did not finish, with a note of what you tried.
+- Do not crowd a file: if two or three other people have claims or open PRs in it (check the issue threads and `gh pr list --repo mccorvie/riemann-masullo --search <file-stem>`), skip it and say so in your report.
+- Keep the file building after every proof, and keep `notes/<n>.md` current, so an interrupted run still hands in what it proved.
+- Build only your module while working; one full `lake build` before the PR. Never run two builds in one worktree.
+
+## PR titles (added 2026-11-22)
+Write PR titles for a reader with no context: name the declarations or the file and say what is proved, e.g. `Prove finiteStandardThetaAverage_one (Ch06 Sec2)` or `Prove six lemmas in Ch05 Sec3b (Mellin integral, flat Schwartz)`. Never use triage ratings, campaign or branch names (`hunt/w5`), or vague nouns like "average" or "batch" without saying of what. Do not mention the 1-5 ratings in titles or descriptions.

@@ -111,6 +111,26 @@ is recreated.
 
 ## State at handoff
 
+### Update 2026-11-22 ~06:00Z (user asleep from here; work autonomously, post nothing new upstream)
+- Crons (session-only; recreate on restart, CronList first): hourly check **08b645bc** at :17
+  (text below); notes nagger **5d728683** every 15 min (:04/:19/:34/:49), see workstream 5.
+- Docs on origin/main unchanged since 02f36f8/15e78ca. HUNTER.md gained "One file at a time"
+  (**ONE PR PER TOUCHED FILE**, user instruction; don't crowd a file with 2–3 other claimants) and
+  "PR titles" (user-edited: name the declarations/file; "easy"/"trivial" are fine; no ratings,
+  branch names, or internal jargon like "average"/"batch"). TRIAGE.md rates ERRATA/`Gap:`/
+  `TODO(paper-gap)` declarations `-` (skip).
+- New issues Ch05 Sec4 (#4333–#4369) and Sec5 (#4382–#4432) triaged: `shortlist/triage4a.tsv`,
+  `triage4b.tsv`. Last shortlisted issue: #4432.
+- Hunters running (roster with agent IDs in `state/agents.txt`): **w6** (Ch05 Sec3a + Sec2b, told
+  to split into one PR per file), **w8** (Ch05 Sec4, 8 issues), **w9** (Ch05 Sec5, 16 issues).
+- w5 finished: PR #4434 (Ch05 Sec3b, 6 issues), PR #4466 (Ch06 Sec2, #4309 #4312); released #4304
+  (`choose_spec` unfolding blew the build up to >25 min); handoff in `notes/handoff-hunt-w5.md`.
+  w7 finished: PR #4440 (Ch06 Sec1, 8 issues).
+- Unassigned: Ch06 Sec2 #4313 (Haar translation) #4314. Held for the user (not posted):
+  #4255 `sLocalArchimedeanPoleMultiplicity_eq_sum` possibly unprovable (needs simple poles;
+  `notes/4255.md`); SUSPECT Sec5 `globalThetaTranspose_range`, `globalHomogeneousThetaTranspose_range`
+  (`Set.range` vs closure of span; local analogue has closure on both sides).
+
 **Update 05:30Z:** finished: w3 (PRs #4323 #4329 #4371 #4374, 8 issues), w4 (PR #4377, 6
 issues), the Opus #3484 prover (SPLIT, PR #4375; stopped after hand-in). Running: Sonnet hunters
 w5 (triage3b: Ch05 Sec3b, Ch06 Sec2), w6 (triage3a: Ch05 Sec2b/3a), w7 (rated-3 Ch06 Sec1 + #4075).
@@ -257,6 +277,13 @@ The **sieve** is our automated tactic screen. It is named so as not to be confus
 - HUNTER.md's end sections are binding: token check, upstream sweepers, token thrift, sweeper overlap,
   helper placement, and claims/notes/attribution.
 
+### 5. Notes nagger (`tools/NAGGER.md`, `tools/notes-stale.sh`, user request 2026-11-22)
+Every 15 min the cron runs `notes-stale.sh 20`; if a hunter in `agents.txt` has no note
+(`notes/<issue>.md` or `notes/handoff-<name>.md`) newer than 20 min, it launches one short Haiku
+that SendMessages the stale hunters (sibling SendMessage by agentId works) and logs to `nag.log`.
+Purpose: notes stay current in case of a usage-limit hit. **Keep `agents.txt` in sync**: add every
+new hunter (`name agentId start_epoch issues...`), remove finished ones.
+
 ## Hourly check (cron prompt)
 
 `Hourly riemann-masullo coordinator check (coordinator only; CPU cheap, tokens scarce).
@@ -266,13 +293,14 @@ S=<repo>/.agent/sweeptools.`
 1. `status.sh` and `cleanup.sh`, under timeout, with the output tailed.
 2. Fix failing Verdicts or review comments with short Sonnet fixers; re-check the PR's state first.
 3. Release orphan or stale claims only via `release.sh`.
-4. Relay finished agents in one line each.
+4. Relay finished agents in one line each; TaskStop them after checking no Lean process remains
+   in their worktree; record in hunters.txt and remove their line from `agents.txt`.
 5. Services: warm, watchdog, memguard and sieve.
 6. If READY or HINT lines appear, launch ONE siever unless one is running. No blind hunters.
 7. **New issues first (low-hanging mode).** Check for proof issues newer than the last
    shortlist. If there are any, run `shortlist.py` and a Haiku triage of the untriaged rows.
-   Keep 2–3 Sonnet hunters running on rows rated 1–2 (then 3) with unclaimed issues, each
-   listed explicitly in its prompt, no overlap.
+   Keep 2–3 Sonnet hunters running on rows rated 1–2 (then 3) with unclaimed issues, one file per hunter, ONE PR PER TOUCHED FILE, each listed explicitly in its prompt, no overlap;
+   add each new hunter to `agents.txt`.
 8. **No Opus** while low-hanging mode is in effect. Ask the user before resuming one Opus
    critical prover (cone sorries outside held files, recorded in `hunted.txt`).
 9. Report in one or two lines.

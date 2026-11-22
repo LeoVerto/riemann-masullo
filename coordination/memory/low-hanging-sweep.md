@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-**Latest handover (2026-11-22 ~04:35Z): `git fetch fork coordination/low-hanging-campaign && git show FETCH_HEAD:coordination/HANDOVER.md` (latest e49620c, 2026-11-22 04:45Z; startup checklist inside; supersedes older lines below).**
+**Latest handover (2026-11-22 ~04:35Z): `git fetch fork coordination/low-hanging-campaign && git show FETCH_HEAD:coordination/HANDOVER.md` (latest 9d32d39, 2026-11-22 04:45Z; startup checklist inside; supersedes older lines below).**
 
 Started 2026-11-21: the user asked to find and close low-hanging proof issues, delegating to subagents in worktrees.
 - Earlier PRs #2067/#2099/#2104 (issues #1313/#1314/#1316) were all merged on 2026-11-21.
@@ -58,4 +58,5 @@ State 2026-11-21 ~04:20:
 - 2026-11-22 ~06:10Z: NEW ISSUES dropped: #4034-#4213 (Ch07 Sec1a 8, Sec1b 38, Ch05 Sec2b 52, Sec3a 59, Sec3b 18) plus #4033 AppD Sec1c. Ch06 has no issues yet. Sieve priority reordered (files with issues first, Ch06 last); the sieve had swept 0 so far, with its fixes still in progress. shortlist.py re-run (223 rows, 182 with issue). Haiku triage N=60 launched; next, a Sonnet hunter on rows rated 1-2.
 - 2026-11-22 ~06:20Z: Haiku triage (81k tokens, 49 rows rated) gave 12 issues rated 1-2. Sonnet hunter hunt/w3 launched on exactly those, and asked to report the triage's accuracy so the triage can be tuned.
 - 2026-11-22 04:35Z (true UTC): the user is near the usage limit; reset at 05:40Z. Start NO new Opus agents before then (the #3484 prover may finish). Sonnets run on usage credits. The hourly cron is deleted; one-shot cron 3ee859ff at 05:45Z re-creates it from the HANDOVER "Hourly check" section and re-allows Opus. TIME ZONES: the shell, status.sh and the logs use CET (UTC+1); the cron tool uses UTC. My earlier "Z" times today were about 1 h too late.
-- 2026-11-22 04:40Z: LOW-HANGING MODE ([[low-hanging-mode]]): Sonnets only, no Opus. One-shot cron 3ee859ff replaced by 0617391e (05:45Z) that re-creates the hourly check in that mode. Launched Sonnet hunt/w4 (rated-3 rows #4050 #4051 #4185 #4189 #4214 #4215, then triage2.tsv Ch06 Sec1 rows) and a Haiku triage of the 42 untriaged rows (shortlist/untriaged.tsv -> triage2.tsv). Handover e49620c.
+- 2026-11-22 04:40Z: LOW-HANGING MODE ([[low-hanging-mode]]): Sonnets only, no Opus. One-shot cron 3ee859ff replaced by 0617391e (05:45Z) that re-creates the hourly check in that mode. Launched Sonnet hunt/w4 (rated-3 rows #4050 #4051 #4185 #4189 #4214 #4215, then triage2.tsv Ch06 Sec1 rows) and a Haiku triage of the 42 untriaged rows (shortlist/untriaged.tsv -> triage2.tsv). Handover 7b746c6.
+- 2026-11-22 06:00Z: notes nagger cron every 15 min (sweeptools/NAGGER.md, notes-stale.sh 20, roster sweeptools/agents.txt — keep in sync when hunters start/finish). One PR per touched file. Handover = head of coordination/low-hanging-campaign.

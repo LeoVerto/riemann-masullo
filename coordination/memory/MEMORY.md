@@ -13,3 +13,5 @@
 - [Sieve naming](sieve-naming.md) — our tactic screen = "sieve" (sieve.sh, SIEVER.md hand-in brief), not upstream "sweeper"
 - [Collaborative, not a race](collaborative-not-race.md) — no pre-proving before issues exist; no racing others or sweepers; help via hints
 - [Low-hanging mode](low-hanging-mode.md) — since 2026-11-22 04:40Z: several Sonnet hunters on new issues, NO Opus until the problem space changes
+- [Read docs from origin/main](read-docs-origin-main.md) — AGENTS/CONTRIBUTING/ERRATA via git show origin/main; gap handling binds hunters
+- [One PR per file](one-pr-per-file.md) — hunter/siever PRs each cover exactly one Lean file (user, 2026-11-22)

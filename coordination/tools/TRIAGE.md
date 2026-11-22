@@ -36,3 +36,6 @@ Write `S/shortlist/triage.tsv` with the columns rating, file:line, decl, issue, 
 most 15 words naming the route (e.g. `unfold f; simp`, `exact foo.trans bar`,
 `needs Haar uniqueness`). Then report the rows rated 1–2 (at most 25 lines) and any `SUSPECT`
 rows. Do not report on the rest.
+
+## Errata and gaps (added 2026-11-22)
+Before rating, `git -C $R show origin/main:ERRATA.md > /tmp/errata-$$.md` once and grep it for each decl name. If the decl is in ERRATA, its docstring has a `Gap:` line, or a `TODO(paper-gap)` sits next to it, rate it `-` with note `ERRATA`/`GAP` instead of 1–5: hunters skip those. SUSPECT is only a note for the coordinator; nothing is posted upstream.

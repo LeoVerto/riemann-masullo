@@ -1,0 +1,37 @@
+rating	file:line	decl	issue	note
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:117	sLocalZetaPair_mk	4336	unfold sLocalZetaPair; exact (existsUnique_sLocalZetaPair χ).exists.choose_spec f
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:59	continuous_sLocalThetaMellin	4333	needs continuity of Mellin map on compact convergence
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:102	existsUnique_sLocalZetaPair	4335	needs Mellin/zeta existence on quotient
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:126	existsUnique_sLocalZetaMatchingDifference	4337	needs continuity of multiplier into B0
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:141	mem_sLocalZetaMatching	4338	unfold; LinearMap.mem_ker; ext on overlap
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:147	sLocalZetaPair_isClosedEmbedding	4339	needs range theorem plus open-map argument
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:152	sLocalZetaPair_range	4340	surjectivity onto matching pairs; Mellin inversion
+-	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:163	sLocalZetaPair_translate	4341	GAP: TODO(paper-gap) at line 155 on translation factors
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:174	exists_sLocalZetaPair_action	4342	construct multiplier operators; joint continuity
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:183	sLocalHomogeneousThetaSpace_frechet	4343	closed kernel of phi plus quotient Frechet instance
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:188	sLocalHomogeneousThetaSpace_separable	4344	quotient of separable space; needs separability input
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:195	continuous_sLocalZetaPair	4345	continuity of zeta transforms on the quotient
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:199	injective_sLocalZetaPair	4346	zeta integrals vanishing forces zero theta class
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:220	sLocalPolarFreeThetaSpace_mk_eq_iff	4347	Submodule.Quotient.eq; LinearMap.mem_ker; map_sub; sub_eq_zero
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:245	mem_sLocalPolarFreeMatching_iff	4348	entire continuation versus order at left-half poles
+-	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:251	sLocalPolarFreeZetaPair_isClosedEmbedding	4349	GAP: TODO(paper-gap) block at lines 265-271 on closed range (5.4.1.12)
+-	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:257	sLocalPolarFreeZetaPair_range	4350	GAP: TODO(paper-gap) block at lines 265-271 on range (5.4.1.22)
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:308	existsUnique_sLocalThetaWeightedL2	4351	existence of continuous injective L2 map
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:318	sLocalThetaWeightedL2_norm	4352	Lp.norm_def; ae-congruence; withDensity integral
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:337	sLocalThetaL2_dense	4353	closure of range is dense; DenseRange of codRestrict
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:342	existsUnique_sLocalThetaL2Fourier	4354	unitary extension of Fourier to completion
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:367	mem_sLocalDecayIsotype	4355	unfold; Submodule.mem_iInf; LinearMap.mem_ker; sub_eq_zero
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:373	sLocalDecayIsotype_eq_actionIsotype	4356	unfold actionIsotype; ext; match inf over J1 with ker
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:383	existsUnique_sLocalDecayFourier	4357	unique isomorphism of isotypes; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:397	existsUnique_sLocalDecayToThetaL2	4358	continuous injection into L2; deep
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:405	sLocalDecayFourier_eq_weightedFourier	4359	agreement of two unitary extensions on dense set
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:424	existsUnique_sLocalCechRadialReflection	4360	isomorphism of weighted decay spaces; reflection estimate
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:436	existsUnique_sLocalCechThetaPair	4361	continuous linear theta pair on quotient
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:449	sLocalCechBergman_exact	4362	exactness needs surjectivity; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:462	sLocalCechBergman_isClosedEmbedding	4363	closed range needs range theorem
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:472	existsUnique_sLocalCechFrequency	4364	continuous unitary characters of R>0 are t^(ix)
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:483	existsUnique_sLocalDecayMellin	4365	Mellin equivalence onto Schwartz-Bergman; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:493	existsUnique_sLocalCechStripMellin	4366	Mellin equivalence on overlap; deep
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:502	sLocalCech_left_commutes	4367	Mellin of theta pair; Fubini and shift bookkeeping
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:522	existsUnique_sLocalCechDifference	4368	uniqueness and exactness of difference map
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec4.lean:542	sLocalCechThetaPair_isClosedEmbedding	4369	needs Bergman closed embedding and identification

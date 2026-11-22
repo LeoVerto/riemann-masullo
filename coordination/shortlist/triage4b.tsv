@@ -1,0 +1,50 @@
+rating	file:line	decl	issue	note
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:313	globalThetaPolarValues_vanish_on_isotype_iff	4411	fst/snd translate give (1-ω g) factor for ω≠1; ω=1 via surjective_on_trivial_isotype
+-	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:324	globalThetaPolarValues_eq_eigendistributions	4412	GAP: TODO(paper-gap) at line 317 (polar value on normalized Gaussian)
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:203	adelicEigendistributions_eq_span	4397	needs one-dimensionality of weight space plus generator
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:131	sLocalEigendistributions_eq_span	4388	needs one-dimensionality of weight space plus generator
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:168	sLocalThetaEigendistributions_eq_span	4393	descent plus pull injectivity plus weight line uniqueness
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:240	globalThetaEigendistributions_eq_span	4402	descent plus pull injectivity plus weight line uniqueness
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:62	sLocalEigendistributions_isClosed	4383	mem lemma; isClosed_iInter; isClosed_eq on evaluation
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:306	globalThetaPolarValues_surjective_on_trivial_isotype	4410	needs trivial-isotype test vectors with prescribed polar values
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:252	sLocalThetaEigendistributions_dense_span	4404	density of eigendistribution span in strong dual
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:283	globalThetaPolarValues_mk	4406	unfold liftQ; rfl
+-	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:453	sLocalThetaEigendistributions_separate	4425	GAP: TODO(paper-gap) at line 446 (connected weight subset claim)
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:56	mem_sLocalEigendistributions	4382	unfold definitions; Iff.rfl
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:334	summable_globalZeroEval_orbit_iff	4413	summand constant by mul_zero; summable_const_iff, needs Infinite Fˣ
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:162	sLocalThetaEigendistribution_mk	4392	liftQL_apply; rfl
+1	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:234	globalThetaEigendistribution_mk	4401	liftQL_apply; rfl
+-	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:460	sLocalThetaEigendistributions_separate_of_accumulation	4427	GAP: TODO(paper-gap) at line 446 covers this remark
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:428	sLocalThetaTranspose_injective	4422	quotient map surjective; ContinuousLinearMap.ext
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:269	globalThetaKernel_le_adelePolarSubspace	4405	polar values vanish on theta kernel via Poisson-type identity
+-	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:402	sLocalHomogeneousThetaTranspose_injective	4419	GAP: TODO(paper-gap) at line 396 (Theorem 5.5.3.2 proof)
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:470	globalHomogeneousThetaTranspose_isEmbedding	4428	embedding needs strictness or closed range
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:222	globalThetaKernel_le_eigendistribution	4400	normalized generator kills theta kernel; unfolding zeta
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:295	globalThetaPolarValues_fst_translate	4408	value at zero invariant under scaling action
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:300	globalThetaPolarValues_snd_translate	4409	Fourier value at zero scales by idelic norm
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:174	sLocalThetaEigendistribution_holomorphic	4394	compose normalized holomorphy with quotient descent
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:246	globalThetaEigendistribution_holomorphic	4403	compose normalized holomorphy with quotient descent
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:137	sLocalNormalizedEigendistribution_holomorphic	4389	holomorphic dependence of local zeta family on chart
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:505	globalThetaTranspose_range	4432	SUSPECT-lite: LHS range not closed, RHS closure; needs closed range
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:197	adelicNormalizedEigendistribution_gaussian	4396	normalization via zeta value at Gaussian
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:208	adelicNormalizedEigendistribution_holomorphic	4398	holomorphy of global zeta family in chart
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:150	sLocalThetaKernel_le_eigendistribution	4391	normalized generator kills theta kernel; unfolding zeta
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:441	sLocalThetaTranspose_closure_range	4424	closure of range equals closed span; duality argument
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:67	adelicEigendistributions_isClosed	4384	membership lemma; isClosed_iInter; isClosed_eq on evaluation
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:383	infiniteEigendistributions_component_closedSpan	4418	closed span of local eigendistributions by norm-one restriction
+2	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:289	globalThetaPolarValues_unique	4407	ext on quotient via mk surjectivity and globalThetaPolarValues_mk
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:361	infiniteEigendistributions_dense_span	4416	density of local eigendistribution span
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:434	sLocalThetaTranspose_invariant	4423	theta kernel contains unit-translate differences; pull at zero
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:370	finiteEigendistributions_component_closedSpan	4417	closed span of local eigendistributions by norm-one restriction
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:498	globalThetaTranspose_invariant	4431	theta kernel contains principal-idele translate differences
+-	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:353	finiteEigendistributions_dense_span	4415	GAP: TODO(paper-gap) at line 347 (weak vs strong dual topologies)
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:486	globalHomogeneousThetaTranspose_range	4430	SUSPECT-lite: LHS range not closed, RHS closure; needs closed range
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:420	sLocalHomogeneousThetaTranspose_closure_range	4421	closure of homogeneous range equals span of generators
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:410	sLocalHomogeneousThetaTranspose_homogeneous	4420	intertwining of translation with homogeneous theta transform
+3	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:476	globalHomogeneousThetaTranspose_homogeneous	4429	intertwining of translation with homogeneous theta transform
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:82	existsUnique_sLocalNormalizedEigendistribution	4385	existence needs continuity of zeta functional
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:215	adelicEigendistribution_descends	4399	existence needs T kills theta kernel; quotient lift
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:184	existsUnique_adelicNormalizedEigendistribution	4395	existence needs continuity of global zeta functional
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:144	sLocalEigendistribution_descends	4390	existence needs T kills theta kernel; quotient lift
+4	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:95	sLocalNormalizedEigendistribution_gaussian	4386	normalization via zeta value at local Gaussians
+5	RiemannMasullo/Ch05_ThetaZSpaces/Sec5.lean:109	sLocalNormalizedEigendistribution_apply_pureTensor	4387	pure tensor formula needs zeta Euler product and uniqueness
