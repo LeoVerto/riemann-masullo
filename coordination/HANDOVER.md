@@ -52,8 +52,8 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
   wake-ups sparse. Agents and the nagger wait in the FOREGROUND, every call under 170 s (HUNTER.md
   "Builds and processes"); never `run_in_background`.
 - **Staffing and Opus work** (2026-11-22): 12-unit budget (user, 20:20Z), at least 2 Opus, at most 6 Sonnets;
-  Opus goes to escalation, then prior work (ours and others'), a fresh issue last; the Fable
-  consultant costs 2 units and comes right after the 2-Opus minimum, before any new work (user,
+  Opus goes to escalation, then prior work (ours and others'), a fresh issue last; Fable
+  consultants cost 2 units each, at most 2 at once (user, ~23:00Z), and come right after the 2-Opus minimum, before any new work (user,
   2026-11-22 ~22:30Z); the findings evaluator stays outside the budget. HOURLY.md steps 7–9. No two agents
   share a file. A prover that finishes with a warm cache may get ONE related issue by SendMessage.
 - **Build on prior work** (2026-11-22): every agent starts from `prior.sh <n>` (HUNTER.md "Prior

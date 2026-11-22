@@ -5,7 +5,7 @@ metadata:
   type: feedback
 ---
 
-The user (2026-11-21): "use Sonnet medium for them" and "Keep subagents running for 4 PRs to avoid triggering your main session too often." Haiku approved for triage and the nagger; Fable as the one-at-a-time consultant ([[escalation-ladder]]) and, since 2026-11-22 ~21:40Z, as the findings evaluator ([[paper-findings-opus]]).
+The user (2026-11-21): "use Sonnet medium for them" and "Keep subagents running for 4 PRs to avoid triggering your main session too often." Haiku approved for triage and the nagger; Fable as the consultant (at most 2 at once since 2026-11-22 ~23:00Z) ([[escalation-ladder]]) and, since 2026-11-22 ~21:40Z, as the findings evaluator ([[paper-findings-opus]]).
 
 **Why:** usage budget and fewer coordinator wake-ups.
 

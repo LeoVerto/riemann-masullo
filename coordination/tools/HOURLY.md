@@ -69,7 +69,7 @@ consultant to `agents.txt` (the nagger's roster).
    agents (`agents.txt`), then hand out free units in this order, never stopping a running agent
    to rebalance:
    1. Opus (step 8) until 2 run.
-   2. The Fable consultant (step 8b, 2 units), if a QUEUED `fable` row waits and none runs.
+   2. Fable consultants (step 8b, 2 units each, at most 2 at once), while QUEUED `fable` rows wait.
       Consultations come before new work (user, 2026-11-22): while such a row waits, hold freed
       units for it instead of starting Sonnet hunters or Opus beyond the two above.
    3. Sonnet hunters while quick-win rows (7a) exist, up to 6 Sonnets.
@@ -93,8 +93,9 @@ consultant to `agents.txt` (the nagger's roster).
    c. Last resort, an Opus hunter: any open unclaimed proof issue (not stuck/gap/ERRATA/
       paper-gap, not sweep-held), preferring triage rows rated 3–4 that no Sonnet holds, never in a
       file another of our agents works in. Record in `hunted.txt`.
-8b. Fable: if `escalations.txt` has a QUEUED `fable` row and no Fable consultant runs, launch ONE
-   (2 units, step 7 item 2). Its ROUTE/SPLIT hand-back appears as a new `opus` row (step 8a).
+8b. Fable: for QUEUED `fable` rows in `escalations.txt`, oldest first, launch Fable consultants up
+   to 2 running at once (user, 2026-11-22 ~23:00Z: "Bump the allowed fable consultant concurrency
+   to 2"; 2 units each, step 7 item 2), one row each, preferably from different files. Its ROUTE/SPLIT hand-back appears as a new `opus` row (step 8a).
    **The coordinator may escalate to Fable itself** when that is the better use of tokens: an
    Opus agent released an issue it tried and failed without escalating; the same blocker keeps
    stopping several issues (one packet for the shared
