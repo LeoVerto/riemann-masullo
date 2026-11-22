@@ -171,7 +171,21 @@ include hSC hInt hne in
 /-- Paper: Equations (4.5.1.3) and (4.5.3.3), pp. 198, 208. Subtracting the
 translate by the inverse generator is linear and continuous on the decay space. -/
 theorem modulatedCyclicDifference_isLinearMap_continuous :
-    IsLinearMap ℂ diff ∧ Continuous diff := by sorry
+    IsLinearMap ℂ diff ∧ Continuous diff := by
+  have h := exists_modulatedExponentialDecay_translationAction (G := G) m I hm hms hInt hne
+  obtain ⟨ρ, hρ, -⟩ := h
+  let T : D →L[ℂ] D := ContinuousLinearMap.id ℂ D - ρ γ⁻¹
+  have hpt : ∀ f : D, diff f = T f := fun f ↦
+    congrArg (fun g : D ↦ f - g)
+      (@Subtype.ext _ _ (⟨fun x ↦ f.val ((γ⁻¹)⁻¹ * x),
+        modulatedExponentialDecaySubmodule_translate m I hm hms γ⁻¹ f⟩ :
+          modulatedExponentialDecaySubmodule m I) (ρ γ⁻¹ f)
+        (funext fun x ↦ (hρ γ⁻¹ f x).symm))
+  have hadd : ∀ x y : D, diff (x + y) = diff x + diff y := fun x y ↦
+    (hpt _).trans ((map_add T x y).trans (congrArg₂ (· + ·) (hpt x).symm (hpt y).symm))
+  have hsmul : ∀ (c : ℂ) (x : D), diff (c • x) = c • diff x := fun c x ↦
+    (hpt _).trans ((map_smul T c x).trans (congrArg (c • ·) (hpt x).symm))
+  exact ⟨⟨hadd, hsmul⟩, T.continuous.congr fun f ↦ (hpt f).symm⟩
 
 /-- Paper: Equations (4.5.1.3) and (4.5.3.3), pp. 198, 208. The cyclic
 difference sends a function to itself minus its translate by the inverse generator. -/
