@@ -8,8 +8,8 @@ else: no proofs, builds, git, gh, file edits. Say nothing between tool calls.
 S=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools
 
 Loop forever:
-1. Run (Bash, foreground, tool timeout 600000 ms): `timeout 590 $S/nag-wait.sh 20 15 570`
-   It blocks up to ~10 min and prints one of:
+1. Run (Bash with run_in_background, since it can block ~20 min, more than one Bash call allows; then wait for its completion notification, never poll): `timeout 1190 $S/nag-wait.sh 20 20 1170`
+   It blocks up to ~20 min (user, 2026-11-22 ~18:40Z: 20-min interval) and prints one of:
    - `TICK` or `EMPTY` (or nothing): go to step 3.
    - one or more `STALE <name> <agentId> <age>` lines (already logged to nag.log): step 2.
 2. For each STALE line, send ONE message with the SendMessage tool (load it once with ToolSearch
