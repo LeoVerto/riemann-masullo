@@ -14,6 +14,11 @@ is recreated.
 
 ## LOW-HANGING MODE (user instruction, 2026-11-22 04:40Z)
 
+**Amended ~06:05Z by the user: "Only resume opus when you're out of low-hanging fruits."** Resume Opus
+(one critical prover at a time) WITHOUT asking once no unclaimed rows rated 1–3 remain in any
+triage file and there are no new issues to triage; go back to Sonnet hunters when new quick wins
+appear. This supersedes "ask the user before resuming Opus" anywhere below.
+
 - **Run several Sonnet agents on quick wins and start NO Opus agents** until the problem space
   changes again (no quick wins left, or a new chapter needs mapping). Ask the user before
   returning to Opus. The #3484 Opus prover that was already running may finish.
@@ -112,7 +117,7 @@ is recreated.
 ## State at handoff
 
 ### Update 2026-11-22 ~06:00Z (user asleep from here; work autonomously, post nothing new upstream)
-- Crons (session-only; recreate on restart, CronList first): hourly check **08b645bc** at :17
+- Crons (session-only; recreate on restart, CronList first): hourly check **c06e208e** at :17
   (text below); notes nagger **5d728683** every 15 min (:04/:19/:34/:49), see workstream 5.
 - Docs on origin/main unchanged since 02f36f8/15e78ca. HUNTER.md gained "One file at a time"
   (**ONE PR PER TOUCHED FILE**, user instruction; don't crowd a file with 2–3 other claimants) and
@@ -301,8 +306,9 @@ S=<repo>/.agent/sweeptools.`
    shortlist. If there are any, run `shortlist.py` and a Haiku triage of the untriaged rows.
    Keep 2–3 Sonnet hunters running on rows rated 1–2 (then 3) with unclaimed issues, one file per hunter, ONE PR PER TOUCHED FILE, each listed explicitly in its prompt, no overlap;
    add each new hunter to `agents.txt`.
-8. **No Opus** while low-hanging mode is in effect. Ask the user before resuming one Opus
-   critical prover (cone sorries outside held files, recorded in `hunted.txt`).
+8. **Opus only when the quick wins are out** (no unclaimed rated 1–3 rows, no new issues): then,
+   without asking, ONE Opus critical prover at a time (cone sorries outside held files, recorded
+   in `hunted.txt`, added to `agents.txt`). Back to Sonnets when new quick wins appear.
 9. Report in one or two lines.
 
 ## Infrastructure (`<repo>/.agent/sweeptools`; copies in `tools/`)
