@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # One-shot status for the coordinator's periodic check.
+# status.sh [--mark]: --mark (the hourly check) advances comments.seen, the start of the
+# "new comments on our claims" window; manual runs leave it alone.
 T=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools; R=mccorvie/riemann-masullo
 echo "== $(date '+%H:%M') host"; free -m | awk 'NR==2{print "mem avail "$7"MB"}'; df -h / | awk 'NR==2{print "disk free "$4}'; uptime | sed 's/.*load/load/'
 echo "== token"; $T/tokencheck.sh
@@ -50,6 +52,13 @@ for n in $(sort -u $T/claims.txt); do
   [ $age -gt 180 ] && echo "STALE #$n claimed ${age}m ago"
 done
 true
+echo "== new comments on our claims (others' comments since the last status.sh --mark run; read in full with prior.sh <n>)"
+seen=$(cat $T/comments.seen 2>/dev/null || date -u -d '-1 hour' +%FT%TZ); stamp=$(date -u +%FT%TZ)
+if new=$(gh api --paginate "repos/$R/issues/comments?since=$seen&per_page=100" --jq '.[]
+    | select(.user.login != "LeoVerto") | "\(.issue_url | split("/") | last) \(.user.login) \(.created_at[:16])Z \(.body | split("\n")[0] | .[0:100])"'); then
+  awk 'NR==FNR {c[$1]; next} $1 in c {n=$1; $1=""; print "NEW #" n ":" $0}' $T/claims.txt <(echo "$new")
+  [ "${1:-}" = --mark ] && echo "$stamp" > $T/comments.seen
+else echo "(gh failed; will retry from $seen)"; fi
 echo "== label census (unclaimed open proof issues; newest issue number; last hunter start)"
 gh api --paginate "repos/$R/issues?state=open&labels=proof&per_page=100" --jq '.[] | select(.pull_request|not) | select([.labels[].name] | (index("claimed") or index("blocked") or index("stuck")) | not) | "\([.labels[].name] | map(select(. != "proof")) | join(",")) \(.number)"' |
   awk '{c[$1]++; if ($2>m[$1]) m[$1]=$2} END {for (l in c) print l, c[l], m[l]}' | sort -k2 -nr |

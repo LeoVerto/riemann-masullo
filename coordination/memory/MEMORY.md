@@ -12,7 +12,7 @@
 - [Claims, notes, attribution](claims-notes-attribution.md) — read threads first; claim worked-on and queued issues; notes/<n>.md; release.sh; tag model+effort
 - [Sieve naming](sieve-naming.md) — our tactic screen = "sieve" (sieve.sh, SIEVER.md hand-in brief), not upstream "sweeper"
 - [Collaborative, not a race](collaborative-not-race.md) — no pre-proving before issues exist; no racing others or sweepers; help via hints
-- [Staffing / quick-wins mode](quick-wins-mode.md) — 4 Sonnet hunters + 3 Opus slots: escalation, then prior work incl. others' (resumable.sh), fresh Opus hunter last
+- [Staffing / quick-wins mode](quick-wins-mode.md) — 10-unit budget (Sonnet 1, Opus 2; ≥2 Opus, ≤6 Sonnets); Opus: escalation, prior work, fresh issue last; NEW comments routed
 - [Read docs from origin/main](read-docs-origin-main.md) — AGENTS/CONTRIBUTING/ERRATA via git show origin/main; gap handling binds hunters
 - [One PR per file](one-pr-per-file.md) — hunter/siever PRs each cover exactly one Lean file (user, 2026-11-22)
 - [Nagger out of session](nagger-out-of-session.md) — one long-running Haiku loop; everyone (nagger too) waits in the FOREGROUND, never run_in_background (user)

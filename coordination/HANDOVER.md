@@ -34,13 +34,16 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   through `escalate.sh` and the Fable consultant instead.
 - **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning.
   Agents wait on builds in the foreground (never `run_in_background`, user 2026-11-22), never polling turns. Keep wake-ups sparse.
-- **Staffing (user, 2026-11-22):** 4 Sonnet hunters plus 3 Opus slots filled by need (HOURLY.md
-  steps 7–8; ~18:30Z: "If there's enough escalation work to be done, use them all for it,
-  otherwise scale back escalation and use them as hunters"; later: "starting an opus hunter on a
-  random issue should be the last option, after escalation and continuing prior work have been
-  exhausted"):
-  1. **4 Sonnet hunters** on quick wins: triage rows rated 1–2, then 3 (HUNTER.md).
-  2. **Opus slots, in this order** (running agents are not stopped to rebalance):
+- **Staffing (user, 2026-11-22; HOURLY.md steps 7–8):** one budget of 10 units, Sonnet hunter 1,
+  Opus prover 2 (~17:30Z: "when two sonnets are idle, spawn an opus instead. keep at minimum two
+  opuses and at maximum six sonnets"). Free units go to Opus until 2 run, then to Sonnets while
+  quick-win rows exist (up to 6), the rest in pairs to Opus. Running agents are not stopped to
+  rebalance. Opus work order (~17:10Z: "If there's enough escalation work to be done, use them all
+  for it, otherwise scale back escalation and use them as hunters"; later: "starting an opus
+  hunter on a random issue should be the last option, after escalation and continuing prior work
+  have been exhausted"):
+  1. **Sonnet hunters** on quick wins: triage rows rated 1–2, then 3 (HUNTER.md).
+  2. **Opus work, in this order:**
      a. **Escalation:** a Sonnet that is *stuck* hands the issue over with `escalate.sh`, keeping
         our claim; an escalation prover (HUNTER.md "Escalators") takes the oldest file with QUEUED
         `opus` rows in `escalations.txt` that our Sonnet has left; one file per prover.
@@ -56,7 +59,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
      the current claim, every comment in full, the PRs referencing the issue, and our notes,
      released notes, reports, patches, commits and worktrees for it.
   4. **1 Fable consultant at a time** (user, 2026-11-22 ~16:00Z, Fable allowance; outside the
-     standing slots): issues an Opus agent tried and failed go `--to fable` with a stuck packet
+     step-7 budget): issues an Opus agent tried and failed go `--to fable` with a stuck packet
      (HUNTER.md). The consultant (`FABLE.md`, model fable) reads only the packet, may probe a
      skeleton with `lake lean`, and writes a `## Fable route` (ROUTE / SPLIT / FINDING /
      NO-ROUTE). ROUTE and SPLIT go back to an Opus escalator; the claim stays ours throughout.
@@ -67,6 +70,9 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
      `escalate.sh --to fable` (HOURLY.md step 8b).
   No two agents share a file. Interpretation of "Opus hunters" (CRITICAL_PROVER.md brief) is the
   coordinator's; confirm with the user if in doubt.
+- **Watch our claims** (user, 2026-11-22): `status.sh` prints `NEW #<n>` for others' comments on
+  `claims.txt` issues since the last `status.sh --mark` run (the hourly check; `comments.seen`); HOURLY.md step 3 passes each to the
+  holding agent, and steps back only if someone else's unreleased claim came before ours.
 - **Claim what we work on or have queued.** Escalation keeps the claim (user, 2026-11-22 ~16:00Z:
   no release and re-claim when an issue moves from Sonnet to Opus): `escalate.sh` posts nothing,
   leaves the issue in `claims.txt` and queues it in `escalations.txt`; `status.sh` shows it as
@@ -105,7 +111,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 - Repo `/mnt/faststorage/math/riemann-masullo` (writable, ~65 GB free; its parent is not writable).
   The overlay root (~16 GB) does not survive a sandbox recreation.
 - 16 GB RAM, 24 cores. **RAM is the limit.** The old ceiling was one prover, one hunter or siever,
-  and the sieve; the 7-agent staffing above is untested at that RAM. Agents build only their module
+  and the sieve; staffing of up to 8 agents (6 Sonnets + 2 Opus) is untested at that RAM. Agents build only their module
   while working, the sieve waits for >6 GB free, and memguard kills the newest Lean below 1000 MB
   (cheap, rc 137). The hourly check watches `memguard.log` (HOURLY.md step 5). An OOM of the host
   is not cheap.
@@ -130,7 +136,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 4. **One hourly check:** `CronList` first (duplicates have happened), then create it with the
    one-line prompt under "Hourly check".
 5. **Relaunch:** the nagger (if any agent runs), the quick-win loop on the new issues, and
-   the 3 Opus slots per HOURLY.md step 8. Never resume long dead transcripts with SendMessage
+   Opus work per HOURLY.md steps 7–8. Never resume long dead transcripts with SendMessage
    (an uncached replay is expensive): start fresh agents from `notes/` and `notes/released/`.
 
 ## Hourly check
@@ -165,7 +171,7 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
   hits and posts HINT hits on the sweep issue. Its yield so far is low (e.g. #4035).
 - **Findings evaluator:** agents report paper findings on a `Finding:` line; SUSPECT triage rows
   are leads. Both go to `S/findings.txt`, and one Opus evaluator at a time (`Read S/FINDINGS.md
-  and follow it. Your findings: <rows>.`, on top of the standing slots) re-checks each against
+  and follow it. Your findings: <rows>.`, outside the step-7 budget) re-checks each against
   the page image and the Lean, then posts confirmed ones on the issue (HOURLY.md step 9).
 - **Nagger:** see `NAGGER.md`; stop it with `touch S/nagger.stop`.
 - `scripts/agent.sh` does not work here: it assumes the integrator's layout and pushes to `origin`.
@@ -177,7 +183,7 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
 | `warm.sh` + `wt/base` | Keeps a worktree built at origin/main; publishes `base/{COMMIT,sig.txt}`; rebuilds failed index modules one at a time. |
 | `newwt.sh <branch> <dir>` | New worktree at the warm commit with a copied build and baseline signatures in `<dir>-before.txt`. |
 | `build.sh <wt>` | `lake build`, exit status in `<wt>/.agent/build.exit`. |
-| `status.sh` | RAM, disk, token, cache, PR verdicts, claims, orphan and stale claims, warm base, label census, `== sieve`. |
+| `status.sh` | RAM, disk, token, cache, PR verdicts, claims, orphan and stale claims, new comments on our claims (`NEW #n`), warm base, label census, `== sieve`. |
 | `cleanup.sh` | Removes worktrees whose PR merged. |
 | `tokencheck.sh` | Classic token with the right scopes? Step 0 of every brief. |
 | `escalate.sh <n> "<reason>"` | Hands a stuck issue to the next tier (`--to opus` default, `--to fable` with a stuck packet) without releasing it: no comment, stays in `claims.txt`, row in `escalations.txt`, note appended; `--prior` (coordinator) restores archived notes or seeds a stub for a re-claimed issue. |
