@@ -9,8 +9,10 @@ S=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools.
 Coordinator only; CPU is cheap, tokens are scarce. Work autonomously and post nothing new upstream
 beyond normal Claiming/Releasing. Ask the user when a decision is theirs (for example, two of their
 instructions conflict), but never wait for the answer: they may be away. Carry on with the newer
-instruction or the safer choice and say which in the report. We claim every issue we work on or have queued for
-one of our agents.
+instruction or the safer choice and say which in the report. We claim an issue when one of our agents starts on
+it. A hand-over (escalation to an Opus escalator or the Fable consultant) keeps the claim for at
+most 2 h; then it is released with the notes. Never re-post a claim to dodge upstream's 8 h
+auto-release on an issue nobody works on (user, 2026-11-22).
 
 **Launching agents.** Use the Agent tool's `subagent_type`. The definitions (`.agent/agents/`) fix
 model, effort and tools and send each agent to its brief, so the prompt carries only the specifics
@@ -39,16 +41,19 @@ consultant to `agents.txt` (the nagger's roster).
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
    A Verdict `error` with "main itself does not build" is not ours: once main builds again
-   (Main state check green), push an empty commit to the PR branch to retrigger.
-3. Release orphan or STALE claims only via `release.sh`. `ESCALATED` lines are not stale: leave
-   them. For `ESCALATED … REFRESH-CLAIM` (claim older than 7 h; upstream auto-releases after 8 h),
-   post `Claiming (Claude Opus 5.5, default effort): queued for an Opus escalator` once.
+   (Main state check green), push an empty commit to the PR branch to retrigger (pending: #5579, #5547, leads.txt).
+3. Release orphan or STALE claims only via `release.sh`. `QUEUED #<n> RELEASE` (queued over 2 h,
+   no agent took it): `release.sh <n> "queued for <level> escalation, no agent free within 2 h; notes
+   below"` (it marks the queue row RELEASED; `resumable.sh` offers it again in 8b). `QUEUED #<n>
+   (…grace)` and `ESCALATED #<n> (taken …)`: leave them. `ESCALATED … REFRESH-CLAIM` (taken, claim
+   older than 7 h): if that agent still runs (agents.txt), post `Claiming (<its M>): still working,
+   <one line of progress from notes/<n>.md>` once; if it does not, release instead.
    `NEW #<n>` lines (others' comments on our claims): pass each to the agent that holds the issue
    (agents.txt) with SendMessage, one line: "New comment on #<n> by <author>; read it with
    S/prior.sh <n> and take it into account." For a queued issue, add an `Upstream:` line to
    `notes/<n>.md`. A `Claiming` by someone else, or a github-actions "already claimed" reply to
    ours: check the Claiming/Releasing sequence (`prior.sh <n>`). If an unreleased claim by someone
-   else came before ours, release ours; a stuck label (as on #4411, our own claim) is no reason.
+   else came before ours, release ours; a leftover `claimed` label (as on #4411, our own claim) is no reason.
    An integrator decision (statement changed, gap, closed) goes to the holder as "stop".
 4. Finished agents: read new `S/notes/report-*.md` (agents woken by the nagger report to it), relay
    each in one line, move the file to `notes/reports-done/`. TaskStop them once no Lean process
@@ -66,9 +71,10 @@ consultant to `agents.txt` (the nagger's roster).
    1. Opus (step 8) until 2 run.
    2. Sonnet hunters while quick-win rows (7a) exist, up to 6 Sonnets.
    3. What is left, two units at a time, to Opus (step 8). One unit left over waits.
-7a. New issues first: proof issues newer than the last shortlisted (last: #5577, triage11) get
+7a. New issues first: proof issues newer than the last shortlisted (last: #5615, triage12) get
    `shortlist.py` on their files and a triage agent into a new `triage<k>.tsv`; update "last"
-   here. Hunters take rows rated 1–2 (then 3) with unclaimed issues, listed in the prompt by file:
+   here. Hunters take rows rated 1–2 (then 3) with unclaimed issues not labelled `stuck`, listed in
+   the prompt by file (run `trap5398.py` on them and append `(RISK-5398)` to flagged issues):
    files in sequence, ONE PR PER TOUCHED FILE, until the list is done, 4 PRs or ~3 h (user:
    "Files in sequence"). No overlap (`claims.txt`, `hunters.txt`), no file crowded by 2–3 other
    claimants or open PRs.
@@ -78,10 +84,10 @@ consultant to `agents.txt` (the nagger's roster).
       left and no escalator holds; one file each. Never re-claim an issue `escalate.sh` queued.
    b. Prior work, ours and others': `resumable.sh` lists open unclaimed issues with earlier
       attempts, ours first, by file. Skip rows whose agents.txt agent still runs. Take a file's
-      rows together: post `Claiming (Claude Opus 5.5, default effort): continuing an earlier
+      rows together, only when the escalator launches this tick: post `Claiming (Claude Opus 5.5, default effort): continuing an earlier
       attempt` on each, add them to `claims.txt`, and run `escalate.sh <n> "continuing prior
       work: <source> <summary>" --prior`. They are now a.
-   c. Last resort, an Opus hunter: any open unclaimed proof issue (not gap/refutation/ERRATA/
+   c. Last resort, an Opus hunter: any open unclaimed proof issue (not stuck/gap/refutation/ERRATA/
       paper-gap, not sweep-held), preferring triage rows rated 3–4 that no Sonnet holds, never in a
       file another of our agents works in. Record in `hunted.txt`.
 8b. Fable: if `escalations.txt` has a QUEUED `fable` row and no Fable consultant runs, launch ONE

@@ -57,10 +57,20 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
   share a file. A prover that finishes with a warm cache may get ONE related issue by SendMessage.
 - **Build on prior work** (2026-11-22): every agent starts from `prior.sh <n>` (HUNTER.md "Prior
   work first"); `resumable.sh` feeds HOURLY.md step 8b.
-- **Claims.** Claim what we work on or have queued; escalation keeps the claim; release only via
-  `release.sh` (posts the notes); refresh a queued claim after 7 h (upstream auto-releases at
-  8 h); watch others' comments on our claims (HOURLY.md step 3). After a halt (the watchdog
-  releases everything), re-claim what the resumed agents and the queue hold.
+- **Claims** (user, 2026-11-22 ~22:00Z: "we definitely should not be re-posting to beat the
+  auto-release on issues we are not actively working on"): claim when an agent starts; an
+  escalation keeps the claim only as a hand-over, at most 2 h in the queue, then `release.sh`
+  posts the notes (HOURLY.md step 3, `status.sh` `QUEUED … RELEASE`); re-post a claim only while an
+  agent is still working on it; release only via `release.sh`; skip `stuck` issues; watch others'
+  comments on our claims. After a halt (the watchdog releases everything), re-claim only what the
+  resumed agents work on.
+- **Parallel probes are fine** (user, 2026-11-22: upstream's one-check-at-a-time rule is for
+  hardware-bound provers; we are token-bound). `probe.sh start` builds the shared imports once
+  under the worktree lock, so they cannot race.
+- **Slow types (#5398):** agents get the trap and upstream's fixes (HUNTER.md "Elaboration
+  traps"); `trap5398.py` flags at-risk issues in `prior.sh` and the hunters' lists.
+- **Refutation is upstream's** (user, 2026-11-22: "Leave refutation to upstream, we just report
+  our findings for now"): no PRs with `Printed.*`/`_false` (FINDINGS.md).
 - **Collaborative, not a race.** No pre-proving of sorries without an issue (the sieve may compute
   hits on CPU only). Do not race other contributors or upstream sweepers; help on held files with
   hints. Step back when someone else claimed first.
@@ -176,6 +186,7 @@ Launch prompts: HOURLY.md "Launching agents".
 | `.agent/agents/*.md` (snapshot `agents/`) | Subagent type definitions: model, effort, tools, and which brief to read. |
 | `HOURLY.md` | The hourly check's instructions, read by the cron on every tick. |
 | `FABLE.md` | Fable consultant brief: route from a stuck packet, no builds or PRs. |
+| `trap5398.py <n>…` / `--decl <path>::<name>` | Flags #5398 slow-type risk without Lean (statement or section variables use one of the 22 synonyms, directly or via defs/abbrevs/notations); called by `prior.sh`. |
 | `FINDINGS.md`, `findings.txt` | Fable findings-evaluator brief (Opus until 2026-11-22 ~21:40Z, user) and its queue. |
 
 State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims.txt`, `hunters.txt`

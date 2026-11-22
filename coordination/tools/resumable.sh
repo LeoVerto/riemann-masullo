@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # resumable.sh [max]: open, unclaimed proof issues with prior work to build on: ours (a released
 # note or Releasing comment that says more than "not started" / "went idle") or anyone else's
-# (a Releasing comment with a real write-up). Skipped: gap/refutation/blocked labels, files held by
+# (a Releasing comment with a real write-up). Skipped: gap/refutation/blocked/stuck labels, files held by
 # an open sweep issue, issues in claims.txt or queued in escalations.txt, issues whose latest
 # Claiming/Releasing comment is someone else's claim. This is HOURLY.md step 8b: re-claim, queue
 # with escalate.sh. Columns: issue, file, source (ours:<model> or the other author), summary,
@@ -46,14 +46,16 @@ def substantive_note(path):
 rows = []
 for it in items:
     n = str(it["number"]); labels = {l["name"] for l in it["labels"]}
-    if labels & {"gap", "refutation", "blocked"} or n in claims or n in queued: continue
+    if labels & {"gap", "refutation", "blocked", "stuck"} or n in claims or n in queued: continue
     m = re.search(r"<!-- sorry: ([^ :]+)", it.get("body") or "")
     path = m.group(1) if m else "-"
     if path != "-" and f"`{path.removeprefix('RiemannMasullo/')}`" in sweep_titles: continue
     cs = json.loads(gh("--paginate", "--slurp", f"repos/{R}/issues/{n}/comments?per_page=100"))
     cs = [c for page in cs for c in page]
-    marks = [c for c in cs if re.match(r"(Claim|Releas)", c["body"])]
-    if marks and marks[-1]["body"].startswith("Claim") and marks[-1]["user"]["login"] != "LeoVerto": continue
+    # upstream claims.yml: first line, case-insensitive; its bot's auto-release counts as a release
+    marks = [c for c in cs if re.match(r"\s*(claim|releas)", c["body"], re.I)
+             or c["body"].startswith("This claim has been released automatically")]
+    if marks and re.match(r"\s*claim", marks[-1]["body"], re.I) and marks[-1]["user"]["login"] != "LeoVerto": continue
     src = summary = ""
     notes = sorted(glob.glob(f"{S}/notes/released/{n}-*.md"))
     ours = [c for c in cs if c["user"]["login"] == "LeoVerto" and c["body"].startswith("Releas")]

@@ -30,7 +30,8 @@ A finding is one of three cases (keep them apart):
    case 1, write the counterexample with explicit objects. Where it is cheap, prove the negation in
    Lean: use a scratch file under `.agent/` in a worktree from `$S/newwt.sh find/<n>
    $R/.agent/wt/find-<n>`, run it with `lake lean`, and post it as a code block. Do not open a PR
-   that adds `Printed.*` propositions: those are the integrator's.
+   that adds `Printed.*` propositions or proves `_false`: refutation is left to upstream, we only
+   report findings (user, 2026-11-22).
 4. **Verdict:**
    - `CONFIRMED`: post it (below).
    - `REJECTED <why>`: the finding is wrong. Post nothing, and note it in the row so nobody repeats

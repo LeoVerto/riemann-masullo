@@ -12,6 +12,7 @@ decl=$(awk -F'\t' -v n="$n" '$1==n {sub(/.*::/, "", $3); print $3; exit}' "$S/is
   ok && $4==n {print $3; exit}' "$S"/shortlist/*.tsv)
 pat="#$n\\b|\\b$n\\b${decl:+|\\b$decl\\b}"
 echo "#$n ${decl:-?}"
+python3 -I "$S/trap5398.py" "$n" 2>/dev/null | grep RISK-5398 | sed 's/^/trap:     /;s/$/ -- see HUNTER.md "Slow types (#5398)"/'
 [ -s "$S/notes/$n.md" ] && echo "notes:    notes/$n.md"
 for f in "$S"/notes/released/"$n"-*.md; do [ -e "$f" ] && echo "released: ${f#$S/}"; done
 grep -lsE "$pat" "$S"/notes/report-*.md "$S"/notes/reports-done/*.md | sed "s|^$S/|report:   |"
@@ -24,11 +25,12 @@ for w in "$R"/.agent/wt/*-"$n"; do [ -d "$w" ] && echo "worktree: ${w#$R/}"; don
 [ "${2:-}" = --local ] && exit 0
 U=mccorvie/riemann-masullo
 last=$(gh api --paginate "repos/$U/issues/$n/comments?per_page=100" --jq '.[]
-  | select(.body | test("^(Claim|Releas)")) | "\(.user.login) \(.created_at[:16])Z \(.body | split("\n")[0] | .[0:80])"' | tail -1)
+  | select((.body | test("^\\s*(claim|releas)"; "i")) or (.body | startswith("This claim has been released automatically")))
+  | "\(.user.login) \(.created_at[:16])Z \(.body | ltrimstr(" ") | split("\n")[0] | .[0:80])"' | tail -1)
 read -r _ _ first _ <<<"$last"
 case $first in
   "") echo "claim:    none";;
-  Claim*) echo "claim:    HELD (unreleased) by $last";;
+  [Cc][Ll][Aa][Ii][Mm]*) echo "claim:    HELD (unreleased) by $last";;
   *) echo "claim:    none (last: $last)";;
 esac
 echo "== upstream comments (bare claims skipped)"

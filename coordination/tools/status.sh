@@ -44,9 +44,17 @@ for n in $(sort -u $T/claims.txt); do
   [ "$st" = closed ] && { echo "CLOSED #$n (remove from claims.txt)"; continue; }
   [ -n "$t" ] || { echo "NO-CLAIM-COMMENT #$n"; continue; }
   age=$(( (now - $(date -d "$t" +%s)) / 60 ))
-  if grep -qE "^$n [a-z]+ [^ ]+ [^ ]+ (QUEUED|TAKEN)" $T/escalations.txt 2>/dev/null; then
-    # escalated with the claim kept: not stale; refresh it before upstream's 8 h auto-release
-    if [ $age -gt 420 ]; then echo "ESCALATED #$n REFRESH-CLAIM (last claim ${age}m ago)"; else echo "ESCALATED #$n (claim ${age}m old)"; fi
+  row=$(grep -E "^$n [a-z]+ [^ ]+ [^ ]+ (QUEUED|TAKEN)" $T/escalations.txt 2>/dev/null | tail -1)
+  if [ -n "$row" ]; then
+    # escalated with the claim kept (user, 2026-11-22: only for a hand-over, never to dodge the
+    # 8 h auto-release): QUEUED gets a 2 h grace for an agent to take it, TAKEN is active work
+    read -r _ lvl _ q st who _ <<<"$row"
+    if [ "$st" = QUEUED ]; then
+      qa=$(( (now - $(date -d "$q" +%s)) / 60 ))
+      if [ $qa -gt 120 ]; then echo "QUEUED #$n RELEASE (queued for $lvl ${qa}m ago, nobody took it within 2 h)"
+      else echo "QUEUED #$n (${qa}m of the 2 h grace)"; fi
+    elif [ $age -gt 420 ]; then echo "ESCALATED #$n REFRESH-CLAIM (taken by $who and still worked on; last claim ${age}m ago)"
+    else echo "ESCALATED #$n (taken by $who, claim ${age}m old)"; fi
     continue
   fi
   [ $age -gt 180 ] && echo "STALE #$n claimed ${age}m ago"

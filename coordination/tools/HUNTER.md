@@ -69,7 +69,9 @@ a little thought. Skip anything deep.
 - **Stuck** (you tried and failed, and nobody else holds the issue): do NOT release it. Update the
   notes, then run `$S/escalate.sh <n> "<one-line reason>"`. It keeps our upstream claim (posts
   nothing), keeps the issue in `claims.txt`, and queues it in `$S/escalations.txt` for an Opus
-  escalator, who continues from your notes under the same claim.
+  escalator, who continues from your notes under the same claim. The claim is kept only for the
+  hand-over: if no escalator takes the issue within 2 h, the coordinator releases it with your notes
+  (user, 2026-11-22), so write them for a stranger.
 - **Otherwise release** with `$S/release.sh <n> "<one-line reason>"` (not attempted, out of time,
   someone else holds it, or the finding route below). It posts `Releasing (<M>): …` with your
   notes, removes the claim from `claims.txt` and archives the notes. Update the notes first.
@@ -146,15 +148,25 @@ a little thought. Skip anything deep.
   range (`scripts/paper.sh <p> <q>`, `--png <p>` for formulas).
 
 ## Elaboration traps and fixes that worked
+- **Principal-value maps** (`adelePrincipalValue`, Ch11 Sec1b, PR #5633): `rw`, `simp` and `congr_fun` hang on them.
+  `LinearMap.ext_iff.mp` works, and private lemmas stated in exactly the definition's shape applied with `exact`.
+  The F ∅ = id and composition helpers are in PR #5633 (Sec1b, private): copy them, do not re-derive.
 - **Quotient step and analysis in one lemma** (#4603, PR #5616): `rintro` on a PV range, `Quotient.mk_surjective`
   and the analytic argument together ran 10+ min. Fix: a lemma about tests plus a generic module lemma
   (`range L ≤ ker φ` if `φ (L (π f)) = 0` for all f).
-- **`abbrev` towers (AGENTS.md, origin/main ed9dbb7):** a space declared as an `abbrev` over a quotient,
+- **Slow types (#5398), `abbrev` towers (AGENTS.md ed9dbb7, prover.md):** a space declared as an `abbrev` over a quotient,
   `SchwartzBruhat` or another synonym borrows its instances by unfolding, so instance terms grow
   exponentially and `whnf`/`isDefEq` time out on trivial goals (#5362, #5398; likely #4344's Θω(ω)). Do not
   unfold it: state helpers generically or for the explicit instances, `set`/`generalize` the space,
   use its `mem_…_iff`/characterizing lemmas. Turning the `abbrev` into a `def` is a statement change:
   report it, do not do it.
+  `prior.sh` prints `trap: … RISK-5398 …` when the statement or section variables use one of #5398's 22
+  synonyms, directly or through defs, abbrevs and notations (`$S/trap5398.py <n>` or `--decl <path>::<name>`,
+  no Lean). Upstream's two fixes: state the step as a private lemma about an abstract space
+  (`{E} [AddCommGroup E] [Module ℂ E] …`) and apply it, or write a helper's binders out in full so nothing
+  comes from the section's `variable`s. **If a mathematically trivial step still never finishes after
+  those, stop retrying** (user and prover.md, 2026-11-22): escalate or release, and name #5398 and the
+  synonym in the notes and the release or escalation reason, so the next person does not start from nothing.
 - **Destructuring a sibling inside an abbrev space** (#4344, PR #5538): `obtain ⟨…⟩ := sibling ω` about
   Θω(ω) ran 3+ min. Fix: a generic private helper over `{E} [instances]` that takes the sibling's
   conclusion (e.g. `IsFrechetTVS E`, `IsNuclearTVS E`) and destructures it there; the main proof is

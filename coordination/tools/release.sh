@@ -14,5 +14,7 @@ if [ -s "$N" ]; then
 fi
 gh issue comment "$n" --repo $UP --body "$body" >/dev/null || { echo "release #$n: comment failed"; exit 1; }
 sed -i "/^$n\$/d" "$T/claims.txt"
+# a queued escalation row must not be picked up without our claim: mark it released
+sed -i -E "s/^($n [a-z]+ [^ ]+ [^ ]+) QUEUED /\1 RELEASED $(date -u +%FT%H:%MZ) /" "$T/escalations.txt"
 [ -e "$N" ] && mv "$N" "$T/notes/released/$n-$(date +%Y%m%dT%H%M).md"
 echo "released #$n${model:+ ($model)}"

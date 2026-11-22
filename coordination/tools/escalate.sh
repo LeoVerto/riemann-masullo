@@ -2,7 +2,8 @@
 # escalate.sh <issue> "<reason>" [--to opus|fable] [--prior]
 # Hands a STUCK issue to the next tier WITHOUT releasing it: our upstream claim stays (no comment
 # is posted), the issue stays in claims.txt, notes/<issue>.md stays in place, and a row is added
-# to escalations.txt.
+# to escalations.txt. The claim is kept only as a hand-over: a row still QUEUED after 2 h is released
+# by the coordinator (status.sh 'QUEUED #n RELEASE', release.sh marks the row RELEASED).
 #   --to opus  (default): a Sonnet is stuck; an Opus escalator continues (HUNTER.md "Escalators").
 #   --to fable: an Opus agent is stuck; a Fable consultant reads the "## Stuck packet" in the notes
 #               and writes a route (FABLE.md); then an Opus escalator implements it (--to opus again).

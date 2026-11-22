@@ -5,7 +5,9 @@
 #
 #   probe.sh start [-t <s>] <name>...      run from the worktree root: for each name, start
 #                                          `timeout <s> lake lean .agent/<name>.lean` detached
-#                                          (default 300 s); log .agent/<name>.log, status .agent/<name>.exit
+#                                          (default 300 s); log .agent/<name>.log, status .agent/<name>.exit.
+#                                          Their RiemannMasullo imports are built once first, under the
+#                                          worktree's build.lock; then the probes run in parallel.
 #   probe.sh wait [-t <s>] <name>...       wait up to <s> (default 100) until every .agent/<name>.exit
 #                                          exists; prints "<name> exit <n>" or "<name> running"
 #   probe.sh run [-t <s>] <name> -- <cmd> [<arg>...]   run from the worktree root: start any long
@@ -27,11 +29,24 @@ case $cmd in
   start)
     [ -d .agent ] && [ -f lakefile.toml ] || { echo "run from a worktree root" >&2; exit 2; }
     for x in "$@"; do ok "$x"; [ -f ".agent/$x.lean" ] || { echo "no .agent/$x.lean" >&2; exit 2; }; done
-    for x in "$@"; do
-      rm -f ".agent/$x.exit"
-      setsid nohup bash -c 'timeout "$1" lake lean ".agent/$2.lean" > ".agent/$2.log" 2>&1; echo $? > ".agent/$2.exit"' _ "${t:-300}" "$x" >/dev/null 2>&1 < /dev/null &
-      echo "$x started"
-    done ;;
+    # `lake lean` builds a file's imports first: parallel probes after an edit would all rebuild the
+    # same module at once. So build the project imports once, under the worktree's build lock
+    # (shared with build.sh), then run the probes in parallel.
+    mods=$(sed -nE 's/^(public )?import[[:space:]]+(RiemannMasullo[^[:space:]]*).*/\2/p' $(printf '.agent/%s.lean ' "$@") | sort -u | tr '\n' ' ')
+    for x in "$@"; do rm -f ".agent/$x.exit"; done
+    setsid nohup bash -c '
+      t=$1; mods=$2; shift 2
+      if [ -n "${mods// }" ]; then
+        exec 9>.agent/build.lock
+        if flock -w "$t" 9 && timeout "$t" lake build $mods > .agent/probe-imports.log 2>&1; then exec 9>&-
+        else exec 9>&-
+          for x in "$@"; do { echo "probe.sh: the imports ($mods) did not build; see .agent/probe-imports.log"; tail -30 .agent/probe-imports.log; } > ".agent/$x.log" 2>&1; echo 1 > ".agent/$x.exit"; done
+          exit 1
+        fi
+      fi
+      for x in "$@"; do ( timeout "$t" lake lean ".agent/$x.lean" > ".agent/$x.log" 2>&1; echo $? > ".agent/$x.exit" ) & done
+      wait' _ "${t:-300}" "$mods" "$@" >/dev/null 2>&1 < /dev/null &
+    echo "started: $* (imports first: ${mods:-none})" ;;
   wait)
     end=$((SECONDS + ${t:-100}))
     while :; do
