@@ -108,7 +108,8 @@ A single-place difference subtracts the inverse uniformizer translate pointwise.
 theorem strongCoprimalityDifference_singleton_apply
     (π : (v : V) → (v.adicCompletion F)ˣ) (v : V) (f : C𝔽 → ℂ) (g : C𝔽) :
     strongCoprimalityDifference {v} π f g =
-      f g - f ((IdeleClassGroup.ofAdicCompletion (𝓞 F) F v (π v))⁻¹ * g) := by sorry
+      f g - f ((IdeleClassGroup.ofAdicCompletion (𝓞 F) F v (π v))⁻¹ * g) := by
+  simp [strongCoprimalityDifference]
 
 section
 variable {G : Type*} [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G]
