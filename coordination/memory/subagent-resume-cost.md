@@ -1,12 +1,12 @@
 ---
 name: subagent-resume-cost
-description: After a usage-limit halt, do not resume long-lived subagents via SendMessage; start fresh ones from notes/<n>.md handoffs
+description: After a halt, start fresh agents from notes/<n>.md handoffs; never resume long transcripts
 metadata:
   type: feedback
 ---
 
-After the 2026-11-21 spend-limit halt (~35 min, longer than the prompt-cache lifetime), resuming four hunters with SendMessage replayed their ~200k-token transcripts uncached. The user reported it as a big usage hit (21% of the next 5-hour window right after reset).
+After the 2026-11-21 spend-limit halt, resuming four hunters with SendMessage replayed ~200k-token transcripts uncached; the user reported it as a big usage hit (21% of the next 5-hour window).
 
-**Why:** a resumed agent re-sends its whole context; after a gap longer than the cache TTL that is billed as fresh input.
+**Why:** a resumed agent re-sends its whole context, billed as fresh input once the cache has expired.
 
-**How to apply:** keep subagents short-lived ([[subagent-model-effort]]), have them keep `notes/<n>.md` current, and after a halt launch fresh agents pointed at those notes (or `notes/released/`) instead of resuming old transcripts. Continuing a just-finished agent while its cache is warm is fine. Keep the coordinator's own loop sparse. Related: [[low-hanging-sweep]].
+**How to apply:** HANDOVER startup step 6: fresh agents from `notes/` and `notes/released/`. Continuing a just-finished agent with a warm cache is fine. Related: [[subagent-model-effort]], [[cpu-cheap-tokens-scarce]].

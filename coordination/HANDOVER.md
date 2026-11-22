@@ -1,7 +1,8 @@
 # Coordinator handover: low-hanging campaign
 
-Rewritten 2026-11-22 ~15:45Z from the live state in `.agent/`. Earlier layered updates are folded
-in; superseded rules are gone (see git history of this file if you need them).
+Compacted 2026-11-22 ~18:00Z. Superseded rules are gone (git history has them). Each rule lives in
+one place: procedures in `S/HOURLY.md` and the briefs, the user's standing instructions here, and
+Claude memory only points at them.
 
 This branch (`coordination/low-hanging-campaign` on the `LeoVerto` fork) is **not for merging**:
 `scripts/` and `prompts/` are integrator-owned, and `lean/Sweep*.lean.txt` define tactic macros,
@@ -55,89 +56,53 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   #5370 (about 18 issues).
 - **Triage:** all issues up to #5369 triaged (triage7a–f, triage8); no Sonnet quick wins left.
   #5363–#5368 need Hecke L zero existence (none in the project), rated 4–5.
-- **Pending user decisions:** whether idle Sonnet slots may run as extra Opus escalators; whether to
-  post w25's unbuilt #5275 route (notes/5275.md) as a hint for troyjlee, who holds #5275.
-- Staffing (user): 4 Sonnet hunters, 1 Opus hunter, 2 Opus escalators, 1 Fable consultant.
-  Agents and the nagger wait in the foreground, every call under 170 s (HUNTER.md).
+- **Pending user decision:** whether to post w25's unbuilt #5275 route (notes/5275.md) as a hint
+  for troyjlee, who holds #5275.
+- **Next session launches by subagent type** (HOURLY.md "Launching agents"; startup step 4).
 
 ## Standing instructions from the user
 
+Where a rule is carried out, the procedure is named; the quotes and dates are there too.
+
+- **Conflicting instructions go back to the user** (2026-11-22: "If my instructions conflict, ask
+  me to resolve. The parameters and tools of the whole operation changed a couple times after
+  all"). In the unattended hourly check, follow the newer instruction and name the conflict in
+  the report until the user answers.
 - **Coordinator only.** No proofs, builds or long log reads in the main session; delegate and
-  relay short reports. The `advisor` tool is turned off (user, 2026-11-22); escalation goes
-  through `escalate.sh` and the Fable consultant instead.
-- **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning.
-  Agents wait on builds in the foreground (never `run_in_background`, user 2026-11-22), never polling turns. Keep wake-ups sparse.
-- **Staffing (user, 2026-11-22; HOURLY.md steps 7–8):** one budget of 10 units, Sonnet hunter 1,
-  Opus prover 2 (~17:30Z: "when two sonnets are idle, spawn an opus instead. keep at minimum two
-  opuses and at maximum six sonnets"). Free units go to Opus until 2 run, then to Sonnets while
-  quick-win rows exist (up to 6), the rest in pairs to Opus. Running agents are not stopped to
-  rebalance. Opus work order (~17:10Z: "If there's enough escalation work to be done, use them all
-  for it, otherwise scale back escalation and use them as hunters"; later: "starting an opus
-  hunter on a random issue should be the last option, after escalation and continuing prior work
-  have been exhausted"):
-  1. **Sonnet hunters** on quick wins: triage rows rated 1–2, then 3 (HUNTER.md).
-  2. **Opus work, in this order:**
-     a. **Escalation:** a Sonnet that is *stuck* hands the issue over with `escalate.sh`, keeping
-        our claim; an escalation prover (HUNTER.md "Escalators") takes the oldest file with QUEUED
-        `opus` rows in `escalations.txt` that our Sonnet has left; one file per prover.
-     b. **Prior work** ("If we have prior work on an issue, we should strive to build on top of
-        it"; others' attempts count too): `resumable.sh` lists open unclaimed issues with earlier
-        attempts, ours first, then others' `Releasing` write-ups. The coordinator re-claims a
-        file's rows, adds them to `claims.txt` and queues them with `escalate.sh … --prior`
-        (restores our archived notes or seeds a stub), so they go to an escalator as in a.
-     c. **Last resort, an Opus hunter** on a fresh open unclaimed proof issue (CRITICAL_PROVER.md;
-        not `gap`/`refutation`/ERRATA/`TODO(paper-gap)`, not sweep-held), preferring triage rows
-        rated 3–4 that no Sonnet holds. No cone remapping.
-  3. **Every agent starts from prior work** (HUNTER.md "Prior work first"): `prior.sh <n>` shows
-     the current claim, every comment in full, the PRs referencing the issue, and our notes,
-     released notes, reports, patches, commits and worktrees for it.
-  4. **1 Fable consultant at a time** (user, 2026-11-22 ~16:00Z, Fable allowance; outside the
-     step-7 budget): issues an Opus agent tried and failed go `--to fable` with a stuck packet
-     (HUNTER.md). The consultant (`FABLE.md`, model fable) reads only the packet, may probe a
-     skeleton with `lake lean`, and writes a `## Fable route` (ROUTE / SPLIT / FINDING /
-     NO-ROUTE). ROUTE and SPLIT go back to an Opus escalator; the claim stays ours throughout.
-     Fable is not used as an advisor: that would send the whole 100–200k-token transcript per call.
-     **The coordinator can escalate to Fable directly** when needed (Opus gave up without
-     escalating, an UNCLEAR finding, a blocker shared by several issues, repeated failed attempts
-     upstream): it writes a short packet from the notes, with no Lean runs, and uses the same
-     `escalate.sh --to fable` (HOURLY.md step 8b).
-  No two agents share a file. Interpretation of "Opus hunters" (CRITICAL_PROVER.md brief) is the
-  coordinator's; confirm with the user if in doubt.
-- **Watch our claims** (user, 2026-11-22): `status.sh` prints `NEW #<n>` for others' comments on
-  `claims.txt` issues since the last `status.sh --mark` run (the hourly check; `comments.seen`); HOURLY.md step 3 passes each to the
-  holding agent, and steps back only if someone else's unreleased claim came before ours.
-- **Claim what we work on or have queued.** Escalation keeps the claim (user, 2026-11-22 ~16:00Z:
-  no release and re-claim when an issue moves from Sonnet to Opus): `escalate.sh` posts nothing,
-  leaves the issue in `claims.txt` and queues it in `escalations.txt`; `status.sh` shows it as
-  ESCALATED, not STALE. Upstream auto-releases a claim with no PR after 8 h, so a queued claim
-  older than 7 h gets one refresh comment (`REFRESH-CLAIM`). After a usage halt (when the
-  watchdog releases everything), re-claim what the resumed agents and the queue hold.
+  relay short reports. No `advisor` tool (off since 2026-11-22: it sends the whole transcript);
+  escalation goes through `escalate.sh` and the Fable consultant.
+- **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning; keep
+  wake-ups sparse. Agents and the nagger wait in the FOREGROUND, every call under 170 s (HUNTER.md
+  "Builds and processes"); never `run_in_background`.
+- **Staffing and Opus work** (2026-11-22): 10-unit budget, at least 2 Opus, at most 6 Sonnets;
+  Opus goes to escalation, then prior work (ours and others'), a fresh issue last; one Fable
+  consultant and one findings evaluator outside the budget. HOURLY.md steps 7–9. No two agents
+  share a file. A prover that finishes with a warm cache may get ONE related issue by SendMessage.
+- **Build on prior work** (2026-11-22): every agent starts from `prior.sh <n>` (HUNTER.md "Prior
+  work first"); `resumable.sh` feeds HOURLY.md step 8b.
+- **Claims.** Claim what we work on or have queued; escalation keeps the claim; release only via
+  `release.sh` (posts the notes); refresh a queued claim after 7 h (upstream auto-releases at
+  8 h); watch others' comments on our claims (HOURLY.md step 3). After a halt (the watchdog
+  releases everything), re-claim what the resumed agents and the queue hold.
 - **Collaborative, not a race.** No pre-proving of sorries without an issue (the sieve may compute
-  hits on CPU only). Do not race other contributors or the upstream sweepers. Help on held files
-  with hints, not competing PRs. Step back when someone else claimed first.
-- **One PR per touched Lean file.** Don't crowd a file that 2–3 others hold.
-- **Models and tags:** hunters, sievers and fixers run on Sonnet, effort medium, until 4 PRs or
-  about 3 h. Opus runs with no effort override. Triage and the nagger run on Haiku. Tag `<M>` =
-  `Claude Sonnet 5.5, effort medium` / `Claude Opus 5.5, default effort`. Claims start
-  `Claiming (<M>)`; PR bodies carry `Prover: <M>` above the 🤖 line.
-- **Read the thread before claiming** (earlier approaches). Release only via `release.sh`, which
-  posts the agent's `notes/<n>.md` (failed approaches first).
+  hits on CPU only). Do not race other contributors or upstream sweepers; help on held files with
+  hints. Step back when someone else claimed first.
+- **One PR per touched Lean file**; don't crowd a file that 2–3 others hold (HUNTER.md).
+- **Models and tags:** fixed by the agent definitions (`.agent/agents/`); tags `<M>` per HOURLY.md.
+  Claims start `Claiming (<M>)` (upstream parses only the first word); PR bodies carry `Prover: <M>` above the 🤖 line. Sonnet agents
+  run until their list is done, 4 PRs or about 3 h.
 - **Token:** only for `mccorvie/riemann-masullo` (`origin`) and `LeoVerto/riemann-masullo`
   (`fork`). It must be a CLASSIC token (repo, workflow, read:org); check with `tokencheck.sh`.
 - **Upstream posting:** ask the user before posting anything new. Standing exceptions: normal
   Claiming/Releasing; sieve hints on open `sweep` issues; extensions of #1288, #561 and #3230;
-  **paper findings that an Opus evaluator has confirmed** (user, 2026-11-22 ~16:00Z: "Paper
-  findings should be evaluated by Opus and then raised"; `FINDINGS.md`, queue `findings.txt`).
-  **Never raise BLOCKERS §0** (Main.lean integration is wave 4+, by the project's choice).
+  paper findings that the Opus evaluator confirmed (`FINDINGS.md`). **Never raise BLOCKERS §0**
+  (Main.lean integration is wave 4+, by the project's choice).
 - **Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main** (`git show origin/main:<file>`)
-  at each session start and when they change; keep the briefs compliant. Checked 2026-11-22 ~16:00Z:
-  HUNTER.md follows AGENTS (Lean rules, false statements and gaps), CONTRIBUTING "Working
-  efficiently" (private helpers in the issue's file only, no `maxHeartbeats`, no routine rebase,
-  keep the file fast) and ERRATA (`TODO(paper-gap)` marks). Paper findings are reported on the
-  issue as CONTRIBUTING asks, after an Opus evaluator has checked them.
+  at session start and when they change (HOURLY.md step 0); HUNTER.md carries their rules (gaps,
+  false statements, private helpers in the issue's file, no `maxHeartbeats`).
 - **State lives in `.agent/`**, never only under `/home/agent`.
-- **Notes nagger out of session:** one long-running Haiku loop (`NAGGER.md`), never cron ticks in
-  the coordinator session. The coordinator only keeps `agents.txt` in sync and relaunches it.
+- **Notes nagger out of session:** one long-running Haiku loop (`NAGGER.md`), no cron ticks in the
+  coordinator session; the coordinator keeps `agents.txt` in sync and relaunches it.
 
 ## Environment (sandbox `riemann-masullo-faststorage`)
 
@@ -150,7 +115,13 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
   is not cheap.
 - elan in `~/.elan`; `/etc/sandbox-persistent.sh` sets its PATH and `LAKE_ARTIFACT_CACHE=true`,
   `LAKE_CACHE_DIR=<repo>/.lake/artifact-cache`, `LAKE_RESTORE_ARTIFACTS=true` (tested: restores
-  leave real local `.olean`s; concurrent builds are fine).
+  leave real local `.olean`s; concurrent builds are fine). Never drop RESTORE: without it no local
+  `.olean` is written and `signatures.sh` breaks. Set these only through the env, never the
+  lakefile; the user approved writes only to that `.lake` subdirectory.
+- A full `lake build` can fail on the chapter index modules with "Too many open files" (the host
+  mount's handles, not the ulimit): build them one at a time and re-run; `warm.sh` does this.
+- Transcripts: `~/.claude/projects/-mnt-faststorage-math-riemann-masullo` (plus one dir per
+  worktree a coordinator runs from; the watchdog's `PROJ` covers them all).
 - poppler-utils (for `scripts/paper.sh`) comes from apt.
 - Claude memory: `~/.claude/projects/-mnt-faststorage-math-riemann-masullo/memory` is a symlink to
   `<repo>/.agent/memory`.
@@ -166,11 +137,16 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
    `cd S && setsid nohup ./<name>.sh >> <name>.log 2>&1 < /dev/null &` for watchdog and memguard, and the same with `nice -n 19` before `./<name>.sh` for warm and sieve (user, 2026-11-22 17:25Z: agents hit timeouts under CPU load; the services must yield; sieve details in `SIEVE.md`). Check that `warm.log` says "ready" at a recent main. The
    watchdog's auto-resume uses a hard-coded old `SESSION`: leave `no-resume` in place unless you
    restart it with `SESSION=<your id>`.
-4. **One hourly check:** `CronList` first (duplicates have happened), then create it with the
+4. **Subagent types:** the Agent tool must list `hunter`, `escalator`, `opus-hunter`, `siever`,
+   `triage`, `fable-consultant`, `findings-evaluator`, `nagger`. They load from `.claude/agents`
+   (symlink to `../.agent/agents`, in `.git/info/exclude`) only if it existed when the session
+   started; a new definition file loads mid-session, an edited one only after a restart, so keep
+   role logic in the briefs.
+5. **One hourly check:** `CronList` first (duplicates have happened), then create it with the
    one-line prompt under "Hourly check".
-5. **Relaunch:** the nagger (if any agent runs), the quick-win loop on the new issues, and
-   Opus work per HOURLY.md steps 7–8. Never resume long dead transcripts with SendMessage
-   (an uncached replay is expensive): start fresh agents from `notes/` and `notes/released/`.
+6. **Relaunch** per HOURLY.md (nagger if any agent runs, then steps 7–8). Never resume long dead
+   transcripts with SendMessage (an uncached replay is expensive): start fresh agents from
+   `notes/` and `notes/released/`.
 
 ## Hourly check
 
@@ -179,34 +155,24 @@ it on every tick. Change the hourly behaviour by editing that file, never the cr
 cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
 `Read /mnt/faststorage/math/riemann-masullo/.agent/sweeptools/HOURLY.md and follow it.`
 
-## Workstreams and launch prompts
+## Workstreams
 
-- **Quick-win loop** (main source of work):
-  1. `shortlist.py <files>` scores every sorry without Lean (statement size, name patterns,
-     docstring hints, red flags, the paper's proof length) into `shortlist/latest.tsv`.
-  2. Haiku triage: `Read S/TRIAGE.md and follow it. N = 60.` (model haiku) rates rows 1–5, or `-`
-     for ERRATA/gap items, and flags SUSPECT statements (leads for the findings evaluator).
-  3. Sonnet hunters on exactly the rows rated 1–2, then 3. Prefer files low in the import order and
-     nearly finished (CONTRIBUTING).
-  Rated-3 rows in Ch05 Sec4/Sec5 hit slow-compile traps (w10, w12, w13) and ended in escalations.
-- **Hunter:** `Read S/HUNTER.md and follow it exactly. Your name is w<k>, your branch prefix <P> is
-  hunt/w<k>, your model tag <M> is Claude Sonnet 5.5, effort medium. Your issues: …` (Sonnet, effort
-  medium). Opus escalation provers get the same brief with the Opus tag, the issue's notes and its
-  release comments.
-- **Opus prover:** `Read S/critical/CRITICAL_PROVER.md and follow it. Your issue is #<n>. Your model
-  tag <M> is Claude Opus 5.5, default effort.` Worktree `wt/crit-<n>`, branch `crit/<n>`, result
-  line in `critical/status.txt`. A prover that finishes with a warm cache may get ONE related issue
-  by SendMessage, then retire it.
-- **Sieve and siever:** the sieve service (`SIEVE.md`) tries cheap, `exact?`, `grind` and
-  unfold-defs passes on every new or changed file, one Lean process at a time, and writes
-  `sieve/hits.tsv`. `status.sh` classifies hits READY / HINT / CLAIMED / WAIT / DONE. A siever
-  (`Read S/SIEVER.md and follow it. Your model tag <M> is …; your hits: <lines>`) hands in READY
-  hits and posts HINT hits on the sweep issue. Its yield so far is low (e.g. #4035).
-- **Findings evaluator:** agents report paper findings on a `Finding:` line; SUSPECT triage rows
-  are leads. Both go to `S/findings.txt`, and one Opus evaluator at a time (`Read S/FINDINGS.md
-  and follow it. Your findings: <rows>.`, outside the step-7 budget) re-checks each against
-  the page image and the Lean, then posts confirmed ones on the issue (HOURLY.md step 9).
-- **Nagger:** see `NAGGER.md`; stop it with `touch S/nagger.stop`.
+Launch prompts: HOURLY.md "Launching agents".
+- **Quick-win loop:** `shortlist.py <files>` scores every sorry without Lean into
+  `shortlist/latest.tsv`; a triage agent rates rows 1–5 (`-` for ERRATA/gap items) and flags
+  SUSPECT statements; hunters take rows rated 1–2, then 3, preferring files low in the import order
+  and nearly finished (CONTRIBUTING). Rated-3 rows in Ch05 Sec4/Sec5 hit slow-compile traps and
+  ended in escalations. Caveats: `paper: no proof` only means no proof before the next item, and
+  `paper:SHORT` over-fires on "This follows…".
+- **Opus work and Fable:** HOURLY.md steps 8–8b; Opus-hunter results in `critical/status.txt`.
+- **Sieve:** the service (`SIEVE.md`) tries cheap, `exact?`, `grind` and unfold-defs passes on every
+  new or changed file, one Lean process at a time, into `sieve/hits.tsv`; `status.sh` classifies
+  hits READY / HINT / CLAIMED / WAIT / DONE, and a siever hands in READY and posts HINT hits on
+  the sweep issue. Low yield so far (e.g. #4035). If it pays off, propose it upstream as an
+  integrator tool in an issue, not a PR (user, 2026-11-21; `scripts/` is integrator-owned).
+- **Findings:** `Finding:` lines and SUSPECT rows go to `findings.txt`; the evaluator re-checks
+  each against the page image and the Lean and posts confirmed ones (HOURLY.md step 9).
+- **Nagger:** `NAGGER.md`; stop it with `touch S/nagger.stop`.
 - `scripts/agent.sh` does not work here: it assumes the integrator's layout and pushes to `origin`.
 
 ## Infrastructure (`S`; copies in `tools/`)
@@ -229,6 +195,7 @@ cron (hourly, e.g. minute 17, after `CronList`) with only this prompt:
 | `sieve.sh`, `sieve.py`, `sieve_status.py`, `sweep.py` | The sieve. |
 | `nag-wait.sh`, `notes-stale.sh`, `NAGGER.md` | Notes nagger. |
 | `HUNTER.md`, `SIEVER.md`, `critical/CRITICAL_PROVER.md` | Agent briefs; HUNTER.md holds the rules shared by all three. |
+| `.agent/agents/*.md` (snapshot `agents/`) | Subagent type definitions: model, effort, tools, and which brief to read. |
 | `HOURLY.md` | The hourly check's instructions, read by the cron on every tick. |
 | `FABLE.md` | Fable consultant brief: route from a stuck packet, no builds or PRs. |
 | `FINDINGS.md`, `findings.txt` | Opus findings-evaluator brief and its queue. |
@@ -248,8 +215,8 @@ State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims
 - **Upstream sweepers** (label `sweep`, codex agents) claim whole files within minutes and hold most
   of the hard tails. Never edit a held file. Census counts lie about difficulty, and blind hunters
   on "unclaimed=N" returned 0 PRs: send agents only on concrete leads.
-- **The `claimed` label lags; claim comments do not.** Read the whole thread; a plain `Claiming`
-  counts.
+- **The `claimed` label lags and can stick; claim comments do not.** `prior.sh` prints the claim
+  state from the comments; a plain `Claiming` counts.
 - **Use `lake lean`, never `lake env lean`:** only the former applies the lakefile options. The
   "elaboration timeouts" reported on Ch02/Ch04/AppD before 2026-11-22 05:00Z were mostly this
   artifact, so re-test such verdicts.

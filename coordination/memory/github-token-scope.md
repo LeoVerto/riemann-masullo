@@ -1,12 +1,12 @@
 ---
 name: github-token-scope
-description: The GitHub token in this sandbox may only be used for the LeoVerto fork and the mccorvie upstream of riemann-masullo; it must be a classic token
+description: Use the sandbox GitHub token only for the LeoVerto fork and the mccorvie upstream; it must be a classic token
 metadata:
   type: feedback
 ---
 
-Use the sandbox's GitHub token only for `LeoVerto/riemann-masullo` (fork, remote `fork`) and `mccorvie/riemann-masullo` (upstream, remote `origin`). Never for any other repo.
+The user, 2026-11-21, when swapping in a classic token: use it only for `LeoVerto/riemann-masullo` (remote `fork`) and `mccorvie/riemann-masullo` (remote `origin`), never any other repo.
 
-**Why:** the user set this restriction on 2026-11-21 when swapping in a classic token.
+**Why:** the user's restriction; a fine-grained PAT also failed upstream (403) on 2026-11-22.
 
-**How to apply:** before any `gh` or `git push` call, check that the target is one of these two. The token must be CLASSIC, with repo, workflow and read:org. A fine-grained PAT gets 403 on upstream comments and PRs, and its fork pushes are rejected (seen 2026-11-22). Check with `.agent/sweeptools/tokencheck.sh` (also in status.sh and step 0 of every brief). On failure ask the user to run `sbx secret set github --sandbox riemann-masullo-faststorage -t <classic token>`. See [[coordinator-only]], [[riemann-masullo-sandbox-quirks]].
+**How to apply:** check the target before any `gh` or `git push`. Token check and fix: HANDOVER "Token" and startup step 2 (`tokencheck.sh`). Related: [[riemann-masullo-sandbox-quirks]].

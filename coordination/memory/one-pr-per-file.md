@@ -1,14 +1,12 @@
 ---
 name: one-pr-per-file
-description: "Hunters/sievers open one PR per touched Lean file, never a PR spanning files"
+description: User rule - every hunter/siever PR covers exactly one Lean file
 metadata:
-  node_type: memory
   type: feedback
-  originSessionId: 00d88758-043b-469f-b435-e8a706bdbafe
-  modified: 2026-11-22T05:55:39.163Z
 ---
 
-Every hunter/siever PR covers exactly one Lean file; a batch spanning several files is handed in as one PR per file (user instruction, 2026-11-22 ~05:50Z).
+The user, 2026-11-22 ~05:50Z: one PR per touched Lean file.
 
 **Why:** matches CONTRIBUTING "Take a file, not an issue": per-file PRs don't collide and merge independently.
-**How to apply:** assign hunters one file each where possible; written into HUNTER.md "One file at a time". See [[quick-wins-mode]].
+
+**How to apply:** HOURLY.md step 7a (one file per hunter) and HUNTER.md. Related: [[quick-wins-mode]].

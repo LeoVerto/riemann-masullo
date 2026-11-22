@@ -1,20 +1,21 @@
-- [GitHub token scope](github-token-scope.md) — use token only for LeoVerto fork and mccorvie upstream
-- [Sandbox quirks](riemann-masullo-sandbox-quirks.md) — lake lean not lake env lean, open-file limit, Lake cache with RESTORE, memguard 1000 MB, gh 401 cache, time zones
-- [Low-hanging sweep](low-hanging-sweep.md) — campaign pointer: HANDOVER.md on fork branch coordination/low-hanging-campaign; wound down 2026-11-22 ~17:50Z for a coordinator restart (watchdog stopped, claims kept)
-- [Subagent resume cost](subagent-resume-cost.md) — after a halt, start fresh agents from notes/<n>.md handoffs; never resume long transcripts
-- [Subagent model and effort](subagent-model-effort.md) — Sonnet medium until list done / 4 PRs / ~3 h; Opus no override; Haiku for triage and nagger
-- [Escalation ladder](escalation-ladder.md) — Sonnet -> Opus escalator -> Fable consultant (stuck packet, route only) -> Opus; claim kept; advisor off
-- [Critical-path workstream](critical-path-workstream.md) — Opus provers on any open unclaimed issue (no cone since 07:30Z); results; never raise BLOCKERS §0
-- [Coordinator only](coordinator-only.md) — main session delegates everything; on restart, settle caching with one subagent first
-- [State lives in .agent](state-in-dot-agent.md) — sweeptools, worktrees, memory all under <repo>/.agent; memory dir is a symlink
-- [CPU cheap, tokens scarce](cpu-cheap-tokens-scarce.md) — prefer sweeps/automation and background waits over agent reasoning and polling
-- [Helper-lemma placement](formathlib-convention.md) — private helpers in the issue's file only (CONTRIBUTING); ForMathlib only for Mathlib-worthy lemmas
-- [Claims, notes, attribution](claims-notes-attribution.md) — read threads first; claim worked-on and queued issues; notes/<n>.md; release.sh; tag model+effort
-- [Sieve naming](sieve-naming.md) — our tactic screen = "sieve" (sieve.sh, SIEVER.md hand-in brief), not upstream "sweeper"
-- [Collaborative, not a race](collaborative-not-race.md) — no pre-proving before issues exist; no racing others or sweepers; help via hints
-- [Staffing / quick-wins mode](quick-wins-mode.md) — 10-unit budget (Sonnet 1, Opus 2; ≥2 Opus, ≤6 Sonnets); Opus: escalation, prior work, fresh issue last; NEW comments routed
-- [Read docs from origin/main](read-docs-origin-main.md) — AGENTS/CONTRIBUTING/ERRATA via git show origin/main; gap handling binds hunters
-- [One PR per file](one-pr-per-file.md) — hunter/siever PRs each cover exactly one Lean file (user, 2026-11-22)
-- [Nagger out of session](nagger-out-of-session.md) — one long-running Haiku loop; everyone (nagger too) waits in the FOREGROUND, never run_in_background (user)
-- [Paper findings via Opus](paper-findings-opus.md) — findings go to findings.txt; an Opus evaluator (FINDINGS.md) checks them and posts confirmed ones on the issue
-- [Custom subagents](custom-subagents.md) — draft types in .agent/agents; new files load mid-session, edits need restart
+- [Ask on conflict](ask-on-conflict.md) — conflicting user instructions go back to the user; hourly runs follow the newer one and report it
+- [Campaign source of truth](low-hanging-sweep.md) — HANDOVER on fork branch coordination/low-hanging-campaign; memory only points, never duplicates
+- [Staffing instructions](quick-wins-mode.md) — user quotes on Sonnet/Opus budget and Opus work order; procedure HOURLY.md steps 7–8
+- [Escalation ladder](escalation-ladder.md) — Sonnet -> Opus escalator -> Fable route -> Opus; claim kept; advisor off
+- [Opus-hunter workstream](critical-path-workstream.md) — CRITICAL_PROVER.md, critical/status.txt; never raise BLOCKERS §0
+- [Coordinator only](coordinator-only.md) — main session delegates everything, keeps its context small
+- [State lives in .agent](state-in-dot-agent.md) — tools, worktrees, agent types, memory under <repo>/.agent
+- [CPU cheap, tokens scarce](cpu-cheap-tokens-scarce.md) — automate before reasoning; sparse wake-ups
+- [Helper-lemma placement](formathlib-convention.md) — private helpers in the issue's file; rule in HUNTER.md
+- [Claims, notes, attribution](claims-notes-attribution.md) — claim worked-on and queued issues, notes, tags, watch comments; procedures in HUNTER/HOURLY
+- [Sieve naming](sieve-naming.md) — our tactic screen = "sieve"/"siever", not upstream "sweeper"
+- [Collaborative, not a race](collaborative-not-race.md) — no pre-proving, no racing; hints on held files
+- [Read docs from origin/main](read-docs-origin-main.md) — AGENTS/CONTRIBUTING/ERRATA via git show origin/main; HOURLY step 0
+- [One PR per file](one-pr-per-file.md) — every hunter/siever PR covers one Lean file
+- [Nagger out of session](nagger-out-of-session.md) — one long-running Haiku loop; everyone waits in the FOREGROUND
+- [Paper findings via Opus](paper-findings-opus.md) — one Opus evaluator checks findings before posting (FINDINGS.md)
+- [Subagent types](custom-subagents.md) — definitions in .agent/agents, used from the next session; edits need a restart
+- [Subagent models](subagent-model-effort.md) — Sonnet medium (4 PRs / ~3 h), Opus default, Haiku triage/nagger, Fable consultant
+- [Subagent resume cost](subagent-resume-cost.md) — after a halt start fresh agents from notes; never resume long transcripts
+- [GitHub token scope](github-token-scope.md) — token only for LeoVerto fork and mccorvie upstream; classic token
+- [Sandbox quirks](riemann-masullo-sandbox-quirks.md) — pointer to HANDOVER Environment/Lessons; key reminders
