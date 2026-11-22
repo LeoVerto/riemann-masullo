@@ -8,7 +8,7 @@
 # Run:  nohup /mnt/faststorage/math/riemann-masullo/.agent/sweeptools/watchdog.sh >/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/watchdog.log 2>&1 &
 set -u
 T=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools
-PROJ=/home/agent/.claude/projects/-mnt-faststorage-math-riemann-masullo
+PROJ=/home/agent/.claude/projects  # all project dirs: the coordinator may run from a worktree, which has its own dir
 REPO=/mnt/faststorage/math/riemann-masullo
 SESSION=${SESSION:-ff69c771-f0e3-4605-a699-65a30fd82b57}
 STALE=${STALE:-1200}; RESUME_AFTER=${RESUME_AFTER:-7200}; PROBE=${PROBE:-900}

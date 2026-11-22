@@ -224,6 +224,9 @@ State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims
   reports to the nagger, not the coordinator** (esc-sec5, 2026-11-22 ~17:50Z). Hence the user's
   rule: all agents and the nagger wait in the FOREGROUND (HUNTER.md "Builds and processes"); a
   coordinator message to an idle agent routes it back to the coordinator.
+- **The watchdog must see every project dir** (`PROJ=/home/agent/.claude/projects`): a coordinator
+  running from a worktree has its own transcript dir, and on 2026-11-22 17:02Z the watchdog, watching
+  only the old dir, released all 25 live claims (re-claimed; #5275 lost to another contributor).
 - Never `pgrep`/`pkill -f` a pattern from your own command line; kill only PIDs you started.
 
 ## Upstream reports (integrator decides)
