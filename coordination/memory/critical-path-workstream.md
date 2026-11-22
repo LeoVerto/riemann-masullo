@@ -1,0 +1,31 @@
+---
+name: critical-path-workstream
+description: Parallel workstream (from 2026-11-21) - map Main.lean's sorry cone and run one Opus prover per critical-path issue; coordinator does no proof work itself
+metadata:
+  type: project
+---
+
+Started 2026-11-21 ~17:00Z at the user's request, because short proof issues are running out. The user said: "Do not run any work yourself, you are the coordinator."
+
+- Files live in /home/agent/sweeptools/critical/: CRITICAL_PROVER.md (the brief), QUEUE.md, graph.tsv, BLOCKERS.md, CONE_SHORT.md (all written by the Opus mapper), and status.txt (one line per finished task).
+- Critical-path provers: Agent model "opus" with no effort override, ONE issue each, launched sequentially from QUEUE.md. Launch prompt: "Read /home/agent/sweeptools/critical/CRITICAL_PROVER.md and follow it. Your issue is #<n>." Worktrees go in /home/agent/wt/crit-<n>, branches are crit/<n>. A prover may prove the issue or split it per prompts/prover.md.
+- scripts/agent.sh is not usable here: it was built for the integrator's checkout layout and pushes to `origin`, which here is upstream.
+- Point the Sonnet hunters ([[low-hanging-sweep]]) at CONE_SHORT.md once it exists.
+- BLOCKERS.md items need the integrator. Ask the user before posting them upstream, unless they extend a report already filed (#1288, #561, #3230).
+
+State 2026-11-21 ~18:00Z:
+- **Mapper result:** Main.lean's own cone is EMPTY. It imports only Statements (pure Mathlib), and all 7 targets are bare sorry; nothing in the library mentions riemannZeta or Dirichlet L. The mapper used an anchored cone instead: the completedHeckeL bridge plus items cited by Ch.5.2–13, 416 sorry nodes in all. Regenerate it with the scripts in /home/agent/wt/crit-map/.agent/.
+- **Queue top 5:** #1223 Tate global continuation, #1906, #1902, #1891, #1890.
+- **Running:** the first Opus prover on crit/1223, and the Sonnet hunter hunt/cone1 on CONE_SHORT.md.
+- **Posted on #3230:** BLOCKERS §1 (6 sorries without an issue) and §2 (124 live issues closed by the 15:23Z sync run, e.g. #862 #848 #1288).
+- BLOCKERS §0 (no library→Main bridge): RESOLVED 2026-11-22, do NOT raise it. The user: integrating Main.lean is part of wave 4 or later; the project's human coordinator chose to focus on the earlier parts first.
+- 2026-11-21 ~21:00Z: the first critical-path result is PR #3660 (#1223, proved apart from #1219 and older upstream sorries). Next on the critical path: #1906 (Opus, running), then #1219 (move it up the queue), then #1902.
+- 2026-11-21 ~22:00Z: PR #3681 FULLY proves #1906 (adds ForMathlib Count.lean and Haar/Units.lean). Opus prover now on #1219. Leads for #1912 and Ch04 Sec5:605 are in leads.txt.
+- 2026-11-22 ~00:30Z: PR #3823 FULLY proves #1219 (lattice-count bound plus a Weil-formula reduction). Next on the path: four sorries in AppD Sec1c and AppA Sec3 (see the top of QUEUE.md), then #1902.
+- 2026-11-22 ~02:05Z: the integrator now runs its own codex "sweeper" agents (label `sweep`, prompts/sweeper.md), each closing out a whole file in one PR. Open on 2026-11-22: AppA Sec3 (#3806), AppD Sec1a/1b/1c/1d/3a_part2 (#3702 #3791 #3792 #3793 #3799), Ch02 Sec1/2b/3/4 (#3794 #3796 #3669 #3667), AppB Sec1 (#3666); AppD Sec3b #3724 is `stuck`. So ALL four queue-top sorries (#3484 #3486 #3488 #3099) belong to sweepers; skip them. Next critical prover target: #1902 (Ch03, unclaimed), then #1891/#1890 (released by mccorvie). Rule added to HUNTER.md and CRITICAL_PROVER.md: never touch files held by open sweep issues.
+
+- 2026-11-22: do not raise BLOCKERS §0 upstream (Main.lean integration is wave 4+, by the project coordinator's decision). Keep the critical path anchored on the cited items in the earlier chapters and appendices.
+- 2026-11-22 ~03:10Z: PR #3978 proves #1902 (S-local continuation, p. 131 gluing via the functional equation plus a meromorphic normal form; uniqueness needs every quasi-character of J_S to lie on a chart). It rests on three open Ch03 Sec3 lemmas: #1885 analyticOn, #1901 functionalEquation, #1900 rho meromorphic (which tie to #1890 (claimed by elmismisimoxhunca) and #1891). The same Opus agent continues on one of #1885/#1901/#1900/#1891 while its cache is warm, stacking on crit/1902 if it needs its helpers.
+- 2026-11-22 ~03:20Z overlap audit (user asked whether we duplicate upstream sweepers): 22 sweep issues since 2026-11-21 21:16Z; ZERO issue overlap with our PRs. Same-file cases were sequential (our PRs merged before the sweep issue was created; by design sweepers take the hard tail after single provers). One near-miss: PR #3823 added helper lemmas to Ch02 Sec2a while sweep #3795 held it. Rule added to both briefs: claim publicly first, re-check open sweeps before push, move new helpers out of a newly held file. Prefer critical issues in files without open sweep issues. Offered the user (pending): post our tactic-sweep hits in held files as hints on the sweep issues (needs approval: new upstream posts).
+- 2026-11-22: user approved posting tactic-sweep hits in sweep-held files as hint comments on the open sweep issues (one comment per issue, batched; done by the sweep agent).
+- 2026-11-22 ~03:40Z: PR #3993 FULLY proves #1885 (analyticOn, clean axioms; it followed the approach in elmismisimoxhunca's release notes). #3978 (#1902) now rests on #1901 and #1900 only. Upstream sweepers took ALL of Ch03 at ~02:12Z: Sec2 #3991, Sec3 #3992 (incl. #1890 #1891 #1900 #1901), Sec3b #3994. So the Ch03 critical chain is theirs. Re-ranked the cone outside held files (178 sorries): top #2663 Ch04 Sec5 (19 deps; #1288 timeout risk), #2607 Ch09 Sec3, #2364/#2359 Ch05 Sec1, #2541 Ch04 Sec4. Launched a fresh Opus prover on #2663 that fails fast to #2364. The ranking script is inline in the session; held files are in .agent/held.txt.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Remove worktrees under /home/agent/wt whose branch has a merged PR upstream.
-MAIN=/home/user/git/riemann-masullo
-for d in /home/agent/wt/*/ /home/agent/wt/hunt/*/; do
+# Remove worktrees under /mnt/faststorage/math/riemann-masullo/.agent/wt whose branch has a merged PR upstream.
+MAIN=/mnt/faststorage/math/riemann-masullo
+for d in /mnt/faststorage/math/riemann-masullo/.agent/wt/*/ /mnt/faststorage/math/riemann-masullo/.agent/wt/hunt/*/; do
   d=${d%/}; case $d in */wt/sweep|*/wt/base|*/wt/hunt) continue;; esac
   br=$(git -C $d branch --show-current 2>/dev/null); [ -n "$br" ] || continue
   st=$(gh pr list --repo mccorvie/riemann-masullo --head "$br" --state merged --json number --jq '.[0].number // empty')

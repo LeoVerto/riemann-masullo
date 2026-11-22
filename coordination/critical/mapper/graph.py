@@ -1,5 +1,5 @@
 import json, re, collections, sys
-rows = [json.loads(l) for l in open('/home/agent/wt/crit-map/.agent/deps.jsonl')]
+rows = [json.loads(l) for l in open('/mnt/faststorage/math/riemann-masullo/.agent/wt/crit-map/.agent/deps.jsonl')]
 C = {r['n']: r for r in rows}
 succ = {n: set(r.get('t', [])) | set(r.get('v', [])) for n, r in C.items()}
 S = {n for n, r in C.items() if r.get('s')}
@@ -41,4 +41,4 @@ print('sorry nodes', len(S), 'chapter roots', len(roots), 'cone', len(cone))
 by = collections.Counter(C[n]['m'].split('.')[1] for n in cone)
 byall = collections.Counter(C[n]['m'].split('.')[1] for n in S)
 for k in sorted(byall): print(k, by.get(k, 0), '/', byall[k])
-json.dump({'cone': sorted(cone), 'direct': {n: sorted(v) for n, v in direct.items()}}, open('/home/agent/wt/crit-map/.agent/cone.json', 'w'))
+json.dump({'cone': sorted(cone), 'direct': {n: sorted(v) for n, v in direct.items()}}, open('/mnt/faststorage/math/riemann-masullo/.agent/wt/crit-map/.agent/cone.json', 'w'))

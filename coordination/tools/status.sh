@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 # One-shot status for the coordinator's periodic check.
-T=/home/agent/sweeptools; R=mccorvie/riemann-masullo
+T=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools; R=mccorvie/riemann-masullo
 echo "== $(date '+%H:%M') host"; free -m | awk 'NR==2{print "mem avail "$7"MB"}'; df -h / | awk 'NR==2{print "disk free "$4}'; uptime | sed 's/.*load/load/'
-echo "lake cache (unique, excluding hardlinks into packages) $(du -sh /home/user/git/riemann-masullo/.lake/packages /home/user/git/riemann-masullo/.lake/artifact-cache 2>/dev/null | tail -1 | cut -f1)"
+echo "== token"; $T/tokencheck.sh
+echo "lake cache (unique, excluding hardlinks into packages) $(du -sh /mnt/faststorage/math/riemann-masullo/.lake/packages /mnt/faststorage/math/riemann-masullo/.lake/artifact-cache 2>/dev/null | tail -1 | cut -f1)"
 echo "== PRs (LeoVerto, open + merged today)"
 gh pr list --repo $R --author LeoVerto --state all --limit 30 --json number,state,title,statusCheckRollup,reviews,comments \
   --jq '.[] | select(.state=="OPEN" or .state=="MERGED") | "\(.number) \(.state) \([.statusCheckRollup[]? | select(.name=="Verdict") | .conclusion] | join(",")) rev=\(.reviews|length) com=\(.comments|length) \(.title[:60])"' 2>&1 | head -30
 echo "== claims.txt ($(wc -l < $T/claims.txt))"; tr '\n' ' ' < $T/claims.txt; echo
-echo "== warm base"; echo "ready $(cut -c1-8 $T/base/COMMIT)  main $(git -C /home/user/git/riemann-masullo rev-parse --short=8 origin/main)  $(tail -1 $T/warm.log)"
+echo "== warm base"; echo "ready $(cut -c1-8 $T/base/COMMIT)  main $(git -C /mnt/faststorage/math/riemann-masullo rev-parse --short=8 origin/main)  $(tail -1 $T/warm.log)"
 echo "== memguard"; tail -1 $T/memguard.log
 echo "== sweep"; echo "res1 $(ls $T/res1 | wc -l) files, res2 $(ls $T/res2 | wc -l) files; chain: $(tail -1 $T/chain.log 2>/dev/null)"
 python3 - <<'PY'
 import json,glob,os
-seen=set(open('/home/agent/sweeptools/dispatched.txt').read().split()) if os.path.exists('/home/agent/sweeptools/dispatched.txt') else set()
-for f in sorted(glob.glob('/home/agent/sweeptools/res[123]/*.json')):
+seen=set(open('/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/dispatched.txt').read().split()) if os.path.exists('/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/dispatched.txt') else set()
+for f in sorted(glob.glob('/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/res[123]/*.json')):
     d=json.load(open(f))
     for s in d['sorries']:
         k=f"{d['file']}::{s['decl']}"
@@ -49,3 +50,4 @@ gh api --paginate "repos/$R/issues?state=open&labels=proof&per_page=100" --jq '.
   awk '{c[$1]++; if ($2>m[$1]) m[$1]=$2} END {for (l in c) print l, c[l], m[l]}' | sort -k2 -nr |
   while read l c m; do h=$(awk -v l="$l" '$1==l {h=$2} END {print h}' $T/hunted.txt); echo "$l unclaimed=$c newest=#$m last_hunt=${h:-NEVER}"; done
 true
+echo "== sieve"; python3 $T/sieve_status.py 2>&1 | head -15

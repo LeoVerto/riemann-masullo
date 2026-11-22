@@ -26,7 +26,7 @@ Data: `graph.tsv` (one row per cone node). Blockers: `BLOCKERS.md`. Short work f
     groups are in the broad-only rows of `graph.tsv`.
 - **Caveat.** The anchors are explicit item numbers cited in the undigested pages. The proof of a
   sorry'd anchor has no edges yet, so what its eventual proof will need is not traced; in that sense
-  the cone is a lower bound. Regenerate with the scripts in `/home/agent/wt/crit-map/.agent/`:
+  the cone is a lower bound. Regenerate with the scripts in `/mnt/faststorage/math/riemann-masullo/.agent/wt/crit-map/.agent/`:
   `Deps.lean` dump, then `anchors.py`, `emit.py`, `tipcheck.py` and `write_tsv.py`, about 1 minute after a built tree (the claim and closed-issue annotations were added by hand-run steps).
 - **"Dependents"** counts the cone sorries whose statement or proof reaches the node. Most edges go
   through `Classical.choose` / proof fields of definitions (for example `globalIdelicZFunction :=

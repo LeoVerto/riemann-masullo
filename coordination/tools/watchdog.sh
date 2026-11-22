@@ -5,11 +5,11 @@
 #    released ("Releasing" comment, which the upstream Claims workflow acts on).
 #  - Then it probes the API every $PROBE seconds; when a probe succeeds it resumes the session
 #    (claude --resume <id>) with a continuation prompt. Only one resume runs at a time.
-# Run:  nohup /home/agent/sweeptools/watchdog.sh >/home/agent/sweeptools/watchdog.log 2>&1 &
+# Run:  nohup /mnt/faststorage/math/riemann-masullo/.agent/sweeptools/watchdog.sh >/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/watchdog.log 2>&1 &
 set -u
-T=/home/agent/sweeptools
-PROJ=/home/agent/.claude/projects/-home-user-git-riemann-masullo
-REPO=/home/user/git/riemann-masullo
+T=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools
+PROJ=/home/agent/.claude/projects/-mnt-faststorage-math-riemann-masullo
+REPO=/mnt/faststorage/math/riemann-masullo
 SESSION=${SESSION:-ff69c771-f0e3-4605-a699-65a30fd82b57}
 STALE=${STALE:-1200}; RESUME_AFTER=${RESUME_AFTER:-7200}; PROBE=${PROBE:-900}
 UP=mccorvie/riemann-masullo
@@ -26,8 +26,7 @@ release_claims() {
   for n in $(sort -u "$T/claims.txt"); do
     if grep -qiE "(closes|fixes|resolves) #$n\b" <<<"$open"; then continue; fi
     log "releasing #$n"
-    gh issue comment "$n" --repo $UP --body "Releasing: the session working on this ran out of budget before handing in. It may be picked up again later." >/dev/null && \
-      sed -i "/^$n\$/d" "$T/claims.txt"
+    "$T/release.sh" "$n" "the session working on this went idle (likely out of budget) before handing in. It may be picked up again later."
   done
 }
 
@@ -42,7 +41,7 @@ while true; do
   if timeout 120 claude -p "Reply with the single word ok." 2>/dev/null | grep -qi ok; then
     log "API available again: resuming session $SESSION"
     ( cd "$REPO" && timeout 36000 claude --dangerously-skip-permissions --resume "$SESSION" -p \
-      "The session was interrupted (likely out of tokens) and a watchdog resumed it. Continue the low-hanging-fruit campaign as before: read the memory note low-hanging-sweep, check /home/agent/sweeptools/ (claims.txt, results), check open LeoVerto PRs upstream, re-claim and continue. Keep the main session lean and delegate to subagents." \
+      "The session was interrupted (likely out of tokens) and a watchdog resumed it. Continue the low-hanging-fruit campaign as before: read the memory note low-hanging-sweep, check /mnt/faststorage/math/riemann-masullo/.agent/sweeptools/ (claims.txt, results), check open LeoVerto PRs upstream, re-claim and continue. Keep the main session lean and delegate to subagents." \
       >>"$T/resume.log" 2>&1 ) &
     echo $! >"$T/resume.lock"
     released=0

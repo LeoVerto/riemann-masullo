@@ -30,3 +30,11 @@ cone  2026-11-21T20:29Z  hunt/cone2 finished: PRs #3607 #3650; CONE_SHORT exhaus
 crit  2026-11-21T20:29Z  crit/1906 started (opus, single issue)
 crit  2026-11-21T21:59Z  crit/1906 finished: PR #3681 (fully proved)
 crit  2026-11-21T21:59Z  crit/1219 started (opus, single issue)
+ch03 2026-11-22T01:18Z hunt/ch03n
+sweep4 2026-11-22T01:18Z hunt/sweep4 (automated sweep, all files)
+crit 2026-11-22T01:18Z crit/1902 (opus)
+crit  2026-11-22T01:51Z  crit/1902 finished: PR #3978 (proved modulo #1885 #1901 #1900); same agent continues on one of #1885/#1901/#1900/#1891
+crit  2026-11-22T02:14Z  crit/1885 finished: PR #3993 (fully proved, clean axioms); crit/2663 started (opus, fallback #2364)
+appB  2026-11-22T02:27Z  hunt/appb5 started (sonnet medium, 47 unclaimed, newest #3914)
+appB  2026-11-22T02:28Z  hunt/appb5 finished: 0 PRs; all 46 unclaimed appB issues (#3749-#3914, Sec4b/5/6) are deep; #3864 heckeNormCoefficient_natCast closest (needs LFunction unfolding vs finsum over ideals of given norm)
+sieve  2026-11-22T02:55Z  sieve.sh service live (PID 45589/45591); sweep4 agent retired (0 PRs, no claims; res4 had 4 cheap results)

@@ -1,6 +1,6 @@
 import json, re, collections, sys, subprocess
-A='/home/agent/wt/crit-map/.agent/'
-WT='/home/agent/wt/crit-map/'
+A='/mnt/faststorage/math/riemann-masullo/.agent/wt/crit-map/.agent/'
+WT='/mnt/faststorage/math/riemann-masullo/.agent/wt/crit-map/'
 rows=[json.loads(l) for l in open(A+'deps.jsonl')]
 C={r['n']:r for r in rows}
 succ={n:set(r.get('t',[]))|set(r.get('v',[])) for n,r in C.items()}
@@ -82,7 +82,7 @@ def match(n):
     c=[i for tok,i in cl_by.get(fl,[]) if ok(tok)]
     if c: return sorted(i['number'] for i in c), 'closed'
     return [], 'missing'
-claims=set(l.strip() for l in open('/home/agent/sweeptools/claims.txt') if l.strip().isdigit())
+claims=set(l.strip() for l in open('/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/claims.txt') if l.strip().isdigit())
 issue_lab={i['number']:i['labels'] for i in iss}
 src_cache={}
 def stmt(n):
@@ -114,7 +114,7 @@ for n in sorted(cone|broad, key=lambda n:(f(n),C[n]['r'][0])):
     tier='bridge' if n in bridgecone else ('endgame' if n in endcone else ('anchored' if n in anchcone else 'broad-only'))
     out.append(dict(n=n, decl=short(n), loc='%s:%d'%(f(n),C[n]['sel'][0] if 'sel' in C[n] else C[n]['r'][0]), issue=iss_s, nums=nums, state=state, claimed=cb, ndep=len(td), ndep_direct=len(rev[n]&cone), chap_above=upch, deps=sorted(short(d) for d in direct[n] if d in cone|broad), diff=diff(n), tier=tier, lines=stmt(n).count('\n')+1))
 json.dump(out, open(A+'nodes.json','w'))
-with open('/home/agent/sweeptools/critical/graph.tsv','w') as w:
+with open('/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/critical/graph.tsv','w') as w:
     w.write('# commit\t%s\n'%subprocess.run(['git','-C',WT,'rev-parse','--short','HEAD'],capture_output=True,text=True).stdout.strip())
     w.write('# tier: bridge = in the cone of completedHeckeL/finiteHeckeL (link to Mathlib HeckeCharacter.LSeries/dedekindZeta); endgame = reached from items Ch.10-13 cite; anchored = reached from items Ch.5.2-8 or Ch.10-13 cite; broad-only = reached only from some Ch.2-9 declaration\n')
     w.write('# dependents = cone sorry nodes whose statement/proof reaches this node (transitively, through sorry-free constants); chapter_decls_above = all Ch.* constants that transitively use it\n')

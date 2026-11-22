@@ -1,3 +1,5 @@
 1223 PROVED https://github.com/mccorvie/riemann-masullo/pull/3660 modulo sibling #1219 sorry; ported AppB Sec1 Tate split; axioms propext,sorryAx,choice,Quot.sound
 1906 PROVED https://github.com/mccorvie/riemann-masullo/pull/3681 via weilQuotientMeasure_existsUnique; also proves sMultiplicativeTamagawaMeasure Haar+Regular (reusable for #1912)
 1219 PROVED https://github.com/mccorvie/riemann-masullo/pull/3823 via Weil norm formula + new absolute theta bounds (lattice count at small norm); closes last sorry in #1223 proof; axioms clean
+1902 PROVED https://github.com/mccorvie/riemann-masullo/pull/3978 by gluing Z on Re>0 with rho*Z(f^,dual) on Re<1; rests on sorried #1885 analyticOn, #1901 FE, #1900 rho meromorphic; axioms incl. sorryAx via those
+1885 PROVED https://github.com/mccorvie/riemann-masullo/pull/3993 differentiation under the integral with log*r^x <= 4/σ(r^{σ/4}+r^{7σ/4}) majorant from sLocalIdelicZetaIntegral_integrable; axioms clean

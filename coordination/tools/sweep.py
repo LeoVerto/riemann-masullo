@@ -2,7 +2,7 @@
 """Tactic sweep: replace every `sorry` in a Lean file by a macro that tries cheap tactics,
 compile the file, and report which sorries were closed and by which tactic.
 
-usage: sweep.py <worktree> <file.lean> <out.json> [--exact] [--hb N] [--timeout S]
+usage: sweep.py <worktree> <file.lean> <out.json> [--exact] [--hb N] [--timeout S] [--only L1,L2,..]  (--only: replace just the sorries on those 1-based lines)
 The file is modified in place and restored afterwards.
 """
 import json, os, re, subprocess, sys
@@ -60,12 +60,15 @@ def main():
     args = sys.argv[4:]
     hb = int(args[args.index("--hb") + 1]) if "--hb" in args else 400000
     tmo = int(args[args.index("--timeout") + 1]) if "--timeout" in args else 3600
+    only = {int(x) for x in args[args.index("--only") + 1].split(",")} if "--only" in args else None
     global MAC
     MAC = "sweepxtac" if "--exact" in args else "sweeptac"
     path = os.path.join(wt, rel)
     orig = open(path).read()
     lines = orig.split("\n")
     sorries = find_sorries(lines)
+    if only is not None:
+        sorries = [(i, j) for (i, j) in sorries if i + 1 in only]
     last_imp = max((k for k, l in enumerate(lines) if re.match(r"^\s*(public\s+)?(meta\s+)?import\b", l)), default=-1)
     block = [f"import RiemannMasullo.Sweep2" if MAC == "sweepxtac" else "import RiemannMasullo.Sweep", f"set_option maxHeartbeats {hb}"]
     K = len(block)
@@ -79,9 +82,14 @@ def main():
     try:
         open(path, "w").write("\n".join(new))
         try:
-            p = subprocess.run(["nice", "-n", "19", "ionice", "-c3", "timeout", str(tmo), "lake", "env", "lean", "--json", rel], cwd=wt,
-                               capture_output=True, text=True)
-            stdout, rc = p.stdout, p.returncode
+            # own process group, so a timeout kills lake and the lean it spawned
+            p = subprocess.Popen(["nice", "-n", "19", "ionice", "-c3", "lake", "env", "lean", "--json", rel], cwd=wt,
+                                 stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, start_new_session=True)
+            try:
+                stdout, _ = p.communicate(timeout=tmo); rc = p.returncode
+            except subprocess.TimeoutExpired:
+                os.killpg(p.pid, 9)
+                stdout, _ = p.communicate(); rc = 124
         except Exception as e:
             stdout, rc = "", -1
     finally:

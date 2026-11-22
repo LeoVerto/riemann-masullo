@@ -1,5 +1,5 @@
 import json, re, collections
-A='/home/agent/wt/crit-map/.agent/'
+A='/mnt/faststorage/math/riemann-masullo/.agent/wt/crit-map/.agent/'
 rows=[json.loads(l) for l in open(A+'deps.jsonl')]
 C={r['n']:r for r in rows}
 succ={n:set(r.get('t',[]))|set(r.get('v',[])) for n,r in C.items()}
@@ -60,7 +60,7 @@ def snippet_match(i):
     if not m: return None
     lines=[l.strip() for l in m.group(1).splitlines() if l.strip()]
     mm=M.search(b); fl=mm.group(1)
-    try: src=open('/home/agent/wt/crit-map/'+fl).read().splitlines()
+    try: src=open('/mnt/faststorage/math/riemann-masullo/.agent/wt/crit-map/'+fl).read().splitlines()
     except: return None
     for l in lines[:1]:
         for k,s in enumerate(src):

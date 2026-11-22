@@ -1,7 +1,7 @@
 import json, re, collections
-rows = [json.loads(l) for l in open('/home/agent/wt/crit-map/.agent/deps.jsonl')]
+rows = [json.loads(l) for l in open('/mnt/faststorage/math/riemann-masullo/.agent/wt/crit-map/.agent/deps.jsonl')]
 C = {r['n']: r for r in rows}
-g = json.load(open('/home/agent/wt/crit-map/.agent/cone.json'))
+g = json.load(open('/mnt/faststorage/math/riemann-masullo/.agent/wt/crit-map/.agent/cone.json'))
 cone = set(g['cone']); direct = {k: set(v) for k, v in g['direct'].items()}
 rev = collections.defaultdict(set)
 for a, ds in direct.items():

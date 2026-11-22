@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# DISABLED 2026-11-22 (cache reuse leaves no local .olean; breaks signatures.sh): export LAKE_ARTIFACT_CACHE=true
-# DISABLED 2026-11-22 (cache reuse leaves no local .olean; breaks signatures.sh): export LAKE_CACHE_DIR=/home/user/git/riemann-masullo/.lake/artifact-cache
+export LAKE_ARTIFACT_CACHE=true
+export LAKE_CACHE_DIR=/mnt/faststorage/math/riemann-masullo/.lake/artifact-cache
+export LAKE_RESTORE_ARTIFACTS=true
 # build.sh <worktree> [lake build args]: run `lake build` in <worktree>, log to
 # <worktree>/.agent/build.log, and write the exit status to <worktree>/.agent/build.exit when done.
 # To wait for it: test -s <worktree>/.agent/build.exit  (never pgrep: other agents build too).

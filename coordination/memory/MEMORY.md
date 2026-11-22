@@ -1,0 +1,13 @@
+- [GitHub token scope](github-token-scope.md) — use token only for LeoVerto fork and mccorvie upstream
+- [Sandbox quirks](riemann-masullo-sandbox-quirks.md) — open-file limit on parallel Mathlib imports, low disk, gh GraphQL 401
+- [Low-hanging sweep](low-hanging-sweep.md) — campaign state; handover doc on fork branch coordination/low-hanging-campaign
+- [Subagent resume cost](subagent-resume-cost.md) — after a halt, start fresh agents from STATE.md handoffs; never resume long transcripts
+- [Subagent model and effort](subagent-model-effort.md) — Sonnet, effort medium; hunters run for 4 PRs (latest user instruction)
+- [Advisor is for subagents](advisor-for-subagents.md) — coordinator does not call advisor; Sonnet hunters escalate to it
+- [Critical-path workstream](critical-path-workstream.md) — Opus mapper + one-issue Opus provers from critical/QUEUE.md; coordinator only
+- [Coordinator only](coordinator-only.md) — main session delegates everything; on restart, settle caching with one subagent first
+- [State lives in .agent](state-in-dot-agent.md) — sweeptools, worktrees, memory all under <repo>/.agent; memory dir is a symlink
+- [CPU cheap, tokens scarce](cpu-cheap-tokens-scarce.md) — prefer sweeps/automation and background waits over agent reasoning and polling
+- [Helper-lemma placement](formathlib-convention.md) — same file by default; public+import for reuse; ForMathlib only for Mathlib-worthy lemmas
+- [Claims, notes, attribution](claims-notes-attribution.md) — read threads first; notes/<n>.md with failed approaches; release.sh; tag model+effort
+- [Sieve naming](sieve-naming.md) — our tactic screen = "sieve" (sieve.sh, SIEVER.md hand-in brief), not upstream "sweeper"

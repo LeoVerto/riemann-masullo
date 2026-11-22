@@ -2,7 +2,7 @@
 # newwt.sh <branch> <dir>: create a worktree on a new branch at the warm-base commit, with a
 # ready .lake/build and the baseline signatures in <dir>-before.txt. No build needed.
 set -euo pipefail
-br=$1; dir=$2; B=/home/agent/sweeptools/base; MAIN=/home/user/git/riemann-masullo
+br=$1; dir=$2; B=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools/base; MAIN=/mnt/faststorage/math/riemann-masullo
 [ -s $B/COMMIT ] || { echo "warm base not ready yet" >&2; exit 1; }
 for try in 1 2 3; do
   c=$(cat $B/COMMIT); cp $B/sig.txt "$dir-before.txt.tmp"
