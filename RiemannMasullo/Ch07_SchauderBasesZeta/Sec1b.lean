@@ -42,7 +42,8 @@ def IsGaloisType (c : HeckeCharacter (𝓞 F) F) : Prop :=
 A pure norm power is of Galois type.
 Deviation: States a sanity check using the trivial finite-order character. -/
 theorem isGaloisType_normPower (s : ℂ) :
-    IsGaloisType (ideleClassNormTwist (1 : U𝔽) s) := by sorry
+    IsGaloisType (ideleClassNormTwist (1 : U𝔽) s) :=
+  ⟨1, s, IsOfFinOrder.one, rfl⟩
 
 /-- Paper: Remark 7.1.3.1, p. 323.
 A rational prime splits completely when every prime over it has ramification index one
@@ -382,7 +383,7 @@ def entireJet (ρ : ℂ) (m : ℕ) : StrongDual ℂ Entire where
 The functional evaluates the prescribed complex derivative.
 Deviation: Its evaluation law is the sanity check for the bundled functional. -/
 theorem entireJet_apply (ρ : ℂ) (m : ℕ) (f : Entire) :
-    entireJet ρ m f = iteratedDeriv m (f.val : ℂ → ℂ) ρ := by sorry
+    entireJet ρ m f = iteratedDeriv m (f.val : ℂ → ℂ) ρ := rfl
 
 /-- Paper: Equation (7.1.4.3), p. 326.
 The jet space at a zero of multiplicity n is spanned by evaluations of the first n
@@ -405,7 +406,18 @@ def entireIdealAnnihilator (g : Entire) : Submodule ℂ (StrongDual ℂ Entire) 
 /-- Paper: Theorem 7.1.4.2(1), p. 326.
 The annihilator for the constant unit generator is zero.
 Deviation: States a sanity check for the annihilator. -/
-theorem entireIdealAnnihilator_one : entireIdealAnnihilator 1 = ⊥ := by sorry
+theorem entireIdealAnnihilator_one : entireIdealAnnihilator 1 = ⊥ := by
+  ext φ
+  simp only [entireIdealAnnihilator, Submodule.mem_comap, Submodule.mem_dualAnnihilator, Submodule.mem_bot]
+  have hmem : ∀ w : Entire, w ∈ Submodule.restrictScalars ℂ (Ideal.span ({1} : Set Entire)) := by
+    intro w
+    simp [Ideal.span_singleton_one]
+  constructor
+  · intro h
+    ext w
+    simpa using h w (hmem w)
+  · intro h w _
+    simp [h]
 
 -- TODO(paper-gap): In (7.1.4.2) the product is the quotient's model, while the
 -- continuous dual consists of finite-support jets as computed on p. 328.
@@ -540,7 +552,11 @@ Removing an empty set of Euler factors recovers the spectral generator.
 Deviation: States a sanity check for the orbital ideal generator. -/
 theorem orbitalHeckeGenerator_empty :
     orbitalHeckeGenerator χ τ hτ L hL hEq ∅ = regularizedCompletedHeckeL χ τ hτ L hL hEq :=
-  by sorry
+  by
+  apply Subtype.ext
+  apply ContinuousMap.ext
+  intro s
+  simp [orbitalHeckeGenerator, reciprocalPartialHeckeEulerProduct]
 
 /-- Paper: Theorem 7.1.4.3(1), pp. 331–332. At the canceled pole on the
 imaginary axis of a pure norm power, every removed finite place adds one jet.
