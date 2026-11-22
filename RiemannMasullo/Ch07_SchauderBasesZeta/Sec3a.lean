@@ -52,7 +52,9 @@ def IsSaturatedPlaceSet (S : Finset V) : Prop :=
 
 /-- Paper: Situation 7.3.1.1(1), p. 340.
 The empty set of finite places is saturated. -/
-theorem isSaturatedPlaceSet_empty : IsSaturatedPlaceSet (∅ : Finset V) := by sorry
+theorem isSaturatedPlaceSet_empty : IsSaturatedPlaceSet (∅ : Finset V) := by
+  intro v w hv _
+  exact absurd hv (Finset.notMem_empty v)
 
 open Classical in
 /-- Paper: Situation 7.3.1.1(2), p. 340.
@@ -64,18 +66,26 @@ def sLocalPrimaryPlaces (S : Finset V) (p : Vℚ) : Finset V :=
 /-- Paper: Situation 7.3.1.1(2), p. 340.
 A place belongs to the primary part exactly when it belongs to S and lies over p. -/
 theorem mem_sLocalPrimaryPlaces (p : Vℚ) (v : V) :
-    v ∈ sLocalPrimaryPlaces S p ↔ v ∈ S ∧ v.under (𝓞 ℚ) = p := by sorry
+    v ∈ sLocalPrimaryPlaces S p ↔ v ∈ S ∧ v.under (𝓞 ℚ) = p := by
+  simp [sLocalPrimaryPlaces]
 
 /-- Paper: Situation 7.3.1.1(2), p. 340.
 The primary part is a subset of the selected finite places. -/
 theorem sLocalPrimaryPlaces_subset (S : Finset V) (p : Vℚ) :
-    sLocalPrimaryPlaces S p ⊆ S := by sorry
+    sLocalPrimaryPlaces S p ⊆ S := by
+  intro v hv
+  exact ((mem_sLocalPrimaryPlaces p v).1 hv).1
 
 /-- Paper: Situation 7.3.1.1(1)–(2), p. 340.
 If S is saturated and its primary part at p is nonempty, that part contains every place over p. -/
 theorem mem_sLocalPrimaryPlaces_of_saturated (p : Vℚ) (_hS : IsSaturatedPlaceSet S)
     (_hp : (sLocalPrimaryPlaces S p).Nonempty) (v : V) :
-    v ∈ sLocalPrimaryPlaces S p ↔ v.under (𝓞 ℚ) = p := by sorry
+    v ∈ sLocalPrimaryPlaces S p ↔ v.under (𝓞 ℚ) = p := by
+  rw [mem_sLocalPrimaryPlaces]
+  refine ⟨fun h ↦ h.2, fun h ↦ ⟨?_, h⟩⟩
+  obtain ⟨w, hw⟩ := _hp
+  rw [mem_sLocalPrimaryPlaces] at hw
+  exact _hS hw.1 (h.trans hw.2.symm)
 
 -- The unitary lifts in Situation 7.3.1.1(3) use the norm-twist chart of §3.3 and §5.4.
 -- TODO(paper-gap): Theorem 7.3.1.2 specifies that S₀ contains the archimedean places,
@@ -95,7 +105,19 @@ local notation "I(" T ", " ω ")" => SLocalOrbitalIndex (F := F) (S := S) T ω
 At the trivial character the admissible offsets are precisely those below the number
 of selected finite places. -/
 theorem sLocalOrbitalIndex_one_iff {T : Finset V} (_hT : T ⊆ S) (r : ℕ) :
-    (∃ j : I(T, (1 : PontryaginDual J₁)), j.val = (1, r)) ↔ r < T.card := by sorry
+    (∃ j : I(T, (1 : PontryaginDual J₁)), j.val = (1, r)) ↔ r < T.card := by
+  have h1 : onComponent((1 : Xₛ), (1 : PontryaginDual J₁)) := by
+    ext x
+    simp [normOneRestriction]
+    exact (map_one Circle.coeHom).symm
+  have hm := sLocalFinitePoleMultiplicity_one (F := F) (S := S) T _hT
+  constructor
+  · rintro ⟨j, hj⟩
+    have := j.property.2
+    rw [hj] at this
+    simpa [hm] using this
+  · intro h
+    exact ⟨⟨(1, r), h1, by simpa [hm] using h⟩, rfl⟩
 
 /-- Paper: Theorem 7.3.1.2, p. 341.
 The indexed functional is the selected Laurent coefficient on homogeneous theta classes. -/
@@ -109,7 +131,10 @@ Offset zero gives the coefficient of the highest allowed pole order on a test. -
 theorem sLocalOrbitalPrincipalPart_mk_top {T : Finset V} {ω : PontryaginDual J₁}
     (j : I(T, ω)) (_hj : j.val.2 = 0) (f : ℬₛ) :
     sLocalOrbitalPrincipalPart j ((Kₛ(ω)).mkQL f) =
-      sLocalZLaurentCoeff f j.val.1 (-(sLocalRhoPoleOrder j.val.1 : ℤ)) := by sorry
+      sLocalZLaurentCoeff f j.val.1 (-(sLocalRhoPoleOrder j.val.1 : ℤ)) := by
+  unfold sLocalOrbitalPrincipalPart
+  rw [sLocalThetaPrincipalPartCoeff_mk]
+  simp [_hj]
 
 -- TODO(paper-gap): Theorem 7.2.1.1(4) describes a pole-bound subspace. The reverse
 -- inclusion below requires division by the selected reciprocal Euler factors in the
@@ -220,7 +245,9 @@ A theta class represents zero in the p-primary quotient exactly when its selecte
 highest Laurent coefficients vanish. -/
 theorem sLocalPrimaryOrbitalQuotient_mk_eq_zero (p : Vℚ) (_hS : IsSaturatedPlaceSet S)
     (_hp : (Sₚ(p)).Nonempty) (_hPic : PicTrivial) (ω : PontryaginDual J₁) (x : Θₛ(ω)) :
-    π(p, ω) x = 0 ↔ ∀ j : I(Sₚ(p), ω), sLocalOrbitalPrincipalPart j x = 0 := by sorry
+    π(p, ω) x = 0 ↔ ∀ j : I(Sₚ(p), ω), sLocalOrbitalPrincipalPart j x = 0 := by
+  have h := mem_sLocalOrbitalPrincipalValue_iff (F := F) (S := S) hₚ(p) _hp _hS _hPic ω x
+  exact (Submodule.Quotient.mk_eq_zero _).trans h
 
 /-- Paper: Definition 7.3.1.4, p. 343.
 The primary multiplicity counts the places over p which contribute a simple pole.
@@ -231,7 +258,8 @@ def sLocalPrimaryPoleMultiplicity (p : Vℚ) (c : Xₛ) : ℕ :=
 /-- Paper: Definition 7.3.1.4, p. 343.
 Every place in the primary part contributes at the trivial character. -/
 theorem sLocalPrimaryPoleMultiplicity_one (p : Vℚ) :
-    sLocalPrimaryPoleMultiplicity p (1 : Xₛ) = (Sₚ(p)).card := by sorry
+    sLocalPrimaryPoleMultiplicity p (1 : Xₛ) = (Sₚ(p)).card :=
+  sLocalFinitePoleMultiplicity_one _ hₚ(p)
 
 section QuotientTransfer
 
@@ -380,7 +408,7 @@ On a test representative the Fourier jet evaluates to the stated derivative. -/
 theorem sLocalOrbitalFourierJet_mk {T : Finset V} {ω : PontryaginDual J₁}
     (j : I(T, ω)) (f : ℬₛ) :
     sLocalOrbitalFourierJet j ((Kₛ(ω)).mkQL f) =
-      iteratedDeriv j.val.2 (fourierZeta(j.val.1) f) 0 := by sorry
+      iteratedDeriv j.val.2 (fourierZeta(j.val.1) f) 0 := rfl
 
 local notation "Idx(" p ", " ω ")" => I(Sₚ(p), ω)
 
@@ -535,13 +563,13 @@ def sLocalFourierOrbitalSystem (p : Vℚ) (ω : PontryaginDual J₁) : Set (Stro
 Each selected Laurent coefficient belongs to the polar orbital system's functional set. -/
 theorem sLocalOrbitalPrincipalPart_mem_polarSystem (p : Vℚ) (ω : PontryaginDual J₁) (j : Idx(p, ω)) :
     sLocalOrbitalPrincipalPart (F := F) (S := S) (T := Sₚ(p)) (ω := ω) j ∈
-      (sLocalPolarOrbitalSystem (F := F) (S := S) p ω).1 := by sorry
+      (sLocalPolarOrbitalSystem (F := F) (S := S) p ω).1 := ⟨j, rfl⟩
 
 /-- Paper: Definition 7.3.1.7(2), p. 350.
 Each selected Fourier jet belongs to the Fourier orbital system's functional set. -/
 theorem sLocalOrbitalFourierJet_mem_fourierSystem (p : Vℚ) (ω : PontryaginDual J₁) (j : Idx(p, ω)) :
     sLocalOrbitalFourierJet (F := F) (S := S) (T := Sₚ(p)) (ω := ω) j ∈
-      (sLocalFourierOrbitalSystem (F := F) (S := S) p ω).1 := by sorry
+      (sLocalFourierOrbitalSystem (F := F) (S := S) p ω).1 := ⟨j, rfl⟩
 
 open Classical in
 /-- Paper: Definition 7.3.1.7(1), p. 350.
