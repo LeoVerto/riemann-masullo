@@ -1,6 +1,6 @@
 # Coordinator handover: low-hanging fruit and critical path
 
-State as of 2026-11-21 ~23:55Z. This branch (`coordination/low-hanging-campaign` on the `LeoVerto`
+State as of 2026-11-22 ~00:45Z. This branch (`coordination/low-hanging-campaign` on the `LeoVerto`
 fork) is **not meant to be merged**. `scripts/` and `prompts/` are integrator-owned, and
 `lean/Sweep*.lean.txt` define tactic macros, which the project bans from the library. The branch
 records the strategy, the tools and the state needed to take over the coordinator role. The live
@@ -8,7 +8,7 @@ copies are in `/home/agent/sweeptools/`; `tools/`, `state/` and `critical/` here
 
 ## Role and standing instructions (from the user)
 
-- **You are the coordinator:** do no proof work yourself. Route work to subagents in their own
+- **You are the coordinator, and only that:** do no proof work, builds or long log reads yourself, so the main context stays small. Route work to subagents in their own
   worktrees and keep the main context lean.
 - **Models:**
   - Hunters and fixers run on Sonnet, effort medium (`model: "sonnet"`, `effort: "medium"`). Hunters
@@ -23,30 +23,46 @@ copies are in `/home/agent/sweeptools/`; `tools/`, `state/` and `critical/` here
 - **Open question to the user:** whether to raise BLOCKERS §0 with the integrator: nothing in the
   library connects to `Main.lean`, and there is no `riemannZeta` or Dirichlet bridge.
 
-## State right now
+## State at handoff (2026-11-22 ~00:45Z)
 
-> **Update 2026-11-22 ~00:30Z:**
-> - **#1219 is proved** in PR #3823 (no split; standard axioms only), and the #1219 prover has finished. Next on the path: the four sorries listed at the top of `critical/QUEUE.md`.
-> - **The Lake artifact cache is DISABLED.** When Lake reuses a module from the cache it writes no local `.olean`, which breaks `scripts/signatures.sh` and `lake env lean`. The exports are removed from `/etc/sandbox-persistent.sh` (it now `unset`s them) and commented out in `warm.sh` and `build.sh`. The running `warm.sh` still has them in its environment: restart it when idle. Re-enable only after testing `LAKE_RESTORE_ARTIFACTS=true` in a tmp worktree.
+- **Nothing is running.** No subagents, no crons: the old session's scheduled run was cancelled. `/home/agent/sweeptools/no-resume` exists, so the watchdog does not resume anything. The background services `warm.sh`, `watchdog.sh` and `memguard.sh` are still running.
+- **Last results:**
+  - PR #3823 fully proves #1219 (standard axioms only; PR check pending at handoff; one lemma raises `maxHeartbeats` to 4000000, so expect a `read` verdict).
+  - PR #3660 (#1223) and PR #3681 (#1906) merged.
+  - `claims.txt` is empty.
+- **The Lake artifact cache is DISABLED.** When Lake reuses a module from the cache it writes no local `.olean`, which breaks `scripts/signatures.sh` and `lake env lean` (found by the #1219 prover, which worked around it by copying cached files back by the hashes in each `.trace`).
+  - The exports are removed from `/etc/sandbox-persistent.sh`, which now `unset`s them, and commented out in `warm.sh` and `build.sh`.
+  - The running `warm.sh` still has the variables in its environment.
+  - The cache dir `/home/user/git/riemann-masullo/.lake/artifact-cache` is kept.
+- **New sections were being digested** on 2026-11-21 ~23:50Z (user's note), so new low-hanging fruit may exist. Issue numbers such as #3484/#3792 suggest a new duplicate batch: choose the well-formed open issue per declaration.
 
-- **Paused for usage (93%; reset 2026-11-22 12:40Z).** The user authorized usage credits so that
-  **only** the Opus prover on **#1219** (`globalIdelicZetaIntegral_integrable`, worktree
-  `/home/agent/wt/crit-1219`, branch `crit/1219`) can finish. It was in its last checks (module
-  rebuilds, axioms, signatures) before opening a PR. Its plan and progress are in that worktree's
-  `.agent/STATE.md`.
-- **Nothing else runs.** No hourly cron (deleted). `/home/agent/sweeptools/no-resume` exists, so
-  the watchdog does not auto-resume.
-- **A one-shot cron** was scheduled in the old session for 12:41Z, but it is session-only. If you
-  are a new session, do its steps yourself after the reset:
-  1. `rm /home/agent/sweeptools/no-resume`; check that `warm.sh`, `watchdog.sh` and `memguard.sh`
-     are running.
-  2. Create ONE hourly check (run `CronList` first: a duplicate cron once ran every check twice).
-  3. #1219: if there is no PR, hand it to a fresh agent from its `STATE.md`. If there is a PR,
-     check its Verdict and comments.
-  4. **New sections were being digested** on 2026-11-21 ~23:50Z. Look for new labels or newest
-     issue numbers in `status.sh`'s census, and launch up to 2 Sonnet hunters there.
-  5. Start the next Opus critical prover: the top unclaimed entry of `critical/QUEUE.md`, likely
-     #1902.
+## Startup checklist for the next (fresh) coordinator session
+
+**The user's instructions for this start:**
+- The main session acts ONLY as a coordinator, to keep its context small: no proofs, no builds, no long log reads. Delegate those to subagents and relay short reports.
+- Before starting ANY other subagent, use one subagent to figure out caching.
+
+1. **Caching first.** Launch one Sonnet medium subagent; wait for its report before launching anything else. Its task:
+   - In two tmp worktrees (`newwt.sh tmp/... /home/agent/wt/tmp-...`), test `LAKE_ARTIFACT_CACHE=true`, `LAKE_CACHE_DIR=/home/user/git/riemann-masullo/.lake/artifact-cache` and `LAKE_RESTORE_ARTIFACTS=true`.
+   - Show that a module reused from the cache leaves a real local `.olean`, that `scripts/signatures.sh` and `lake env lean` work, that two concurrent builds are safe, and that `lake build --no-build Mathlib` stays up to date.
+   - Measure the disk cost: is restore a hardlink or a copy? Small modules only, under `timeout`; remove the tmp worktrees afterwards.
+   - If it all works, roll out `export LAKE_ARTIFACT_CACHE=true LAKE_CACHE_DIR=... LAKE_RESTORE_ARTIFACTS=true`: replace the `unset` line at the end of `/etc/sandbox-persistent.sh` (python rewrite, since `sed -i` cannot create its temp file in /etc), and uncomment and extend the lines in `warm.sh` and `build.sh`. Restart `warm.sh` when idle (its child is `sleep`).
+   - If it does not work, leave the cache off. In either case, restart `warm.sh` when idle so its environment matches.
+   - Background: the user approved writing only to that `.lake/artifact-cache` subdirectory of the main checkout. The cache's real size is shown by `status.sh`; plain `du` over-counts hardlinks.
+2. **Services.**
+   - Check that `warm.sh`, `watchdog.sh` and `memguard.sh` run (`ps -eo args | grep -E '^bash ./(warm|watchdog|memguard).sh'`), and that `warm.log` says "ready" at a recent main.
+   - The watchdog resumes a HARDCODED old session (`SESSION` default in `watchdog.sh`). To use auto-resume, restart it with `SESSION=<your session id>`, then `rm no-resume`. Otherwise leave `no-resume` in place.
+3. **One hourly check.** Run `CronList` first: a surviving duplicate once ran every check twice. Then create the check at minute 17. Prompt: run status.sh and cleanup.sh; fix failing Verdicts or review comments with short Sonnet subagents; release orphan or stale claims; relay finished agents' results; check the services; keep at most 1 Opus critical prover and 2 Sonnet medium hunters; record launches in hunted.txt; report in one or two lines.
+4. **PR #3823:** check its Verdict and the merger's comments, and use a short Sonnet fixer if needed.
+5. **New sections:** in `status.sh`'s label census, look for new labels (ch06–ch14, appE) or jumps in newest issue numbers. Launch up to 2 Sonnet medium hunters on the freshest labels, newest issues first (HUNTER.md, 4 PRs or ~3 h), skipping the malformed batch #3183–#3322.
+6. **Critical path:** ONE Opus prover on the first of the four sorries at the top of `critical/QUEUE.md`:
+   - `schwartzBruhat_fourier_equiv`
+   - `lcaCosetIntegral_mem_schwartzBruhat`
+   - `schwartzBruhat_poisson`
+   - `exists_ratAdeleDualEquiv`
+
+   They are what #1223's continuation theorem still depends on; then #1902. Prompt: `Read /home/agent/sweeptools/critical/CRITICAL_PROVER.md and follow it. Your issue is #<n>.` If the newly digested sections add anchors, consider a short Opus mapper refresh first (scripts in `critical/mapper/`).
+7. **Still open with the user:** whether to raise BLOCKERS §0 with the integrator (nothing in the library connects to `Main.lean`).
 
 ## Results so far
 
@@ -55,6 +71,7 @@ copies are in `/home/agent/sweeptools/`; `tools/`, `state/` and `critical/` here
 - **Critical path:**
   - #3660 proves #1223 (Tate's theorem for the global idelic zeta integral) apart from #1219 and
     older upstream sorries, by porting the Tate split from AppB Sec1.
+  - #3823 fully proves #1219 (lattice-count bound plus a Weil-formula reduction; adds `adelicTheta_normSum_decay_large` and `adelicTheta_normSum_le_small` in Ch02 Sec2a, the majorant #1220 and #1222 need).
   - #3681 fully proves #1906 and adds `ForMathlib/MeasureTheory/Measure/{Count,Haar/Units}.lean`.
 - **Low-hanging fruit is mostly gone.** `state/leads.txt` lists what is left per label, and why.
   - ch02, ch04 and ch09: blocked by `SchwartzBruhat` / `ModulatedExponentialDecay` elaboration
@@ -128,7 +145,7 @@ copies are in `/home/agent/sweeptools/`; `tools/`, `state/` and `critical/` here
 | `cleanup.sh` | removes worktrees whose PR merged (run it on every check; disk is tight, ~7 GB free) |
 | `watchdog.sh` | releases idle claims after 20 min; auto-resumes after 2 h idle unless `no-resume` exists |
 | `memguard.sh` | kills the newest sweep Lean process when RAM < 1.5 GB |
-| **Lake artifact cache** | `LAKE_ARTIFACT_CACHE=true`, `LAKE_CACHE_DIR=/home/user/git/riemann-masullo/.lake/artifact-cache`, exported in `/etc/sandbox-persistent.sh`, `warm.sh` and `build.sh`. On the same filesystem as `.lake/packages`, so Mathlib artifacts are hardlinked (~45 MB real use; plain `du` shows ~6.8 GB). The user approved writing to that `.lake` subdirectory only. Tested with concurrent builds |
+| **Lake artifact cache** | **DISABLED** (see "State at handoff"). When on: `LAKE_ARTIFACT_CACHE=true`, `LAKE_CACHE_DIR=/home/user/git/riemann-masullo/.lake/artifact-cache` (same filesystem as `.lake/packages`, so Mathlib artifacts are hardlinked; ~45 MB real use). Cache reuse without `LAKE_RESTORE_ARTIFACTS=true` leaves no local `.olean` and breaks the hand-in checks. Startup step 1 tests the fix |
 
 ## Lessons (read before changing anything)
 
