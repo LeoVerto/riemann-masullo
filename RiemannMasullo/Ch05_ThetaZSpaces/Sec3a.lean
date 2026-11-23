@@ -1596,7 +1596,8 @@ theorem testFunction_inductiveTensor_equiv :
 /-- Iterated line derivatives are iterated derivatives along the line. -/
 private theorem lineDerivPow_apply_eq_iteratedDeriv {E : Type*} [NormedAddCommGroup E]
     [NormedSpace ℝ E] (v : E) (k : ℕ) (φ : 𝓓((⊤ : Opens E), ℂ)) (y : E) (s : ℝ) :
-    (((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v : 𝓓((⊤ : Opens E), ℂ) →L[ℂ] 𝓓((⊤ : Opens E), ℂ)) ^ k) φ) (y + s • v) =
+    (((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v : 𝓓((⊤ : Opens E), ℂ)
+        →L[ℂ] 𝓓((⊤ : Opens E), ℂ)) ^ k) φ) (y + s • v) =
       iteratedDeriv k (fun t : ℝ ↦ φ (y + t • v)) s := by
   induction k generalizing φ s with
   | zero => simp
@@ -1609,11 +1610,13 @@ private theorem lineDerivPow_apply_eq_iteratedDeriv {E : Type*} [NormedAddCommGr
     have h : (fun u : ℝ ↦ φ (y + t • v + u • v)) = fun u ↦ (fun w : ℝ ↦ φ (y + w • v)) (u + t) := by
       funext u; congr 1; rw [add_smul, add_assoc, add_comm (u • v)]
     rw [h]
-    exact (deriv_comp_add_const (f := fun w : ℝ ↦ φ (y + w • v)) (a := t) (x := 0)).trans (by rw [zero_add])
+    exact (deriv_comp_add_const (f := fun w : ℝ ↦ φ (y + w • v)) (a := t)
+        (x := 0)).trans (by rw [zero_add])
 
 private theorem lineDerivPow_apply_eq_iteratedDeriv_zero {E : Type*} [NormedAddCommGroup E]
     [NormedSpace ℝ E] (v : E) (k : ℕ) (φ : 𝓓((⊤ : Opens E), ℂ)) (y : E) :
-    (((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v : 𝓓((⊤ : Opens E), ℂ) →L[ℂ] 𝓓((⊤ : Opens E), ℂ)) ^ k) φ) y =
+    (((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v : 𝓓((⊤ : Opens E), ℂ)
+        →L[ℂ] 𝓓((⊤ : Opens E), ℂ)) ^ k) φ) y =
       iteratedDeriv k (fun t : ℝ ↦ φ (y + t • v)) 0 := by
   have h := lineDerivPow_apply_eq_iteratedDeriv v k φ y 0
   rwa [zero_smul, add_zero] at h
@@ -1624,7 +1627,8 @@ private theorem exists_lineDeriv_unbounded_on_nhds {E : Type*} [NormedAddCommGro
     [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] (e : E) (he : e ≠ 0)
     (U : Set 𝓓((⊤ : Opens E), ℂ)) (hU : U ∈ 𝓝 (0 : 𝓓((⊤ : Opens E), ℂ))) :
     ∃ n : ℕ, ∀ M : ℝ, ∃ g ∈ U,
-      M ≤ ‖(((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) e : 𝓓((⊤ : Opens E), ℂ) →L[ℂ] 𝓓((⊤ : Opens E), ℂ))) ^ n) g 0‖ := by
+      M ≤ ‖(((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) e : 𝓓((⊤ : Opens E), ℂ)
+          →L[ℂ] 𝓓((⊤ : Opens E), ℂ))) ^ n) g 0‖ := by
   classical
   let K : Compacts E := ⟨Metric.closedBall 0 1, isCompact_closedBall 0 1⟩
   have hK : (K : Set E) ⊆ ((⊤ : Opens E) : Set E) := fun _ _ ↦ trivial
@@ -1741,7 +1745,8 @@ private theorem exists_lineDeriv_unbounded_on_nhds {E : Type*} [NormedAddCommGro
 private theorem lineDerivPow_apply_eq_zero_of_isOpen {E : Type*} [NormedAddCommGroup E]
     [NormedSpace ℝ E] (v : E) (O : Set E) (hO : IsOpen O) (φ : 𝓓((⊤ : Opens E), ℂ))
     (hφ : ∀ z ∈ O, φ z = 0) (k : ℕ) (z : E) (hz : z ∈ O) :
-    (((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v : 𝓓((⊤ : Opens E), ℂ) →L[ℂ] 𝓓((⊤ : Opens E), ℂ)) ^ k) φ) z = 0 := by
+    (((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v : 𝓓((⊤ : Opens E), ℂ)
+        →L[ℂ] 𝓓((⊤ : Opens E), ℂ)) ^ k) φ) z = 0 := by
   rw [lineDerivPow_apply_eq_iteratedDeriv_zero]
   have hc : Tendsto (fun t : ℝ ↦ z + t • v) (𝓝 0) (𝓝 z) := by
     have := ((tendsto_id (x := 𝓝 (0 : ℝ))).smul_const v).const_add z
@@ -1756,8 +1761,10 @@ private theorem lineDerivPow_apply_eq_zero_of_isOpen {E : Type*} [NormedAddCommG
 private theorem exists_finsum_lineDerivPow_CLM {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     (v : E) (p : ℕ → E) (hp : ∀ k : ℕ, (k : ℝ) ≤ ‖p k‖) :
     ∃ T : 𝓓((⊤ : Opens E), ℂ) →L[ℂ] ℂ, ∀ h : 𝓓((⊤ : Opens E), ℂ),
-      T h = ∑ᶠ k, (((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v : 𝓓((⊤ : Opens E), ℂ) →L[ℂ] 𝓓((⊤ : Opens E), ℂ)) ^ k) h) (p k) := by
-  set D : 𝓓((⊤ : Opens E), ℂ) →L[ℂ] 𝓓((⊤ : Opens E), ℂ) := LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v with hD
+      T h = ∑ᶠ k, (((LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v : 𝓓((⊤ : Opens E), ℂ)
+          →L[ℂ] 𝓓((⊤ : Opens E), ℂ)) ^ k) h) (p k) := by
+  set D : 𝓓((⊤ : Opens E), ℂ) →L[ℂ] 𝓓((⊤ : Opens E), ℂ) :=
+    LineDeriv.lineDerivOpCLM ℂ 𝓓((⊤ : Opens E), ℂ) v with hD
   let Tk : ℕ → 𝓓((⊤ : Opens E), ℂ) →L[ℂ] ℂ := fun k ↦
     ((BoundedContinuousFunction.evalCLM ℂ (p k)).comp
       (TestFunction.toBoundedContinuousFunctionCLM ℂ)).comp (D ^ k)
@@ -1894,11 +1901,13 @@ private theorem false_of_projectiveTensor_unbounded {X Y Z : Type*}
   linarith
 
 /-- Normal-direction-free product rule: differentiating a product in a tangential direction. -/
-private theorem lineDerivPow_factors [DecidableEq ι] [DecidableEq κ] (j₀ : κ) (f : 𝒟(ι)) (g : 𝒟(κ)) (h : 𝒟(ι ⊕ κ))
+private theorem lineDerivPow_factors [DecidableEq ι] [DecidableEq κ] (j₀ : κ) (f : 𝒟(ι)) (g : 𝒟(κ))
+    (h : 𝒟(ι ⊕ κ))
     (hh : ∀ z, h z = factors(f, g, z)) (k : ℕ) (z : Eᵣ(ι ⊕ κ)) :
     (((LineDeriv.lineDerivOpCLM ℂ 𝒟(ι ⊕ κ) (EuclideanSpace.single (Sum.inr j₀ : ι ⊕ κ) (1 : ℝ)) :
       𝒟(ι ⊕ κ) →L[ℂ] 𝒟(ι ⊕ κ)) ^ k) h) z =
-      factors(f, ((LineDeriv.lineDerivOpCLM ℂ 𝒟(κ) (EuclideanSpace.single j₀ (1 : ℝ) : Eᵣ(κ)) : 𝒟(κ) →L[ℂ] 𝒟(κ)) ^ k) g, z) := by
+      factors(f, ((LineDeriv.lineDerivOpCLM ℂ 𝒟(κ)
+          (EuclideanSpace.single j₀ (1 : ℝ) : Eᵣ(κ)) : 𝒟(κ) →L[ℂ] 𝒟(κ)) ^ k) g, z) := by
   rw [lineDerivPow_apply_eq_iteratedDeriv_zero, lineDerivPow_apply_eq_iteratedDeriv_zero]
   have hfun : (fun t : ℝ ↦ h (z + t • EuclideanSpace.single (Sum.inr j₀ : ι ⊕ κ) (1 : ℝ))) =
       fun t : ℝ ↦ f (WithLp.toLp 2 (fun i : ι ↦ z (Sum.inl i))) *
