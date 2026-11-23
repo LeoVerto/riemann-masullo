@@ -1,7 +1,7 @@
 module
 
 public import RiemannMasullo.Ch06_LocalGlobal.Sec2
-import all RiemannMasullo.Ch02_AdelicTheta.Sec2a
+import RiemannMasullo.Ch02_AdelicTheta.Sec2a
 import all RiemannMasullo.Ch02_AdelicTheta.Sec4
 import all RiemannMasullo.Ch03_IdelicZeta.Sec3b
 import RiemannMasullo.External.AlgebraicNumberTheoryLean.Chebotarev.DirichletHecke
