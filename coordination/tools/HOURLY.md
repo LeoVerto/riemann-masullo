@@ -37,6 +37,14 @@ consultant to `agents.txt` (the nagger's roster).
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
    last check (last seen: AGENTS ed9dbb7, ERRATA 92c9ed9), re-read the change, update the briefs
    (HUNTER.md first), and update "last seen" here.
+0a. **Watch PR #5889** (user, 2026-11-23 ~01:50Z: "if that merges we can solve a lot of previously
+   hard issues"): `gh pr view 5889 -R mccorvie/riemann-masullo --json state -q .state`. While OPEN,
+   nothing. Once MERGED (warm base at or past the merge): for #3878 #3879 #5673 #3869 #3875 #4982
+   #4973 #3884 #3889 (the PR's list; modules in `RiemannMasullo/External/Grh/`), run `prior.sh`,
+   and offer the unclaimed ones as step 8b prior work to Opus escalators (one file each, ahead of
+   fresh issues), the prompt naming the vendored lemmas the PR body assigns to each issue. Held
+   issues: a hint on the issue is upstream posting, so ask the user first. Tell the user it merged;
+   then mark this step done (leads.txt #5889 line too).
 1. Run `status.sh --mark` (advances the new-comments window) and `cleanup.sh` under timeout,
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
