@@ -45,12 +45,7 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
    fresh issues), the prompt naming the vendored lemmas the PR body assigns to each issue. Held
    issues: a hint on the issue is upstream posting, so ask the user first. Tell the user it merged;
    then mark this step done (leads.txt #5889 line too).
-0b. **Watch #4078 #4079** (user, 2026-11-23 ~02:10Z: "check if those open up again"; we released
-   them to elmismisimoxhunca at 01:36Z): `claims.py 4078 4079`. HELD: nothing. FREE (or closed
-   without a merged proof): tell the user; if FREE, claim both, `escalate.sh <n> "continuing prior
-   work: ours, Fable route" --prior`, and launch one escalator per step 8a on both, its prompt
-   naming `notes/4078-work/`, `notes/4078-Route.lean`, `notes/4079-Route.lean` and
-   `notes/released/4078-20261123T0236.md`. Then mark this step done.
+0b. (Done 2026-11-23 ~03:15Z: #4078/#4079 re-claimed by us after the user noted the last claims were ~5 h old; escalator esc-ch07sec1b4.)
 1. Run `status.sh --mark` (advances the new-comments window) and `cleanup.sh` under timeout,
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
