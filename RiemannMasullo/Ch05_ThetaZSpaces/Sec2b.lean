@@ -326,6 +326,121 @@ theorem existsUnique_sLocalHomogeneousThetaAction (χ : PontryaginDual (J₁(S))
         ρ (QuotientGroup.mk g) ((Kₛω(S, χ)).mkQ f) =
           (Kₛω(S, χ)).mkQ (schwartzBruhatUnitTranslate g f) := by sorry
 
+private theorem sLocalHomogeneousThetaTransition_equivariant_mul_mem {R : Type*} [CommRing R]
+    {D : Subring R} (u : Dˣ) (x : R) : u.val.val * x ∈ D ↔ x ∈ D := by
+  constructor
+  · intro h
+    have hh := D.mul_mem u.inv.property h
+    rwa [← mul_assoc, show u.inv.val * u.val.val = 1 from congrArg Subtype.val u.inv_val,
+      one_mul] at hh
+  · exact D.mul_mem u.val.property
+
+private theorem sLocalHomogeneousThetaTransition_equivariant_toGlobal
+    (S : Finset (HeightOneSpectrum (𝓞 F))) (f : ℬₛ(S)) (x : 𝔸[F]) :
+    sAdeleSchwartzToGlobal F S f (Multiplicative.ofAdd x) =
+      open Classical in if x ∈ integralAdelesOutside F S then
+        f (Multiplicative.ofAdd (adeleProjection F S x)) else 0 := by
+  classical
+  have hi : x ∈ integralAdelesOutside F S ↔ ∀ v : HeightOneSpectrum (𝓞 F), v ∉ S →
+      x.2 v ∈ v.adicCompletionIntegers F := by
+    simp only [integralAdelesOutside, Subring.mem_iInf]
+    rfl
+  exact (sAdeleSchwartzToGlobal_apply F S f x).trans (if_congr hi.symm rfl rfl)
+
+private theorem sLocalHomogeneousThetaTransition_equivariant_insert
+    (S : Finset (HeightOneSpectrum (𝓞 F))) (u : (integralAdelesOutside F S)ˣ) (f : ℬₛ(S)) :
+    sAdeleSchwartzToGlobal F S (schwartzBruhatUnitTranslate
+        (Units.map (adeleProjection F S).toMonoidHom (integralIdeleInsertion F S u)) f) =
+      schwartzBruhatUnitTranslate (integralIdeleInsertion F S u)
+        (sAdeleSchwartzToGlobal F S f) := by
+  classical
+  let g := integralIdeleInsertion F S u
+  let gS := Units.map (adeleProjection F S).toMonoidHom g
+  refine Subtype.ext (funext fun x ↦ ?_)
+  let y := x.toAdd
+  have h := sLocalHomogeneousThetaTransition_equivariant_mul_mem u⁻¹ y
+  change g.inv * y ∈ integralAdelesOutside F S ↔ y ∈ integralAdelesOutside F S at h
+  refine (sLocalHomogeneousThetaTransition_equivariant_toGlobal S
+    (schwartzBruhatUnitTranslate gS f) y).trans ?_
+  refine Eq.trans (if_congr h.symm ?_ rfl)
+    (sLocalHomogeneousThetaTransition_equivariant_toGlobal S f (g.inv * y)).symm
+  exact congrArg (fun t ↦ f (Multiplicative.ofAdd t)) (map_mul (adeleProjection F S) g.inv y).symm
+
+private theorem sLocalHomogeneousThetaTransition_equivariant_range {g : IdeleGroup (𝓞 F) F}
+    (hg : g ∈ Set.range (integralIdeleInsertion F T)) (f : ℬₛ(T)) :
+    sAdeleSchwartzToGlobal F T
+      (schwartzBruhatUnitTranslate (Units.map (adeleProjection F T).toMonoidHom g) f) =
+        schwartzBruhatUnitTranslate g (sAdeleSchwartzToGlobal F T f) := by
+  obtain ⟨u, rfl⟩ := hg
+  exact sLocalHomogeneousThetaTransition_equivariant_insert T u f
+
+private theorem sLocalHomogeneousThetaTransition_equivariant_test (hST : S ⊆ T)
+    (u : (integralAdelesOutside F S)ˣ) (f : ℬₛ(S)) :
+    let g := integralIdeleInsertion F S u
+    let gS := Units.map (adeleProjection F S).toMonoidHom g
+    let gT := Units.map (adeleProjection F T).toMonoidHom g
+    sAdeleSchwartzTransition F hST (schwartzBruhatUnitTranslate gS f) =
+      schwartzBruhatUnitTranslate gT (sAdeleSchwartzTransition F hST f) := by
+  let g := integralIdeleInsertion F S u
+  have hg : g ∈ Set.range (integralIdeleInsertion F T) :=
+    (mem_range_integralIdeleInsertion F T g).mpr fun v hv ↦
+      (mem_range_integralIdeleInsertion F S g).mp ⟨u, rfl⟩ v (fun h ↦ hv (hST h))
+  have hTS (k : ℬₛ(S)) : sAdeleSchwartzToGlobal F T (sAdeleSchwartzTransition F hST k) =
+      sAdeleSchwartzToGlobal F S k := DFunLike.congr_fun (sAdeleSchwartzToGlobal_comp F hST) k
+  have hT := sLocalHomogeneousThetaTransition_equivariant_range hg
+    (sAdeleSchwartzTransition F hST f)
+  exact (sAdeleSchwartzToGlobal_isEmbedding F T).injective
+    ((hTS _).trans ((sLocalHomogeneousThetaTransition_equivariant_insert S u f).trans
+        ((congrArg (schwartzBruhatUnitTranslate g) (hTS f).symm).trans hT.symm)))
+
+private theorem sLocalHomogeneousThetaTransition_equivariant_gen {E E' Q Q' : Type*}
+    (q : E → Q) (q' : E' → Q')
+    (hq : Surjective q)
+    (π : Q → Q') (T : E → E') (hπ : ∀ f, π (q f) = q' (T f))
+    (a : Q → Q) (b : Q' → Q') (s : E → E) (t : E' → E')
+    (ha : ∀ f, a (q f) = q (s f)) (hb : ∀ f, b (q' f) = q' (t f))
+    (hst : ∀ f, T (s f) = t (T f)) (x : Q) : π (a x) = b (π x) := by
+  obtain ⟨f, rfl⟩ := hq x
+  rw [ha f, hπ, hπ, hb, hst]
+
+private theorem sLocalHomogeneousThetaTransition_equivariant_aux (hST : S ⊆ T)
+    (χS : PontryaginDual (J₁(S)))
+    (χT : PontryaginDual (J₁(T)))
+    (π : Θₛω(S, χS) → Θₛω(T, χT))
+    (hπ : ∀ f, π ((Kₛω(S, χS)).mkQ f) = (Kₛω(T, χT)).mkQ (sAdeleSchwartzTransition F hST f))
+    (gS : (SAdeleRing F S)ˣ) (gT : (SAdeleRing F T)ˣ)
+    (hst : ∀ f, sAdeleSchwartzTransition F hST (schwartzBruhatUnitTranslate gS f) =
+      schwartzBruhatUnitTranslate gT (sAdeleSchwartzTransition F hST f))
+    (x : Θₛω(S, χS)) :
+    π ((existsUnique_sLocalHomogeneousThetaAction (F := F) (S := S) χS).exists.choose
+        (QuotientGroup.mk gS) x) =
+      (existsUnique_sLocalHomogeneousThetaAction (F := F) (S := T) χT).exists.choose
+        (QuotientGroup.mk gT) (π x) :=
+  sLocalHomogeneousThetaTransition_equivariant_gen (Kₛω(S, χS)).mkQ (Kₛω(T, χT)).mkQ
+    (Submodule.mkQ_surjective _) π _ hπ _ _ _ _
+    (fun f ↦ (existsUnique_sLocalHomogeneousThetaAction (F := F) (S := S) χS).exists.choose_spec.2
+      gS f)
+    (fun f ↦ (existsUnique_sLocalHomogeneousThetaAction (F := F) (S := T) χT).exists.choose_spec.2
+      gT f)
+    hst x
+
+private theorem sLocalHomogeneousThetaTransition_equivariant_aux2
+    (hω : NormOneCharacterUnramifiedOutside (F := F) ω S) (hST : S ⊆ T)
+    (gS : (SAdeleRing F S)ˣ) (gT : (SAdeleRing F T)ˣ)
+    (hst : ∀ f, sAdeleSchwartzTransition F hST (schwartzBruhatUnitTranslate gS f) =
+      schwartzBruhatUnitTranslate gT (sAdeleSchwartzTransition F hST f))
+    (x : Θₛω(S, ωₛ(S, hω))) :
+    sLocalHomogeneousThetaTransition (F := F) (ω := ω) hω hST
+        ((existsUnique_sLocalHomogeneousThetaAction (F := F) (S := S) (ωₛ(S, hω))).exists.choose
+          (QuotientGroup.mk gS) x) =
+      (existsUnique_sLocalHomogeneousThetaAction (F := F) (S := T)
+          (ωₛ(T, NormOneCharacterUnramifiedOutside.mono (F := F) (ω := ω) hω hST))).exists.choose
+        (QuotientGroup.mk gT) (sLocalHomogeneousThetaTransition (F := F) (ω := ω) hω hST x) :=
+  sLocalHomogeneousThetaTransition_equivariant_aux hST _ _
+    (⇑(sLocalHomogeneousThetaTransition (F := F) (ω := ω) hω hST))
+    (fun f ↦ LinearMap.congr_fun
+      (sLocalHomogeneousThetaTransition_spec (F := F) (ω := ω) hω hST).1 f) gS gT hst x
+
 /-- Paper: Theorem 5.2.3.1(1), p. 233.
 The homogeneous transition intertwines the descended actions on theta classes.
 Deviation: The acting class is represented by an idele integral and invertible outside S. -/
@@ -339,7 +454,9 @@ theorem sLocalHomogeneousThetaTransition_equivariant
     let g := integralIdeleInsertion F S u
     let gS := Units.map (adeleProjection F S).toMonoidHom g
     let gT := Units.map (adeleProjection F T).toMonoidHom g
-    π (ρS (QuotientGroup.mk gS) x) = ρT (QuotientGroup.mk gT) (π x) := by sorry
+    π (ρS (QuotientGroup.mk gS) x) = ρT (QuotientGroup.mk gT) (π x) :=
+  sLocalHomogeneousThetaTransition_equivariant_aux2 hω hST _ _
+    (sLocalHomogeneousThetaTransition_equivariant_test (F := F) hST u) x
 
 /-- Paper: Theorem 5.2.3.1(1), pp. 233–234.
 Insertion of test functions into the adeles preserves the homogeneous theta kernels. -/
