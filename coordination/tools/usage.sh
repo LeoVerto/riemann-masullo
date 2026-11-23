@@ -2,7 +2,8 @@
 # Claude subscription usage for the coordinator (replaces `usg`, whose rustls client does not trust
 # the sandbox proxy CA). Plain curl: ~/.claude/.credentials.json holds a SENTINEL token that the
 # sandbox proxy swaps for the real one on api.anthropic.com, so nothing secret is read or printed here.
-# Prints one line:  USAGE 5h=95% (resets in 12m) 7d=22% (resets in 11h03m)  [WARN ...]
+# Prints one line:  USAGE 5h=95% (resets in 12m) 7d=22% (resets in 11h03m) fable-7d=13%  [WARN ...]
+# (per-model weekly limits, e.g. Fable, come from the API's `limits` array, kind weekly_scoped)
 # Exit 0 = ok, 1 = above $USAGE_WARN (default 85) in either window, 2 = could not read usage.
 # usage.sh --json prints the raw API reply instead.
 WARN=${USAGE_WARN:-85}
@@ -27,6 +28,12 @@ for key,lab in (("five_hour","5h"),("seven_day","7d")):
     when="window already reset (stale)" if m<0 else ("resets in %dm"%m if m<60 else "resets in %dh%02dm"%(m//60,m%60))
     out.append("%s=%.0f%% (%s)"%(lab,u,when))
     if u>=warn and m>=0: hot.append(lab)
+for l in d.get("limits") or []:
+    if l.get("kind")!="weekly_scoped": continue
+    name=((l.get("scope") or {}).get("model") or {}).get("display_name") or "scoped"
+    u=l.get("percent"); r=dt.datetime.fromisoformat(l["resets_at"]); m=int((r-now).total_seconds()//60)
+    out.append("%s-7d=%s%%"%(name.lower(),u))
+    if u is not None and u>=warn and m>=0: hot.append(name.lower())
 print("USAGE "+" ".join(out)+("  WARN "+"/".join(hot)+" >= %.0f%%"%warn if hot else ""))
 sys.exit(1 if hot else 0)
 ' "$body" "$WARN"
