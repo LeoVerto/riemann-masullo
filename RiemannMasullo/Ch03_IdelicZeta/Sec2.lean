@@ -10,7 +10,6 @@ public import RiemannMasullo.ForMathlib.NumberTheory.NumberField.DedekindZeta
 import all RiemannMasullo.AppA_AlgebraicNT.Sec2
 import all RiemannMasullo.AppA_AlgebraicNT.Sec3
 import all RiemannMasullo.Ch02_AdelicTheta.Sec1
-import all RiemannMasullo.Ch02_AdelicTheta.Sec2a
 import RiemannMasullo.ForMathlib.Topology.Algebra.OpenSubgroup
 import Mathlib.Topology.LocallyConstant.Basic
 import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated

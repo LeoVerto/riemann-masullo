@@ -15,7 +15,6 @@ import Mathlib.Topology.Algebra.Nonarchimedean.TotallyDisconnected
 import all RiemannMasullo.AppA_AlgebraicNT.Sec1
 import all RiemannMasullo.AppA_AlgebraicNT.Sec2
 import all RiemannMasullo.AppA_AlgebraicNT.Sec3
-import all RiemannMasullo.Ch02_AdelicTheta.Sec2a
 import RiemannMasullo.ForMathlib.Analysis.Distribution.SchwartzSpace.Basic
 import RiemannMasullo.ForMathlib.Analysis.Distribution.SchwartzSpace.Complete
 import RiemannMasullo.ForMathlib.Analysis.Fourier.FourierPhase
