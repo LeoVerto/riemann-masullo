@@ -16,30 +16,26 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 ## Current state (2026-11-23 ~01:15Z, coordinator session a9c138b2 handing over; new session after the 01:30Z reset)
 
 - **State at 01:08Z:** budget scales with token usage (HOURLY step 7, max 10). At 01:08Z 5h=97%
-  (reset ~01:30Z), so budget 0: one Opus escalator still runs, esc-ch05sec3a5 (Ch05 Sec3a #4184, resuming the
-  paused work; launched 00:56Z under the earlier 2-unit cap). Paused for quota at 00:28Z, rows QUEUED with notes
+  (reset ~01:30Z), so budget 0. No agent runs since 01:25Z: esc-ch05sec3a5 handed in #4184 as PR #5874 (clean axioms; it resumed the
+  paused work). Paused for quota at 00:28Z, rows QUEUED with notes
   ("paused for quota … resume from notes"): #4078 (helpers in notes/4078-work, theorem E left) and #4079 (same
   file, shares helpers), #5108 (Fable route, one PolynormableSpace instance left), #4116 #4117 #4127 #4128 #4132
-  (Ch05 Sec2b, plans only). Open PRs awaiting review: #5724 #5740 #5813 #5835 #5850 #5859. Leads: AppB Sec6 via
+  (Ch05 Sec2b, plans only). Open PRs awaiting review: #5724 #5740 #5813 #5835 #5850 #5859 #5874. Leads: AppB Sec6 via
   vendored StrongPNT (#5822): #3860 #3878 released with routes, #3869 #3875 #3879 held by elmismisimoxhunca;
   cleanup of duplicated adelePrincipalValue_empty helpers (leads.txt), now possible since #5697 merged.
 - **For the next session (user restarts after the reset to load the edited subagent definitions):**
   1. Startup checklist steps 2–6 below; `CronList`, then create the hourly cron (session-only, it died with
      a9c138b2). Budget from `S/usage.sh` per HOURLY step 7 (table, max 10).
-  2. **esc-ch05sec3a5 (#4184) dies with the old session.** If no PR for #4184 exists, set its
-     `escalations.txt` row (TAKEN esc-ch05sec3a5) back to QUEUED and resume from `notes/4184.md` (status line,
-     worktree `wt/esc-ch05sec3a5-1`; helper (4) proved in `wt/esc-ch05sec3a4-1/.agent/A4.lean`). Remove its
-     `agents.txt` line. Kill leftover Lean processes in that worktree by PID only.
-  3. Work order once units are free: #4184 → #4078 (+#4079 in the same PR, shared helpers; code in
+  2. Work order once units are free: #4078 (+#4079 in the same PR, shared helpers; code in
      `notes/4078-work/`, J/B 3 small errors, theorem E left; elmismisimoxhunca also posted Claiming after
      ours) → #5108 (Fable route, PolynormableSpace instance left; Sec4 free since #5806 merged) → Ch05 Sec2b
      #4116 #4117 #4127 #4128 #4132 → AppB Sec6 #3878 then #3860 (routes in notes; koffie's plan on #3860;
      vendored StrongPNT #5822) → `adelePrincipalValue_empty` cleanup (leads.txt). Paused rows' 2 h grace
      ends ~02:30Z: launch or release then.
-  4. Nagger: relaunch (step 4) once agents run. Watch #5724 (conflict fixed d2381d0, Verdict pending).
-  5. Open question to the user, unanswered: post on #4454 about elmismisimoxhunca's later double claim
+  3. Nagger: relaunch (step 4) once agents run. Watch #5724 (conflict fixed d2381d0, Verdict pending).
+  4. Open question to the user, unanswered: post on #4454 about elmismisimoxhunca's later double claim
      (their #5635 merged first; our proof is unpushed on `esc/ch06sec3-1` 1e749c6)? Default: post nothing.
-  6. A peer session edits the live files and this branch for the user and messages the coordinator
+  5. A peer session edits the live files and this branch for the user and messages the coordinator
      (find it with ListAgents); `git pull` before editing.
 - **Lead:** Ch05 Sec3a has ~30 more issues with failed automated attempts by elmismisimoxhunca, most
   failing only on inherited sorryAx: good Opus work (`resumable.sh`).
