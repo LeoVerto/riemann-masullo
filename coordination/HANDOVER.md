@@ -51,7 +51,7 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
 - **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning; keep
   wake-ups sparse. Agents and the nagger wait in the FOREGROUND, every call under 170 s (HUNTER.md
   "Builds and processes"); never `run_in_background`.
-- **Staffing and Opus work** (2026-11-22): 10-unit budget (user, 23:10Z, CPU pegged; was 12 from 20:20Z), at least 2 Opus, at most 6 Sonnets;
+- **Staffing and Opus work** (2026-11-22): 8-unit budget until 2026-11-23T01:30Z (user, 00:20Z), then 10 (user, 23:10Z, CPU pegged; was 12 from 20:20Z), at least 2 Opus, at most 6 Sonnets;
   Opus goes to escalation, then prior work (ours and others'), a fresh issue last; Fable
   consultants cost 2 units each, at most 2 at once (user, ~23:00Z), and come right after the 2-Opus minimum, before any new work (user,
   2026-11-22 ~22:30Z); the findings evaluator stays outside the budget. HOURLY.md steps 7–9. No two agents
