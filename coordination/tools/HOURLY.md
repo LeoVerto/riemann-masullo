@@ -35,7 +35,7 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
 | fixer: `general-purpose`, model sonnet, effort medium | – | `Fix <failing check or review comment> on PR #<p> in worktree <wt>, following S/HUNTER.md "Checks and pull request". Model tag <M>.` |
 
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
-   last check (last seen: AGENTS ed9dbb7, ERRATA 92c9ed9), re-read the change, update the briefs
+   last check (last seen: AGENTS ed9dbb7, ERRATA 0d2e5b1), re-read the change, update the briefs
    (HUNTER.md first), and update "last seen" here.
 0a. **Watch PR #5889** (user, 2026-11-23 ~01:50Z: "if that merges we can solve a lot of previously
    hard issues"): `gh pr view 5889 -R mccorvie/riemann-masullo --json state -q .state`. While OPEN,
