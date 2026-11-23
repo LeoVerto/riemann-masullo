@@ -542,12 +542,91 @@ def sLocalPolarFreeMatching (χ : PontryaginDual Jₛ) : Set (B⁺ × B⁻) :=
   {p | p ∈ sLocalZetaMatching (F := F) (S := S) χ ∧
     ∃ H : ℂ → ℂ, AnalyticOnNhd ℂ H univ ∧ EqOn H p.1.val rightHalf}
 
+private theorem mem_sLocalPolarFreeMatching_iff_aux (ρ a b : ℂ → ℂ) (hρ : Meromorphic ρ)
+    (ha : AnalyticOnNhd ℂ a (Complex.re ⁻¹' Ioi (0 : ℝ)))
+    (hb : AnalyticOnNhd ℂ b (Complex.re ⁻¹' Iio (1 : ℝ)))
+    (hab : EqOn a (fun s ↦ ρ s * b s) (Complex.re ⁻¹' Ioo (0 : ℝ) 1)) :
+    (∃ H : ℂ → ℂ, AnalyticOnNhd ℂ H univ ∧ EqOn H a (Complex.re ⁻¹' Ioi (0 : ℝ))) ↔
+      ∀ s ∈ Complex.re ⁻¹' Iio (1 : ℝ), 0 ≤ meromorphicOrderAt (fun z ↦ ρ z * b z) s := by
+  have hoL : IsOpen (Complex.re ⁻¹' Iio (1 : ℝ)) := isOpen_Iio.preimage Complex.continuous_re
+  have hoR : IsOpen (Complex.re ⁻¹' Ioi (0 : ℝ)) := isOpen_Ioi.preimage Complex.continuous_re
+  have hoO : IsOpen (Complex.re ⁻¹' Ioo (0 : ℝ) 1) := isOpen_Ioo.preimage Complex.continuous_re
+  have hmg : MeromorphicOn (fun z ↦ ρ z * b z) (Complex.re ⁻¹' Iio (1 : ℝ)) :=
+    fun z hz => (hρ z).mul (hb z hz).meromorphicAt
+  have hmid : (1 / 2 : ℂ) ∈ Complex.re ⁻¹' Ioo (0 : ℝ) 1 := by
+    norm_num [mem_preimage, mem_Ioo]
+  have hmidL : (1 / 2 : ℂ) ∈ Complex.re ⁻¹' Iio (1 : ℝ) := by
+    norm_num [mem_preimage, mem_Iio]
+  have hconn : IsConnected (Complex.re ⁻¹' Iio (1 : ℝ)) :=
+    ⟨⟨_, hmidL⟩, (convex_halfSpace_re_lt 1).isPreconnected⟩
+  constructor
+  · rintro ⟨H, hH, hHa⟩ s hs
+    have hdiff : MeromorphicOn (fun z ↦ ρ z * b z - H z) (Complex.re ⁻¹' Iio (1 : ℝ)) :=
+      hmg.sub (fun z _ => (hH z (mem_univ _)).meromorphicAt)
+    have htop : meromorphicOrderAt (fun z ↦ ρ z * b z - H z) (1 / 2 : ℂ) = ⊤ := by
+      rw [meromorphicOrderAt_eq_top_iff]
+      filter_upwards [hoO.mem_nhds hmid |> fun h => nhdsWithin_le_nhds h] with z hz
+      have h1 := hab hz
+      have h2 := hHa (show z ∈ Complex.re ⁻¹' Ioi (0 : ℝ) from hz.1)
+      change ρ z * b z - H z = 0
+      have h1' : a z = ρ z * b z := h1
+      rw [← h1', h2]; ring
+    have hall : meromorphicOrderAt (fun z ↦ ρ z * b z - H z) s = ⊤ := by
+      by_contra hne
+      have := (hdiff.exists_meromorphicOrderAt_ne_top_iff_forall_mem hconn).mp ⟨s, hs, hne⟩
+        (1 / 2) hmidL
+      exact this htop
+    rw [meromorphicOrderAt_eq_top_iff] at hall
+    have hev : (fun z ↦ ρ z * b z) =ᶠ[𝓝[≠] s] H := by
+      filter_upwards [hall] with z hz
+      simpa [sub_eq_zero] using hz
+    rw [meromorphicOrderAt_congr hev]
+    exact (hH s (mem_univ _)).meromorphicOrderAt_nonneg
+  · intro hord
+    set G := toMeromorphicNFOn (fun z ↦ ρ z * b z) (Complex.re ⁻¹' Iio (1 : ℝ)) with hG
+    have hGan : ∀ z ∈ Complex.re ⁻¹' Iio (1 : ℝ), AnalyticAt ℂ G z := by
+      intro z hz
+      have hnf : MeromorphicNFAt G z := meromorphicNFOn_toMeromorphicNFOn _ _ hz
+      refine hnf.meromorphicOrderAt_nonneg_iff_analyticAt.mp ?_
+      rw [hG, meromorphicOrderAt_toMeromorphicNFOn hmg hz]
+      exact hord z hz
+    have hGa : ∀ z ∈ Complex.re ⁻¹' Ioo (0 : ℝ) 1, G z = a z := by
+      intro z hz
+      have hzL : z ∈ Complex.re ⁻¹' Iio (1 : ℝ) := hz.2
+      have hev : G =ᶠ[𝓝[≠] z] a := by
+        have h1 := hmg.toMeromorphicNFOn_eq_self_on_nhdsNE hzL
+        have h2 : (fun z ↦ ρ z * b z) =ᶠ[𝓝[≠] z] a := by
+          filter_upwards [nhdsWithin_le_nhds (hoO.mem_nhds hz)] with w hw using (hab hw).symm
+        exact h1.trans h2
+      have hca : ContinuousAt a z := (ha z hz.1).continuousAt
+      have hcG : ContinuousAt G z := (hGan z hzL).continuousAt
+      exact ((hcG.eventuallyEq_nhds_iff_eventuallyEq_nhdsNE hca).mp hev).self_of_nhds
+    let H : ℂ → ℂ := fun z ↦ if 0 < z.re then a z else G z
+    have hHa : EqOn H a (Complex.re ⁻¹' Ioi (0 : ℝ)) := fun z hz => if_pos hz
+    have hHG : EqOn H G (Complex.re ⁻¹' Iio (1 : ℝ)) := by
+      intro z hz
+      by_cases h0 : 0 < z.re
+      · exact (if_pos h0).trans (hGa z ⟨h0, hz⟩).symm
+      · exact if_neg h0
+    refine ⟨H, fun z _ => ?_, hHa⟩
+    by_cases hz : z.re < 1
+    · exact (hGan z hz).congr (Filter.eventuallyEq_of_mem (hoL.mem_nhds hz) hHG.symm)
+    · have hz1 : z ∈ Complex.re ⁻¹' Ioi (0 : ℝ) := by
+        change 0 < z.re; linarith [not_lt.mp hz]
+      exact (ha z hz1).congr (Filter.eventuallyEq_of_mem (hoR.mem_nhds hz1) hHa.symm)
+
 /-- Paper: (5.4.1.8), p. 267.
 In a matching pair the first component has an entire extension exactly when the
 continued second component has no poles in the left half-plane. -/
 theorem mem_sLocalPolarFreeMatching_iff (χ : PontryaginDual Jₛ) (p : B⁺ × B⁻) :
     p ∈ sLocalPolarFreeMatching (F := F) (S := S) χ ↔ p ∈ sLocalZetaMatching (F := F) (S := S) χ ∧
-      ∀ s ∈ leftHalf, 0 ≤ meromorphicOrderAt (fun z ↦ ρₛ(χ, z) * p.2.val z) s := by sorry
+      ∀ s ∈ leftHalf, 0 ≤ meromorphicOrderAt (fun z ↦ ρₛ(χ, z) * p.2.val z) s := by
+  refine and_congr_right fun hp => ?_
+  exact mem_sLocalPolarFreeMatching_iff_aux (fun z ↦ ρₛ(χ, z)) p.1.val p.2.val
+    (sLocalRhoFactor_meromorphic χ)
+    (p.1.property.2.1.analyticOnNhd (isOpen_Ioi.preimage Complex.continuous_re))
+    (p.2.property.2.1.analyticOnNhd (isOpen_Iio.preimage Complex.continuous_re))
+    ((mem_sLocalZetaMatching χ p).mp hp)
 
 /-- Paper: Proposition 5.4.1.4, p. 267.
 The zeta pair on the polar-free quotient is a topological embedding with closed range. -/
