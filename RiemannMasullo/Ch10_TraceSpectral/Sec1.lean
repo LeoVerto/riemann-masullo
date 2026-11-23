@@ -11,6 +11,7 @@ import all RiemannMasullo.Ch09_HardySobolev.Sec2
 import all RiemannMasullo.Ch02_AdelicTheta.Sec3
 import all RiemannMasullo.Ch02_AdelicTheta.Sec2b
 
+import RiemannMasullo.ForMathlib.Analysis.Fourier.CompactGroup
 import Mathlib.MeasureTheory.Measure.SeparableMeasure
 
 /-!
@@ -1959,6 +1960,120 @@ theorem globalThetaSobolevAverage_quotient_equiv (ω : PontryaginDual C₁) :
     exact thetaSobolevAverage_quotient_equiv_of_compact μ𝔽₁ ρ₁ hρ ω (P(ω))
       (existsUnique_globalThetaSobolevAverage (F := F) (a := a) hI hs ω).exists.choose_spec.1
 
+/-- On the norm-one subgroup the translation estimate is contractive, also after restriction
+to an invariant Sobolev subspace. -/
+private theorem globalThetaSobolev_isotypeDecomposition_bound {G : Type*}
+    [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+    [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsHaarMeasure] (m : G →ₜ* ℝ≥0ˣ)
+    (α β s : ℝ) (hI : α ≤ β) (hs : 0 ≤ s)
+    (V : Submodule ℂ (CompactIntervalSobolev μ (fun x ↦ Real.log ((m x).val : ℝ)) α β s))
+    (ρ : G →* (V →L[ℂ] V))
+    (hρ : ∀ g (u : V), (ρ g u).val = hardySobolevTranslation μ m α β s hI hs g u.val)
+    (g : G) (hg : m g = 1) (u : V) : ‖ρ g u‖ ≤ ‖u‖ := by
+  have hle : ‖hardySobolevTranslation μ m α β s hI hs g‖ ≤ 1 := by
+    simpa [hg] using norm_hardySobolevTranslation_le μ m α β s hI hs g
+  change ‖(ρ g u).val‖ ≤ ‖u.val‖
+  rw [hρ]
+  exact ((hardySobolevTranslation μ m α β s hI hs g).le_opNorm u.val).trans
+    ((mul_le_mul_of_nonneg_right hle (norm_nonneg u.val)).trans_eq (one_mul _))
+
+/-- Pairing the raw compact-group projection with a continuous functional gives
+the Fourier coefficient of its orbit. -/
+private theorem globalThetaSobolev_isotypeDecomposition_coefficient {G E : Type*}
+    [CommGroup G] [TopologicalSpace G] [MeasurableSpace G]
+    [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (μ : Measure G) (ρ : G →* (E →L[ℂ] E)) (ω : PontryaginDual G)
+    (P : E →L[ℂ] actionIsotype ρ ω)
+    (hP : IsPettisIsotypicAverageOn μ univ ρ ω ((actionIsotype ρ ω).subtypeL.comp P))
+    (x : E) (φ : StrongDual ℂ E) :
+    φ (P x).val = ∫ g, star (ω g : ℂ) * φ (ρ g x) ∂μ := by
+  obtain ⟨_, he⟩ := hP x
+  have h := congrArg (fun z : PettisWeakCompletion E ↦
+    (show Module.Dual ℂ (StrongDual ℂ E) from z) φ) he
+  change φ (P x).val = ∫ g, φ (star (ω g : ℂ) • ρ g x) ∂μ.restrict univ at h
+  simpa only [Measure.restrict_univ, map_smul, smul_eq_mul] using h
+
+/-- The normalized isotypic averages give the coordinates of the orthogonal Hilbert sum. -/
+private theorem globalThetaSobolev_isotypeDecomposition_compact {G E : Type*}
+    [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [CompactSpace G]
+    [SecondCountableTopology G]
+    [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure]
+    [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
+    [NormedSpace ℝ E] [IsScalarTower ℝ ℂ E]
+    (ρ : G →* (E →L[ℂ] E)) (hc : Continuous fun p : G × E ↦ ρ p.1 p.2)
+    (hle : ∀ g x, ‖ρ g x‖ ≤ ‖x‖) (P : (ω : PontryaginDual G) → E →L[ℂ] actionIsotype ρ ω)
+    (hP : ∀ ω, IsPettisIsotypicAverageOn μ univ ρ ω ((actionIsotype ρ ω).subtypeL.comp (P ω))) :
+    ∃ (p : E →L[ℂ] (∀ ω, actionIsotype ρ ω))
+      (T : E ≃ₗᵢ[ℂ] lp (fun ω ↦ ↥(actionIsotype ρ ω)) 2),
+      Injective p ∧ ∀ x ω, p x ω = T x ω ∧ T x ω = (μ.real univ)⁻¹ • P ω x := by
+  classical
+  let X := actionIsotype ρ
+  let (ω : PontryaginDual G) : CompleteSpace (X ω) := (isClosed_actionIsotype ρ ω).completeSpace_coe
+  have hi (g : G) (x y : E) : inner ℂ (ρ g x) (ρ g y) = inner ℂ x y := by
+    have hnorm (u : E) : ‖ρ g u‖ = ‖u‖ := by
+      apply le_antisymm (hle g u)
+      have h := hle g⁻¹ (ρ g u)
+      rwa [← mul_apply_eq_comp, ← map_mul, inv_mul_cancel, map_one, one_apply_eq_self] at h
+    let I : E →ₗᵢ[ℂ] E := ⟨(ρ g).toLinearMap, hnorm⟩
+    exact I.inner_map_map x y
+  have hcoeff := globalThetaSobolev_isotypeDecomposition_coefficient μ ρ
+  have hpoint (ω : PontryaginDual G) (y : X ω) (x : E) (g : G) :
+      star (ω g : ℂ) * inner ℂ y.val (ρ g x) = inner ℂ y.val x := by
+    have h := hi g y.val x
+    rwa [(mem_actionIsotype ρ ω _).mp y.property g, inner_smul_left] at h
+  have hortho : OrthogonalFamily ℂ (fun ω ↦ X ω) (fun ω ↦ (X ω).subtypeₗᵢ) := by
+    intro ω η hω u v
+    change inner ℂ u.val v.val = 0
+    by_contra hn
+    apply hω
+    apply DFunLike.ext
+    intro g
+    apply Subtype.ext
+    have h := hpoint ω u v.val g
+    rw [(mem_actionIsotype ρ η _).mp v.property g, inner_smul_right, ← mul_assoc] at h
+    have h1 : star (ω g : ℂ) * (η g : ℂ) = 1 :=
+      mul_right_cancel₀ hn (h.trans (one_mul _).symm)
+    have h2 : star (ω g : ℂ) * (ω g : ℂ) = 1 := by simp [← Circle.coe_inv_eq_conj]
+    exact mul_left_cancel₀ (star_ne_zero.mpr (Circle.coe_ne_zero _)) (h2.trans h1.symm)
+  have htotal : ⊤ ≤ (⨆ ω, X ω).topologicalClosure := by
+    intro x _
+    by_contra hn
+    let D := (⨆ ω, X ω).topologicalClosure
+    obtain ⟨φ, hne, hz⟩ := exists_dual_eq_zero_on_submodule_of_notMem D
+      (Submodule.isClosed_topologicalClosure _) hn
+    let u (g : G) := φ (ρ g x)
+    have hu : Continuous u := φ.continuous.comp (hc.comp (continuous_id.prodMk continuous_const))
+    have hz' (ω : PontryaginDual G) : ∫ g, star (ω g : ℂ) * u g ∂μ = 0 := by
+      rw [← hcoeff ω (P ω) (hP ω) x φ]
+      exact hz _ (Submodule.le_topologicalClosure _ (le_iSup X ω (P ω x).property))
+    have heq := ae_eq_zero_of_character_integral_eq_zero μ
+      (hu.memLp_of_hasCompactSupport (HasCompactSupport.of_compactSpace _)) hz'
+    exact hne (by simpa [u] using congrFun (Measure.eq_of_ae_eq heq hu continuous_const) 1)
+  have hsum := IsHilbertSum.mkInternal X hortho htotal
+  let T := hsum.linearIsometryEquiv
+  let p := ContinuousLinearMap.pi fun ω ↦ (lp.evalCLM ℂ (fun ω ↦ ↥(X ω)) 2 ω).comp
+    T.toContinuousLinearEquiv.toContinuousLinearMap
+  refine ⟨p, T, fun x y h ↦ T.injective (lp.ext h), fun x ω ↦ ⟨rfl, ?_⟩⟩
+  apply ext_inner_left ℂ
+  intro y
+  have hsingle : T.symm (lp.single 2 ω y) = y.val := hsum.linearIsometryEquiv_symm_apply_single y
+  have hpair : inner ℂ y (T x ω) = inner ℂ y.val x := by
+    calc
+      inner ℂ y (T x ω) = inner ℂ (lp.single 2 ω y) (T x) :=
+        (lp.inner_single_left (𝕜 := ℂ) (G := fun ω ↦ ↥(X ω)) ω y (T x)).symm
+      _ = inner ℂ (T.symm (lp.single 2 ω y)) (T.symm (T x)) :=
+        (T.symm.inner_map_map _ _).symm
+      _ = _ := by rw [hsingle, T.symm_apply_apply]
+  have hav := hcoeff ω (P ω) (hP ω) x (innerSL ℂ y.val)
+  change inner ℂ y.val (P ω x).val = ∫ g, star (ω g : ℂ) * inner ℂ y.val (ρ g x) ∂μ at hav
+  simp_rw [hpoint] at hav
+  rw [integral_const] at hav
+  rw [hpair, RCLike.real_smul_eq_coe_smul (K := ℂ), inner_smul_right]
+  change _ = _ * inner ℂ y.val (P ω x).val
+  rw [hav, RCLike.real_smul_eq_coe_smul (K := ℂ), smul_eq_mul, ← mul_assoc]
+  simp [measureReal_univ_pos (μ := μ) |>.ne']
+
 /-- Paper: Proposition 10.1.1.5(2), p. 437. The global coordinate map is a
 continuous injection into the product and factors through the isometric Hilbert sum.
 Deviation: Use the polar-free space and divide each raw average by the mass of
@@ -1967,7 +2082,24 @@ theorem globalThetaSobolev_isotypeDecomposition :
     ∃ (Pprod : H →L[ℂ] (∀ ω : PontryaginDual C₁, Hω(ω)))
       (T : H ≃ₗᵢ[ℂ] lp (fun ω : PontryaginDual C₁ ↦ ↥(Hω(ω))) 2),
       Injective Pprod ∧ ∀ (u : H) (ω : PontryaginDual C₁),
-        Pprod u ω = T u ω ∧ T u ω = (Measure.real μ𝔽₁ univ)⁻¹ • P(ω) u := by sorry
+        Pprod u ω = T u ω ∧ T u ω = (Measure.real μ𝔽₁ univ)⁻¹ • P(ω) u := by
+  let : SecondCountableTopology C₁ := Topology.IsInducing.subtypeVal.secondCountableTopology
+  let : CompactSpace C₁ := (ideleClassGroup_finiteness F).2.1
+  let : (μ𝔽₁).IsHaarMeasure :=
+    (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.1
+  let : CompleteSpace H := (globalThetaSobolev_closed_complete_separable a hI hs).2.1
+  have hR := (exists_globalThetaSobolevAction (F := F) a hI hs).choose_spec
+  have hc : Continuous (fun p : C₁ × H ↦ ρ₁ p.1 p.2) :=
+    hR.2.1.comp ((continuous_subtype_val.comp continuous_fst).prodMk continuous_snd)
+  have hn (g : C₁) (x : H) : ‖ρ₁ g x‖ ≤ ‖x‖ := by
+    have hg : m𝔽 g.val = 1 := g.property
+    change ‖R𝔽(a, hI, hs) g.val x‖ ≤ ‖x‖
+    with_reducible_and_instances
+      exact globalThetaSobolev_isotypeDecomposition_bound μ𝔽 m𝔽 α β s hI hs
+        H𝔽(a, hI, hs) (R𝔽(a, hI, hs)) hR.1 g.val hg x
+  with_reducible_and_instances
+    exact globalThetaSobolev_isotypeDecomposition_compact (E := H) μ𝔽₁ ρ₁ hc hn (fun ω ↦ P(ω))
+      (fun ω ↦ (existsUnique_globalThetaSobolevAverage (F := F) (a := a) hI hs ω).exists.choose_spec.1)
 
 end GlobalIsotypes
 
