@@ -331,12 +331,50 @@ def sLocalMellin_surjective_divisorBounded : Prop :=
     ∃ f : ℬₛ(F, S), (fun z : ℂ ↦ sLocalIdelicZFunction f (twistₛ(F, S) ((circleToComplex).comp χ) z))
       =ᶠ[codiscrete ℂ] Z
 
+/-- The constant function one meets every divisor bound. A test matching it off a
+discrete set would agree with it on the right half-plane, where its Z-function is
+holomorphic, against the decay in height of `sLocalIdelicZFunction_schwartzOnStrip`. -/
+private theorem sLocalMellin_surjective_divisorBounded_false_aux :
+    ¬ sLocalMellin_surjective_divisorBounded.{u} := by
+  intro h
+  let := ulift_rat_numberField.{u}
+  let F := ULift.{u} ℚ
+  let S : Finset Places(F) := ∅
+  obtain ⟨f, hf⟩ := h F S 1 (fun _ ↦ 1) (fun x ↦ analyticAt_const.meromorphicAt) (fun z ↦ by
+    classical
+    rw [meromorphicOrderAt_const, ite_eq_right_iff.mpr (fun h ↦ absurd h one_ne_zero)]
+    exact WithTop.coe_le_coe.mpr (by omega))
+  set Zf : ℂ → ℂ := fun z ↦
+    sLocalIdelicZFunction f (twistₛ(F, S) ((circleToComplex).comp 1) z) with hZf
+  have hs := sLocalIdelicZFunction_schwartzOnStrip f 1 1 3 one_pos (by norm_num) 0
+  simp only [iteratedDeriv_zero] at hs
+  obtain ⟨-, hdiff, hdec⟩ := hs
+  -- On the strip the Z-function is continuous, so it equals one there.
+  have hone (s : ℂ) (hs : s.re ∈ Ioo 1 3) : Zf s = 1 := by
+    have hc : ContinuousAt Zf s := (hdiff.differentiableAt
+      ((isOpen_Ioo.preimage Complex.continuous_re).mem_nhds hs)).continuousAt
+    have h1 : Tendsto Zf (𝓝[≠] s) (𝓝 1) :=
+      tendsto_const_nhds.congr' ((hf.filter_mono (nhdsNE_le_codiscrete s)).mono
+        fun z hz ↦ hz.symm)
+    exact tendsto_nhds_unique (hc.tendsto.mono_left nhdsWithin_le_nhds) h1
+  obtain ⟨C, hC, hev⟩ := hdec (1 / 2) (by norm_num) (by norm_num) 1 le_rfl
+  rw [Filter.eventually_comap, Filter.eventually_atTop] at hev
+  obtain ⟨N, hN⟩ := hev
+  set b : ℝ := max N (C + 1) with hb
+  have hb1 : C + 1 ≤ b := le_max_right _ _
+  have hbpos : 0 < b := by linarith
+  have key := hN b (le_max_left _ _) b (abs_of_pos hbpos) 2 ⟨by norm_num, by norm_num⟩
+  change ‖Zf (((2 : ℝ) : ℂ) + (b : ℂ) * Complex.I)‖ ≤ _ at key
+  rw [hone _ (by norm_num), norm_one, pow_one, abs_of_pos hbpos, le_div_iff₀ hbpos] at key
+  linarith
+
 /-- Paper: Remark 7.2.1.2, p. 335.
 For ℚ with only the real place and the trivial component, the constant entire
 function one satisfies the divisor bound but violates the vertical decay of
 every Schwartz–Bruhat Mellin transform on the line of real part one. -/
 theorem sLocalMellin_surjective_divisorBounded_false :
-    ¬ sLocalMellin_surjective_divisorBounded := by sorry
+    ¬ sLocalMellin_surjective_divisorBounded :=
+  sLocalMellin_surjective_divisorBounded_false_aux
 
 /-- Paper: Remark 7.2.1.3, p. 335.
 The full pole bound is identified with the closure of the homogeneous theta
