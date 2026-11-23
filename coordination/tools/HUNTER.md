@@ -271,11 +271,14 @@ declarations that live in other files.
   proof that needs it cannot build: say so in your report rather than working around it. A
   vendored result that needs strengthening is strengthened in your paper file, which imports it
   (`External/README.md`).
-- Porting one proof from a project in `External/SURVEY.md` that is *not* vendored (reference copies,
-  other Lean versions) stays allowed, as AGENTS "Using existing Lean" says: adapt it into your file
-  as a private helper, add an `ATTRIBUTION.md` row, and never copy from a project with no license.
-- **`ATTRIBUTION.md`** gets a row only when you *adapt* a proof or definition from another project,
-  that is, port or rewrite it (AGENTS "Using existing Lean"). Importing and calling vendored
+- **Never copy another project's code into project files**, vendored or not (user, 2026-11-23, on
+  #6071: copying definitions over "most definitely is not the idea behind vendoring"; the integrator
+  agreed there). If a result you need exists in a project in `External/SURVEY.md` that is not
+  vendored, name it (project, file, declaration) in your notes and report and stop that route; the
+  coordinator asks the integrator to vendor it, as happened with Runge for #4666 (#6043). (AGENTS
+  "Using existing Lean" still allows porting, but in this campaign it goes through the integrator.)
+- **`ATTRIBUTION.md`** gets a row only when you *adapt* a proof from another project: you write
+  your own Lean proof following its argument (AGENTS "Using existing Lean"; never use a project with no license). Importing and calling vendored
   declarations needs no row (#6133 used `External/Grh` by import and added none; #6071 adapted
   Patel's integral bound and added one).
 
