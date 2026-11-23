@@ -53,13 +53,12 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
    inductive entire-function construction of ERRATA F22 plus connected complements of each stage's
    square ∪ discs ∪ points; vendored Tau Ceti names live in `RiemannMasullo.External.TauCeti` except
    `_root_` ones. Weaker leads (leads.txt): #4072, #4079, #4078. Tell the user it merged (done 04:5xZ).
-0d. **`import all` fixes** (AGENTS.md 9d44796 bans new `import all`): our open PRs #6071 (adds `import all
-   RiemannMasullo.External.Grh.Lemmas.LogLossGoodHeight`; fix: copy the private `logLoss_translate` as a
-   private helper with credit, drop the import) and #6072 (adds `import all` of Ch06 Sec2 and Ch03 Sec3;
+0d. **`import all` fixes** (AGENTS.md 9d44796 bans new `import all`): #6071 KEEPS its `import all` of External/Grh (user 05:1xZ: vendoring means we don't copy code in; asked the
+   integrator on the PR 05:1xZ, wait for their answer) and #6072 (adds `import all` of Ch06 Sec2 and Ch03 Sec3;
    fix: make the private lemmas it uses public in place per AGENTS.md, plain imports). One Sonnet fixer
    (general-purpose, model sonnet, 1 unit) per PR, first free units; each re-checks the PR is OPEN, edits
    its worktree, rebuilds, lint, signatures compare (expect only the made-public names), axioms unchanged,
-   pushes, one-line PR comment. Mark done here.
+   pushes, one-line PR comment. LAUNCHED 05:0xZ: fix6072 (fix6071 stopped by the user). Then: #4911 opus (Fable ROUTE; needs #6066 merged or its branch), then #4666.
 1. Run `status.sh --mark` (advances the new-comments window) and `cleanup.sh` under timeout,
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
