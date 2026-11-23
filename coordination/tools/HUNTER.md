@@ -18,9 +18,7 @@ a little thought. Skip anything deep.
 
 ## Loop
 0. **Token check:** `$S/tokencheck.sh`. On `TOKEN FAIL`, stop before claiming and report that line.
-1. **Candidates:** the issues in your prompt. If you were given none, list them with
-   `gh issue list --repo mccorvie/riemann-masullo --label proof --label <L> --state open --limit 400 --json number,title,labels,body --jq '.[] | select([.labels[].name] | (index("claimed") or index("blocked") or index("stuck")) | not) | "\(.number)\t\(.title)\t\(.body | capture("<!-- sorry: (?<f>[^ ]+) -->").f? // "-")"'`
-   and prefer the newest (highest numbers): fresh sections carry the easy sanity lemmas.
+1. **Candidates:** the issues in your prompt. If it lists none, report that and stop.
 2. **Before claiming each issue**, check all of these:
    - The full thread and all prior work: `$S/prior.sh <n>` (every comment in full, the PRs that
      reference the issue, and our notes, patches, commits and worktrees for it).
@@ -96,9 +94,8 @@ a little thought. Skip anything deep.
   Partial work: <worktree path and commit, if any; keep that worktree>
   ```
   The failed approaches above it (with their errors) are part of the packet. Then run
-  `$S/escalate.sh <n> "<one-line reason>" --to fable`: the claim stays ours.
-- An escalator stuck on an issue: write the stuck packet and escalate `--to fable` (only once per
-  issue; if the notes already have a `## Fable route` that also failed, release it).
+  `$S/escalate.sh <n> "<one-line reason>" --to fable`: the claim stays ours. Only once per issue:
+  if the notes already have a `## Fable route` that also failed, release instead.
 - After the PR is open, remove its issues from `claims.txt` and delete their `notes/<n>.md`.
 
 ## Builds and processes
@@ -114,8 +111,7 @@ a little thought. Skip anything deep.
 - **Wait in the FOREGROUND, never with `run_in_background`** (user, 2026-11-22): an agent that ends
   its turn to wait gets resumed by any message and then reports to the sender, not the coordinator,
   and every pause pings the coordinator. The harness moves any foreground call that runs over
-  **120 s** into the background (measured 2026-11-22 ~20:00Z; earlier 180 s), so every foreground call must finish within
-  110 s:
+  **120 s** into the background, so every foreground call must finish within 110 s:
   - Short (under ~1.5 min): run it directly under `timeout 110` (e.g. `timeout 110 lake lean
     .agent/Probe.lean`).
   - Anything longer (most module builds under load, the full build, long probes): start it
@@ -148,80 +144,77 @@ a little thought. Skip anything deep.
   range (`scripts/paper.sh <p> <q>`, `--png <p>` for formulas).
 
 ## Elaboration traps and fixes that worked
-- **Goal vs witness defeq at default transparency** (#5181, Fable route, notes/5181.md): `exact`/`apply` of a
-  correct witness ran 600+ s. Fix: private lemma over abstract `Submodule B`/maps, `have key := lemma …` with
-  all arguments explicit and no expected type, then `with_reducible exact …` (here
-  `Submodule.topologicalClosure_mono (Submodule.span_mono key)`).
-- **`let`-bound statement variables** (#4091, Fable route, notes/4091.md): after `intro` of the statement's lets,
-  every check against a spec ran 240–500 s; the same checks without lets in context took ~1.3 s. Fix: never
-  `intro` the lets; prove a let-free helper (the let values as variables) by one generic lemma in term mode,
-  and close the theorem in term mode `:= helper … _ _ (…) x`. Bisect in separate scratch files to find this.
-- **`obtain` on an existential inside a heavy statement** (#4454, esc-ch06sec3): `obtain ⟨c, hc⟩ := DFunLike.ne_iff.mp _hω`
-  and `obtain ⟨u, hu⟩ : ∃ u, (QuotientGroup.mk u : C𝔽) = c.val := …` each ran 600+ s, ignoring maxHeartbeats. Fix:
-  `have h : ∃ c : C₁, ω c ≠ (1 : PontryaginDual C₁) c := …` with the type spelled out, or a standalone private helper.
-- **`FiniteDimensional ℂ ↥(range T)` compared against itself** (#5108, Fable route, notes/5108.md): gdb showed the hang
-  is `isDefEq` → `getFunInfo` → `FunInfo.collectDeps`, an uncached walk with no heartbeat check over a huge type,
-  hit whenever two non-syntactically-equal copies of the conclusion meet. Fix: generic lemma returns
-  `(LinearMap.range T.toLinearMap).FG`, then a small `S.FG → FiniteDimensional ℂ ↥S` lemma.
-- **`rw`/`▸` on a Submodule goal over a heavy space** (#5135, StrongCoprimalityThetaSpace): never finished; plain
-  `exact` of the span lemma too. Worked: `unfold <def>`, `have key := …` with explicit arguments, then
-  `with_reducible_and_instances exact key`; split long factorizations into separate `have`s (86 s → 13 s).
-  Avoid binder names that clash with the file's local notations (Sec5: `P`, `B`, `C₁`).
-- **Quotient types in general** (#5078, Fable route, notes/5078.md): run no tactic at the theta quotient types;
-  each step is a private lemma over abstract `{M Q Bm : Type*}`, applied in one term with the heavy objects as arguments.
-- **Principal-value maps** (`adelePrincipalValue`, Ch11 Sec1b, PR #5633): `rw`, `simp` and `congr_fun` hang on them.
-  `LinearMap.ext_iff.mp` works, and private lemmas stated in exactly the definition's shape applied with `exact`.
-  The F ∅ = id and composition helpers are in PR #5633 (Sec1b, private): copy them, do not re-derive.
-- **Quotient step and analysis in one lemma** (#4603, PR #5616): `rintro` on a PV range, `Quotient.mk_surjective`
-  and the analytic argument together ran 10+ min. Fix: a lemma about tests plus a generic module lemma
-  (`range L ≤ ker φ` if `φ (L (π f)) = 0` for all f).
-- **Slow types (#5398), `abbrev` towers (AGENTS.md ed9dbb7, prover.md):** a space declared as an `abbrev` over a quotient,
-  `SchwartzBruhat` or another synonym borrows its instances by unfolding, so instance terms grow
-  exponentially and `whnf`/`isDefEq` time out on trivial goals (#5362, #5398; likely #4344's Θω(ω)). Do not
-  unfold it: state helpers generically or for the explicit instances, `set`/`generalize` the space,
-  use its `mem_…_iff`/characterizing lemmas. Turning the `abbrev` into a `def` is a statement change:
-  report it, do not do it.
-  `prior.sh` prints `trap: … RISK-5398 …` when the statement or section variables use one of #5398's 22
-  synonyms, directly or through defs, abbrevs and notations (`$S/trap5398.py <n>` or `--decl <path>::<name>`,
-  no Lean). Upstream's two fixes: state the step as a private lemma about an abstract space
-  (`{E} [AddCommGroup E] [Module ℂ E] …`) and apply it, or write a helper's binders out in full so nothing
-  comes from the section's `variable`s. **If a mathematically trivial step still never finishes after
-  those, stop retrying** (user and prover.md, 2026-11-22): escalate or release, and name #5398 and the
-  synonym in the notes and the release or escalation reason, so the next person does not start from nothing.
-- **Destructuring a sibling inside an abbrev space** (#4344, PR #5538): `obtain ⟨…⟩ := sibling ω` about
-  Θω(ω) ran 3+ min. Fix: a generic private helper over `{E} [instances]` that takes the sibling's
-  conclusion (e.g. `IsFrechetTVS E`, `IsNuclearTVS E`) and destructures it there; the main proof is
-  one term `helper.{0} (sibling ω) (other ω)`.
-- **Unascribed `_mk`/`_apply` lemmas on quotients** (#4535, Ch07 Sec2, PR #5547): `rwa [coeff_apply]` and
+**The fix that keeps working:** run no tactic on the heavy objects themselves. State each step as
+a private lemma over abstract types (`{E} [AddCommGroup E] [Module ℂ E] …`, `{M Q Bm : Type*}`,
+`Submodule B`), with every binder written out (nothing from the section's `variable`s); bind it
+first with `have key := lemma (F := …) …`, all arguments explicit and no expected type; then
+close with `exact key`, `with_reducible exact …` or `with_reducible_and_instances exact …`, or in
+term mode with the heavy objects as arguments. To find the step that runs away, bisect: turn your
+new proofs back into `sorry` one at a time, or cut the file with `#exit`, in separate scratch files.
+
+Known traps (issue, where the fix is recorded):
+- **Goal vs witness defeq at default transparency** (#5181, notes/5181.md): `exact`/`apply` of a
+  correct witness ran 600+ s. Fixed as above, e.g. `with_reducible exact
+  Submodule.topologicalClosure_mono (Submodule.span_mono key)`. The same unification on quotient or
+  pullback goals (Ch05 Sec5 `pull(K)`) via `rw`/`exact` cost 150–400 s, unbounded by heartbeats;
+  `with_reducible_and_instances exact generic_lemma (E := …) θ T h` took ~1 s (Sec5 `closure_range`).
+- **`let`-bound statement variables** (#4091, notes/4091.md): after `intro` of the statement's lets,
+  every check against a spec ran 240–500 s (~1.3 s without the lets). Never `intro` them: prove a
+  let-free helper (the let values as variables) by one generic lemma in term mode, and close the
+  theorem in term mode `:= helper … _ _ (…) x`.
+- **`obtain`/`have` on heavy facts** (#4454; #4344, PR #5538; crit/1526, #5045): `obtain ⟨c, hc⟩ :=
+  DFunLike.ne_iff.mp _hω`, or `obtain ⟨…⟩ := sibling ω` inside an abbrev space (Θω(ω)), ran 3–10+
+  min, ignoring maxHeartbeats. Fix: `have h : ∃ c : C₁, ω c ≠ (1 : PontryaginDual C₁) c := …` with
+  the type spelled out, or a generic private helper over `{E} [instances]` that takes the facts
+  (e.g. `IsFrechetTVS E`, `IsNuclearTVS E`) as hypotheses and destructures them there, applied in
+  one term `helper.{0} (sibling ω) (other ω)` (a killed 90-min build became ~2 min).
+- **`FiniteDimensional ℂ ↥(range T)` compared against itself** (#5108, notes/5108.md): gdb showed
+  `isDefEq` → `getFunInfo` → `FunInfo.collectDeps`, an uncached walk with no heartbeat check over a
+  huge type, hit whenever two non-syntactically-equal copies of the conclusion meet. Fix: a generic
+  lemma returning `(LinearMap.range T.toLinearMap).FG`, then a small `S.FG → FiniteDimensional ℂ ↥S`.
+- **`rw`/`▸` on a Submodule goal over a heavy space** (#5135, StrongCoprimalityThetaSpace): never
+  finished, plain `exact` of the span lemma neither. Worked: `unfold <def>`, `have key := …`, then
+  `with_reducible_and_instances exact key`; split long factorizations into separate `have`s (86 s →
+  13 s). Avoid binder names that clash with the file's local notations (Sec5: `P`, `B`, `C₁`).
+- **Quotients** (#5078, notes/5078.md; #4603, PR #5616; esc-sec2b, #4576): no tactic at the theta
+  quotient types. Keep the quotient step and the analysis in separate lemmas (`rintro` on a PV range
+  plus `Quotient.mk_surjective` plus the estimate ran 10+ min; fix: a lemma about tests plus the
+  generic `range L ≤ ker φ` if `φ (L (π f)) = 0` for all f). A quotient step is a lemma about general
+  modules (`V ≤ K` → surjective `liftQ` commuting with the quotient maps); replace `rw [foo_apply]`
+  that times out by `change` to the explicit form; write `(L).map_sub _ _` explicitly.
+- **Unascribed `_mk`/`_apply` lemmas on quotients** (#4535, PR #5547): `rwa [coeff_apply]` and
   `coeff_mk ω c hc _ f` with the index left as `_` each ran 15+ min. Fix: `have e : … (mkQ f) = … :=
-  coeff_mk ω c hc N f` with every index written out, then use `e`. Locate runaways by bisecting with `#exit`.
-- **Slow-compile trap:** if a module build grows from about 1 min to 10+ min, one of your proofs
-  runs away. Bisect by turning your new proofs back into `sorry` one at a time; drop the culprit,
-  note it, release it as stuck, and hand in the rest.
-- **`Classical.choose` / `existsUnique_*` definitions** (e.g. `sLocalZetaPair`): never `unfold`
-  them and `exact …choose_spec`, `rw … rfl` or `simp` through them (builds of 13–25 min). Use
-  `have h := (existsUnique_… ).exists.choose_spec f; exact h`, or the `*_mk`/`*_apply` lemmas.
-  `obtain` on `existsUnique_sLocalThetaAction` alone took >200 s.
-- **Default-transparency unification** of quotient or pullback goals (Ch05 Sec5 `pull(K)`) with any
-  lemma via `rw`/`exact` cost 150–400 s and is not bounded by heartbeats. Instead use
-  `with_reducible_and_instances exact generic_lemma (E := …) θ T h` (~1 s; the pattern is in Sec5
-  `closure_range`) (esc-sec5).
-- **Isolate a quotient step** as a private lemma about general modules (`V ≤ K` → surjective
-  `liftQ` commuting with the quotient maps); replace `rw [foo_apply]`/`simp only [foo_apply]` that
-  hit isDefEq timeouts by `change` to the explicit form; write `(L).map_sub _ _` explicitly; when
-  `exact f lemma` times out, bind first: `have h := lemma (F := F); exact f h` (esc-sec2b, #4576).
-- **Heavy `have`/`obtain` chains:** if a theorem body with such steps on heavy lemmas never
-  finishes, move the argument into a helper lemma that takes those facts as hypotheses and apply
-  it (a killed 90-min build became ~2 min; crit/1526, #5045).
+  coeff_mk ω c hc N f` with every index written out, then use `e`.
+- **Principal-value maps** (`adelePrincipalValue`, Ch11 Sec1b, PR #5633): `rw`, `simp` and
+  `congr_fun` hang. `LinearMap.ext_iff.mp` works, and private lemmas stated in exactly the
+  definition's shape applied with `exact`. The F ∅ = id and composition helpers are in PR #5633
+  (private): copy them, do not re-derive.
+- **`Classical.choose` / `existsUnique_*` definitions** (e.g. `sLocalZetaPair`): never `unfold` them
+  and `exact …choose_spec`, `rw … rfl` or `simp` through them (builds of 13–25 min; `obtain` on
+  `existsUnique_sLocalThetaAction` alone >200 s). Use `have h := (existsUnique_… ).exists.choose_spec
+  f; exact h`, or the `*_mk`/`*_apply` lemmas.
+- **Slow types (#5398), `abbrev` towers (AGENTS.md ed9dbb7, prover.md):** a space declared as an
+  `abbrev` over a quotient, `SchwartzBruhat` or another synonym borrows its instances by unfolding,
+  so instance terms grow exponentially and `whnf`/`isDefEq` time out on trivial goals (#5362, #5398;
+  likely #4344's Θω(ω)). Do not unfold it: state helpers generically or for the explicit instances,
+  `set`/`generalize` the space, use its `mem_…_iff`/characterizing lemmas. Turning the `abbrev` into
+  a `def` is a statement change: report it, do not do it. `prior.sh` prints `trap: … RISK-5398 …`
+  when the statement or section variables use one of #5398's 22 synonyms, directly or through defs,
+  abbrevs and notations (`$S/trap5398.py <n>` or `--decl <path>::<name>`, no Lean). **If a
+  mathematically trivial step still never finishes after the fix above, stop retrying** (user and
+  prover.md, 2026-11-22): escalate or release, and name #5398 and the synonym in the notes and the
+  reason, so the next person does not start from nothing.
 - `+`, `-`, `•` on `SchwartzBruhat` / `ModulatedExponentialDecay` values and `Lβ` coercions: most
   reported timeouts (#1288) were the `lake env lean` artifact. If in doubt, probe the bare statement
   with a `sorry` body under `timeout 300 lake lean .agent/Probe.lean` and skip it if that does not
-  finish. Known workarounds: `(someLinearMap).map_add f f'`; `Eq.trans ?_ (integral_add ..)` where
+  finish. Workarounds: `(someLinearMap).map_add f f'`; `Eq.trans ?_ (integral_add ..)` where
   `rw [← integral_add ..]` times out.
 - **Keep the file fast** (CONTRIBUTING "Keep the file fast"): time your module before and after
-  your change; if your proof adds more than about a minute, find the slow step with
-  `set_option profiler true in` on the theorem and restructure. **Do not raise `maxHeartbeats`** to
-  get a proof through. AppD Sec2b alone takes ~30 min in a full build; that is upstream, not you.
+  your change. If it grows from about 1 min to 10+ min, or your proof adds more than about a
+  minute, find the slow step (bisect, or `set_option profiler true in` on the theorem) and
+  restructure; if you cannot, drop that proof, note it, release or escalate it, and hand in the
+  rest. **Do not raise `maxHeartbeats`.** AppD Sec2b alone takes ~30 min in a full build; that is
+  upstream, not you.
 
 ## Upstream sweepers
 Issues labelled `sweep` ("Sweep: close out `<file>`") each hold ALL remaining sorries of one file.

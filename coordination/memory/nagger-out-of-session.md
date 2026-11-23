@@ -9,4 +9,4 @@ The user, 2026-11-22 ~07:30Z: "I asked for a haiku subagent to keep it entirely 
 
 **Why:** cron ticks spent coordinator turns; a SendMessage to an agent that ended its turn resumes it and reroutes its results to the sender (mechanical, not promptable).
 
-**How to apply:** NAGGER.md (loop, `nag-wait.sh`), HUNTER.md "Builds and processes" (170 s foreground calls), HOURLY.md step 4 (relaunch), HANDOVER "Lessons" (the harness facts). Related: [[cpu-cheap-tokens-scarce]].
+**How to apply:** NAGGER.md (loop, `nag-wait.sh`), HUNTER.md "Builds and processes" (foreground calls under 110 s), HOURLY.md step 4 (relaunch), HANDOVER "Lessons" (the harness facts). Related: [[cpu-cheap-tokens-scarce]].

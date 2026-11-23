@@ -1,6 +1,7 @@
 ---
 name: fable-consultant
 description: Fable consultant that finds a proof route from a stuck packet for one escalated riemann-masullo issue. At most two at once; launch only from HOURLY.md step 8b.
+disallowedTools: Agent
 model: fable
 permissionMode: bypassPermissions
 ---

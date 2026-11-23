@@ -30,7 +30,7 @@ consultant to `agents.txt` (the nagger's roster).
 | `siever` (Sonnet) | – | `Your name is siev<k>, model tag <M>. Your hits: <lines>.` |
 | `triage` (Haiku) | – | `N = 60.` |
 | `fable-consultant` (Fable) | 2 | `Your issue: <row>.` |
-| `findings-evaluator` (Fable; until the coordinator restarts, pass `model: fable` in the Agent call) | – | `Your findings: <rows>.` |
+| `findings-evaluator` (Fable) | – | `Your findings: <rows>.` |
 | `nagger` (Haiku) | – | `Start the loop.` |
 | fixer: `general-purpose`, model sonnet, effort medium | – | `Fix <failing check or review comment> on PR #<p> in worktree <wt>, following S/HUNTER.md "Checks and pull request". Model tag <M>.` |
 

@@ -1,6 +1,6 @@
 # Coordinator handover: low-hanging campaign
 
-Compacted 2026-11-22 ~18:00Z. Superseded rules are gone (git history has them). Each rule lives in
+Compacted 2026-11-23 ~01:20Z. Superseded rules are gone (git history has them). Each rule lives in
 one place: procedures in `S/HOURLY.md` and the briefs, the user's standing instructions here, and
 Claude memory only points at them.
 
@@ -15,10 +15,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 
 ## Current state (2026-11-23 ~01:15Z, coordinator session a9c138b2 handing over; new session after the 01:30Z reset)
 
-- **Restarted after a sandbox reboot** (~18:05Z): services restarted (watchdog with all-projects
-  `PROJ`, memguard, warm and sieve at nice 19); the token needed `sbx secret set` again after the
-  reboot. Hourly cron at minute 17 (session-only). Nagger stopped 00:30Z (quota); relaunch per step 4 once agents run again.
-- **Current state (2026-11-23 01:08Z):** budget scales with token usage (HOURLY step 7, max 10). At 01:08Z 5h=97%
+- **State at 01:08Z:** budget scales with token usage (HOURLY step 7, max 10). At 01:08Z 5h=97%
   (reset ~01:30Z), so budget 0: one Opus escalator still runs, esc-ch05sec3a5 (Ch05 Sec3a #4184, resuming the
   paused work; launched 00:56Z under the earlier 2-unit cap). Paused for quota at 00:28Z, rows QUEUED with notes
   ("paused for quota … resume from notes"): #4078 (helpers in notes/4078-work, theorem E left) and #4079 (same
@@ -44,17 +41,8 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
      (their #5635 merged first; our proof is unpushed on `esc/ch06sec3-1` 1e749c6)? Default: post nothing.
   6. A peer session edits the live files and this branch for the user and messages the coordinator
      (find it with ListAgents); `git pull` before editing.
-- **PRs opened this session:** #5433 #5441 #5447 #5450 merged; open #5454 (#5288; Verdict
-  `error` because main cec1c13 did not build: push an empty commit once main builds, leads.txt),
-  #5538 (#4344, Fable route), #5542 (#4144), #5547 (#4535), #5551 (Ch11 Sec3, 5 issues), #5553
-  (Ch11 Sec2b, 7 issues).
-- **Released:** #5514 (Haar-null singleton needs >100 lines; route on the issue).
-- **Triage:** done up to #5525 (triage10). Ch05 Sec3a still has ~30 more issues with failed
-  automated attempts by elmismisimoxhunca, most failing only on inherited sorryAx: good Opus work.
-- **Posted with user approval:** the #5275 route hint for troyjlee.
-- **New traps in HUNTER.md:** abbrev towers (AGENTS.md ed9dbb7), destructuring a sibling inside
-  an abbrev space (#4344), unascribed `_mk`/`_apply` lemmas (#4535). Foreground limit is now
-  110 s (the harness backgrounds calls after 120 s).
+- **Lead:** Ch05 Sec3a has ~30 more issues with failed automated attempts by elmismisimoxhunca, most
+  failing only on inherited sorryAx: good Opus work (`resumable.sh`).
 
 ## Standing instructions from the user
 
@@ -67,13 +55,15 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
   relay short reports. No `advisor` tool (off since 2026-11-22: it sends the whole transcript);
   escalation goes through `escalate.sh` and the Fable consultant.
 - **CPU is cheap, tokens are scarce.** Automate (sieve, shortlist, scripts) before reasoning; keep
-  wake-ups sparse. Agents and the nagger wait in the FOREGROUND, every call under 170 s (HUNTER.md
+  wake-ups sparse. Agents and the nagger wait in the FOREGROUND, every call under 110 s (HUNTER.md
   "Builds and processes"); never `run_in_background`.
-- **Staffing and Opus work** (2026-11-22): max budget 10 units (user, 23:10Z, CPU pegged; was 12 from 20:20Z), scaled down by token usage and back up after the reset (user, 2026-11-23 ~01:05Z; table in HOURLY.md step 7), at least 2 Opus, at most 6 Sonnets;
-  Opus goes to escalation, then prior work (ours and others'), a fresh issue last; Fable
-  consultants cost 2 units each, at most 2 at once (user, ~23:00Z), and come right after the 2-Opus minimum, before any new work (user,
-  2026-11-22 ~22:30Z); the findings evaluator stays outside the budget. HOURLY.md steps 7–9. No two agents
-  share a file. A prover that finishes with a warm cache may get ONE related issue by SendMessage.
+- **Staffing and Opus work:** max budget 10 units (user, 2026-11-22 23:10Z, CPU pegged; was 12),
+  scaled down by token usage and back up after the reset (user, 2026-11-23 ~01:05Z); at least 2
+  Opus while the budget allows, at most 6 Sonnets. Opus goes to escalation, then prior work (ours
+  and others'), a fresh issue last. Fable consultants cost 2 units, at most 2 at once, and come
+  right after the 2-Opus minimum, before any new work; the findings evaluator is outside the budget.
+  Quotes and order: HOURLY.md steps 7–9. No two agents share a file. A prover that finishes with a
+  warm cache may get ONE related issue by SendMessage.
 - **Build on prior work** (2026-11-22): every agent starts from `prior.sh <n>` (HUNTER.md "Prior
   work first"); `resumable.sh` feeds HOURLY.md step 8b.
 - **Claims** (user, 2026-11-22 ~22:00Z: "we definitely should not be re-posting to beat the
@@ -118,8 +108,9 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
 
 - Repo `/mnt/faststorage/math/riemann-masullo` (writable, ~65 GB free; its parent is not writable).
   The overlay root (~16 GB) does not survive a sandbox recreation.
-- 20 GB RAM (raised from 16 GB on 2026-11-22), 24 cores. **RAM is the limit.** The old ceiling was one prover, one hunter or siever,
-  and the sieve; staffing of up to 8 agents (6 Sonnets + 2 Opus) is untested at 20 GB. Agents build only their module
+- 20 GB RAM (raised from 16 GB on 2026-11-22), 24 cores. **RAM is the hard limit**; CPU load
+  limits staffing too (12 units ran at 20 GB on 2026-11-22 evening; the user cut to 10 at 23:10Z, CPU
+  pegged). Agents build only their module
   while working, the sieve waits for >6 GB free, and memguard kills the newest Lean below 1000 MB
   (cheap, rc 137). The hourly check watches `memguard.log` (HOURLY.md step 5). An OOM of the host
   is not cheap.
@@ -210,7 +201,7 @@ Launch prompts: HOURLY.md "Launching agents".
 | `HOURLY.md` | The hourly check's instructions, read by the cron on every tick. |
 | `FABLE.md` | Fable consultant brief: route from a stuck packet, no builds or PRs. |
 | `trap5398.py <n>…` / `--decl <path>::<name>` | Flags #5398 slow-type risk without Lean (statement or section variables use one of the 22 synonyms, directly or via defs/abbrevs/notations); called by `prior.sh`. |
-| `FINDINGS.md`, `findings.txt` | Fable findings-evaluator brief (Opus until 2026-11-22 ~21:40Z, user) and its queue. |
+| `FINDINGS.md`, `findings.txt` | Fable findings-evaluator brief and its queue. |
 
 State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims.txt`, `hunters.txt`
 (agent log), `hunted.txt` (launch log), `leads.txt` (leads), `escalations.txt` (escalation queue, claims kept), `findings.txt`
@@ -250,8 +241,6 @@ State files in `S` (snapshot in `state/`): `agents.txt` (nagger roster), `claims
 
 ## Upstream reports (integrator decides)
 
-- **#3230:** issue-sync damage (fragment batch #3183–#3322, 124 issues wrongly closed, 6 sorries
-  without issue). Details in `critical/BLOCKERS.md`.
-- **#1288:** consolidated instance-timeout report (much of it turned out to be the `lake env lean`
-  artifact).
+- **#3230** (closed): issue-sync damage, batch #3183–#3322 (`critical/BLOCKERS.md`).
+- **#1288:** consolidated instance-timeout report (mostly the `lake env lean` artifact).
 - **#561:** `ApproxProp` false statements, repaired by #3330.
