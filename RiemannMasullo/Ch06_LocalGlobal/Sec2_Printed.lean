@@ -1,12 +1,13 @@
 module
 
 public import RiemannMasullo.Ch06_LocalGlobal.Sec2
-import all RiemannMasullo.Ch02_AdelicTheta.Sec2a
+import RiemannMasullo.Ch02_AdelicTheta.Sec2a
 import all RiemannMasullo.Ch02_AdelicTheta.Sec4
 import all RiemannMasullo.Ch03_IdelicZeta.Sec3b
 import RiemannMasullo.External.AlgebraicNumberTheoryLean.Chebotarev.DirichletHecke
 import Mathlib.NumberTheory.MulChar.Duality
 import Mathlib.NumberTheory.DirichletCharacter.Bounds
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 import Mathlib.NumberTheory.NumberField.Cyclotomic.Basic
 import Mathlib.Topology.Algebra.Module.Equiv.Pi
 

@@ -3,8 +3,8 @@ module
 public import RiemannMasullo.Ch02_AdelicTheta.Sec4
 public import RiemannMasullo.Ch03_IdelicZeta.Sec2
 
-import all RiemannMasullo.AppA_AlgebraicNT.Sec3
-import all RiemannMasullo.Ch02_AdelicTheta.Sec2a
+import RiemannMasullo.AppA_AlgebraicNT.Sec3
+import RiemannMasullo.Ch02_AdelicTheta.Sec2a
 import RiemannMasullo.ForMathlib.MeasureTheory.Measure.Count
 import RiemannMasullo.ForMathlib.MeasureTheory.Measure.Haar.Unique
 import RiemannMasullo.ForMathlib.MeasureTheory.Measure.Haar.Units
@@ -2870,7 +2870,7 @@ theorem sLocalNormOneQuotientMeasure_existsUnique :
     ((isProperMap_sIdeleQuotientNorm F S).isCompact_preimage isCompact_singleton)
   have : BorelSpace ℝ≥0ˣ := borelSpace_units_of_continuousInv₀ ℝ≥0
   have : SecondCountableTopology ℝ≥0ˣ := Units.isEmbedding_val₀.secondCountableTopology
-  have : positiveRealHaar.IsHaarMeasure := positiveRealHaar_isHaarMeasure
+  have : positiveRealHaar.IsHaarMeasure := positiveRealHaar_isHaarMeasure_of_lebesgue
   have hμJ := sLocalQuotientTamagawaMeasure_isWeil (F := F) (S := S)
   have : (μJ).IsHaarMeasure := hμJ.1
   -- Probability Haar measure on the compact norm-one group.

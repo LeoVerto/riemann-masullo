@@ -3,7 +3,7 @@ module
 public import RiemannMasullo.Ch07_SchauderBasesZeta.Sec4
 import all RiemannMasullo.Ch04_PeriodicSchauderBases.Sec6
 
-import all RiemannMasullo.AppA_AlgebraicNT.Sec3
+import RiemannMasullo.AppA_AlgebraicNT.Sec3
 
 import all RiemannMasullo.Ch03_IdelicZeta.Sec2
 

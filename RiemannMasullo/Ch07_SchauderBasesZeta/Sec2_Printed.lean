@@ -8,6 +8,9 @@ import Mathlib.NumberTheory.NumberField.Discriminant.Different
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import all RiemannMasullo.Ch03_IdelicZeta.Sec4
 import all RiemannMasullo.Ch07_SchauderBasesZeta.Sec1a
+import Mathlib.NumberTheory.Cyclotomic.Basic
+import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
+import Mathlib.NumberTheory.NumberField.Discriminant.Different
 
 /-! # §7.2 Claims that are false as printed -/
 
