@@ -4,7 +4,7 @@ public import RiemannMasullo.AppD_SchwartzBruhat.Sec1b
 public import Mathlib.Analysis.Calculus.Deriv.Basic
 import all RiemannMasullo.AppC_LCTVS.Sec2a_part2
 import RiemannMasullo.AppC_LCTVS.Sec3a
-import all RiemannMasullo.AppD_SchwartzBruhat.Sec1a
+import RiemannMasullo.AppD_SchwartzBruhat.Sec1a
 import Mathlib.Topology.Algebra.MvPolynomial
 import Mathlib.Algebra.Category.Grp.Injective
 import Mathlib.Analysis.PSeries

@@ -19,7 +19,7 @@ import RiemannMasullo.ForMathlib.Analysis.MellinTransform.Weighted
 import all RiemannMasullo.Ch02_AdelicTheta.Sec2b
 import all RiemannMasullo.Ch09_HardySobolev.Sec1
 import RiemannMasullo.ForMathlib.Analysis.Normed.Field.ProperSpace
-import all RiemannMasullo.AppD_SchwartzBruhat.Sec1a
+import RiemannMasullo.AppD_SchwartzBruhat.Sec1a
 import Mathlib.Analysis.Complex.Convex
 import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
 import Mathlib.Topology.LocallyConstant.Algebra

@@ -13,7 +13,7 @@ import RiemannMasullo.AppD_SchwartzBruhat.Sec1b
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec1d
 import RiemannMasullo.ForMathlib.Analysis.Calculus.ContDiff.LineDeriv
 import RiemannMasullo.ForMathlib.Topology.Algebra.OpenSubgroup
-import all RiemannMasullo.AppD_SchwartzBruhat.Sec1a
+import RiemannMasullo.AppD_SchwartzBruhat.Sec1a
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec2b
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec3a
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec3a_part2

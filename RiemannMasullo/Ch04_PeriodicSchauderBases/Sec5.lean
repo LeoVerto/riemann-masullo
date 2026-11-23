@@ -7,7 +7,7 @@ import all RiemannMasullo.Ch04_PeriodicSchauderBases.Sec2
 import all RiemannMasullo.Ch04_PeriodicSchauderBases.Sec4
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec1c
 public import RiemannMasullo.ForMathlib.Topology.Algebra.Module.ContinuousLinearMap.Quotient
-import all RiemannMasullo.AppD_SchwartzBruhat.Sec1a
+import RiemannMasullo.AppD_SchwartzBruhat.Sec1a
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec1c
 import Mathlib.Topology.Algebra.Group.SubmonoidClosure
 import Mathlib.Analysis.Calculus.SmoothSeries

@@ -19,6 +19,8 @@ import RiemannMasullo.ForMathlib.RingTheory.Trace.Defs
 import Mathlib.Analysis.Calculus.ParametricIntegral
 import Mathlib.Analysis.SpecialFunctions.PolarCoord
 import Mathlib.Analysis.Calculus.Taylor
+import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+import Mathlib.Analysis.Normed.Field.ProperSpace
 import Mathlib.Analysis.Complex.Liouville
 import Mathlib.Analysis.Meromorphic.RCLike
 import Mathlib.Topology.LocallyConstant.Algebra

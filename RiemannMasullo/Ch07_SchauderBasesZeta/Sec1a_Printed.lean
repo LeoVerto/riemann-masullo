@@ -1,6 +1,7 @@
 module
 
 public import RiemannMasullo.Ch07_SchauderBasesZeta.Sec1a
+import RiemannMasullo.ForMathlib.Topology.Algebra.PontryaginDual.Separation
 import Mathlib.Algebra.Field.ULift
 import Mathlib.NumberTheory.NumberField.Cyclotomic.Embeddings
 import Mathlib.Analysis.Real.Pi.Irrational

@@ -5,7 +5,7 @@ public import RiemannMasullo.Ch03_IdelicZeta.Sec1
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec3a
 import RiemannMasullo.AppC_LCTVS.Sec1
 import all RiemannMasullo.AppC_LCTVS.Sec2a_part2
-import all RiemannMasullo.AppD_SchwartzBruhat.Sec1a
+import RiemannMasullo.AppD_SchwartzBruhat.Sec1a
 import RiemannMasullo.AppD_SchwartzBruhat.Sec1b
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec2a
 import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
