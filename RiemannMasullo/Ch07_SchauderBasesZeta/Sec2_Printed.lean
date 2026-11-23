@@ -2,6 +2,7 @@ module
 
 public import Mathlib.Algebra.Field.ULift
 public import RiemannMasullo.Ch07_SchauderBasesZeta.Sec2
+import all RiemannMasullo.Ch03_IdelicZeta.Sec4
 
 /-! # §7.2 Claims that are false as printed -/
 
@@ -106,11 +107,130 @@ def sLocalPrincipalPartCoeff_universal_pole_bound : Prop :=
     sLocalNonnegativeLaurentCoeff c k ≠ 0 →
       c ∈ poleLocus(F, S) ∧ ∀ f : ℬₛ(F, S), k ≤ sLocalPolarMultiplicity f c
 
+open scoped TensorProduct in
+/-- A product of local tests at the archimedean places and the places of `S` is a
+test on the S-adeles. -/
+private theorem sLocalPrincipalPartCoeff_universal_pole_bound_tensor {F : Type u} [Field F] [NumberField F]
+    (S : Finset (HeightOneSpectrum (𝓞 F)))
+    (a : (w : InfinitePlace F) → SchwartzBruhat (Multiplicative w.Completion))
+    (b : (v : S) → SchwartzBruhat (Multiplicative (v.val.adicCompletion F))) :
+    ∃ f : SchwartzBruhat (Multiplicative (SAdeleRing F S)), ∀ x : SAdeleRing F S,
+      f (Multiplicative.ofAdd x) =
+        (∏ w, a w (Multiplicative.ofAdd (x.1 w))) * ∏ v, b v (Multiplicative.ofAdd (x.2 v)) := by
+  classical
+  let G (w : InfinitePlace F) := Multiplicative w.Completion
+  let (w : InfinitePlace F) : T2Space (G w) := (inferInstance : T2Space w.Completion)
+  let (w : InfinitePlace F) : LocallyCompactSpace (G w) :=
+    (inferInstance : LocallyCompactSpace w.Completion)
+  let (w : InfinitePlace F) : SecondCountableTopology (G w) :=
+    (InfinitePlace.Completion.isometry_extensionEmbedding w).isEmbedding.secondCountableTopology
+  obtain ⟨a₀, ha⟩ := schwartzBruhat_pi_test G a
+  let e : Multiplicative (InfiniteAdeleRing F) ≃ₜ* ((w : InfinitePlace F) → G w) :=
+    { toFun := fun x w ↦ Multiplicative.ofAdd (x.toAdd w)
+      invFun := fun x ↦ Multiplicative.ofAdd (fun w ↦ (x w).toAdd)
+      left_inv := fun _ ↦ rfl
+      right_inv := fun _ ↦ rfl
+      map_mul' := fun _ _ ↦ rfl
+      continuous_toFun := continuous_id
+      continuous_invFun := continuous_id }
+  let : T2Space (Multiplicative (InfiniteAdeleRing F)) := e.toHomeomorph.isEmbedding.t2Space
+  let : LocallyCompactSpace (Multiplicative (InfiniteAdeleRing F)) :=
+    e.toHomeomorph.isOpenEmbedding.locallyCompactSpace
+  let arch : SchwartzBruhat (Multiplicative (InfiniteAdeleRing F)) :=
+    ⟨a₀.val ∘ e, schwartzBruhat_mem_comp_equiv e a₀.property⟩
+  obtain ⟨t, ht⟩ := sAdeleSchwartz_inductiveTensor_equiv F S
+  refine ⟨t (arch ⊗ₜ[ℂ] (⨂ₜ[ℂ] v : S, b v)), fun x ↦ ?_⟩
+  rw [ht arch b x]
+  exact congrArg (· * _) (ha (e (Multiplicative.ofAdd x.1)))
+
+/-- Over ℚ with only the real place, the standard Gaussian has Z-function equal to the
+Euler factor times its normalized value one, so it does not vanish at `1/2` on the trivial
+component. There the correcting factor is regular, so the constant coefficient is a nonzero
+functional at a character outside the pole locus. -/
+private theorem sLocalPrincipalPartCoeff_universal_pole_bound_false_aux :
+    ¬ sLocalPrincipalPartCoeff_universal_pole_bound.{u} := by
+  intro h
+  let := NumberField.of_ringEquiv ℚ (ULift.{u} ℚ) (ULift.ringEquiv.{0, u} (R := ℚ)).symm
+  let F := ULift.{u} ℚ
+  let S : Finset (HeightOneSpectrum (𝓞 F)) := ∅
+  let tw := quasiCharacterNormTwist (G := SIdeleQuotient F S) (sIdeleQuotientNorm F S)
+    (isProperMap_sIdeleQuotientNorm F S).continuous
+  let χ : PontryaginDual (SIdeleQuotient F S) := 1
+  let s₀ : ℂ := 1 / 2
+  let c := tw ((circleToComplex).comp χ) s₀
+  let χArch : (w : InfinitePlace F) → PontryaginDual w.Completionˣ := fun _ ↦ 1
+  have hχ : ∀ w, (circleToComplex).comp (χArch w) =
+      sLocalInfiniteRestriction w ((circleToComplex).comp χ) := fun w ↦ by
+    ext g; rfl
+  obtain ⟨f, hf⟩ := sLocalPrincipalPartCoeff_universal_pole_bound_tensor S (fun w ↦ infiniteStandardGaussian w (χArch w))
+    (fun v ↦ finiteStandardGaussian v.val (sLocalFiniteRestriction v c))
+  have hE := sLocalNormalizedEigendistribution_gaussian χ s₀ χArch hχ f hf
+  have hspec := (existsUnique_sLocalNormalizedEigendistribution c).exists.choose_spec f
+  have hN : sLocalNormalizedZFunction f c = 1 := by
+    rw [← hspec]
+    change _ * sLocalNormalizedEigendistribution c f = 1
+    rw [hE]
+    simp [S]
+  have hpos : s₀ ∈ Complex.re ⁻¹' Ioi (0 : ℝ) := by
+    show (0 : ℝ) < (1 / 2 : ℂ).re
+    norm_num
+  have hdiv := sLocalNormalizedZFunction_eq_div f χ hpos
+  have hI : sLocalIdelicZetaIntegral f c ≠ 0 := by
+    intro h0
+    change sLocalNormalizedZFunction f c = _ at hdiv
+    rw [hdiv, h0, zero_div] at hN
+    exact zero_ne_one hN
+  have hZ : sLocalIdelicZFunction f c = sLocalIdelicZetaIntegral f c :=
+    sLocalIdelicZFunction_eq_integral f ⟨χ, s₀, hpos, rfl⟩
+  have htw (z : ℂ) : tw c z = tw ((circleToComplex).comp χ) (s₀ + z) := by
+    ext1 g
+    have hm : ((((sIdeleQuotientNorm F S g : ℝ≥0) : ℝ)) : ℂ) ≠ 0 :=
+      Complex.ofReal_ne_zero.mpr (NNReal.coe_pos.mpr (Units.zero_lt _)).ne'
+    change ((circleToComplex).comp χ) g * (((sIdeleQuotientNorm F S g : ℝ≥0) : ℝ) : ℂ) ^ s₀ *
+        (((sIdeleQuotientNorm F S g : ℝ≥0) : ℝ) : ℂ) ^ z = ((circleToComplex).comp χ) g *
+        (((sIdeleQuotientNorm F S g : ℝ≥0) : ℝ) : ℂ) ^ (s₀ + z)
+    rw [mul_assoc, ← Complex.cpow_add _ _ hm]
+  have hopen : IsOpen (Complex.re ⁻¹' Ioi (0 : ℝ)) := isOpen_Ioi.preimage Complex.continuous_re
+  have hZa : AnalyticAt ℂ (fun z ↦ sLocalIdelicZFunction f (tw ((circleToComplex).comp χ) z)) s₀ :=
+    ((sLocalIdelicZetaIntegral_analyticOn f χ) s₀ hpos).congr
+      (Filter.eventually_of_mem (hopen.mem_nhds hpos) fun z hz ↦
+        (sLocalIdelicZFunction_eq_integral f ⟨χ, z, hz, rfl⟩).symm)
+  have hg : AnalyticAt ℂ (fun z ↦ sLocalIdelicZFunction f (tw c z)) 0 := by
+    simp only [htw]
+    exact hZa.comp_of_eq (by fun_prop) (add_zero s₀)
+  have hR : AnalyticAt ℂ (fun z ↦ sLocalRhoFactor (tw c z)) 0 := by
+    simp only [htw]
+    exact (sLocalRhoFactor_analyticAt_criticalLine χ s₀ (by norm_num [s₀])).comp_of_eq
+      (by fun_prop) (add_zero s₀)
+  have hcoeff : sLocalNonnegativeLaurentCoeff c 0 ≠ 0 := by
+    intro h0
+    have h1 : sLocalZLaurentCoeff f c ((0 : ℕ) : ℤ) = 0 := DFunLike.congr_fun h0 f
+    unfold sLocalZLaurentCoeff at h1
+    have h2 : (fun z ↦ sLocalIdelicZFunction f (tw c z) / z ^ (((0 : ℕ) : ℤ) + 1)) =
+        fun z ↦ sLocalIdelicZFunction f (tw c z) / (z - 0) := by
+      funext z; simp
+    have h3 := complexResidue_div_sub hg
+    change complexResidue (fun z ↦ sLocalIdelicZFunction f (tw c z) / z ^ (((0 : ℕ) : ℤ) + 1)) 0
+      = 0 at h1
+    rw [h2, h3] at h1
+    have h4 : tw c 0 = c := by
+      ext1 g
+      change c g * _ ^ (0 : ℂ) = c g
+      rw [Complex.cpow_zero, mul_one]
+    rw [h4, hZ] at h1
+    exact hI h1
+  have hpole := (h F S c 0 hcoeff).1
+  change 0 < sLocalRhoPoleOrder c at hpole
+  unfold sLocalRhoPoleOrder sLocalIdelicOrderBound at hpole
+  rw [min_eq_left hR.meromorphicOrderAt_nonneg] at hpole
+  simp at hpole
+
 /-- Paper: Theorem 7.2.1.1(3), p. 334.
 At the trivial character over ℚ with only the real place, an even nonnegative
 nonzero bump on 2 < |x| < 3 has positive first Mellin derivative and no pole. -/
 theorem sLocalPrincipalPartCoeff_universal_pole_bound_false :
-    ¬ sLocalPrincipalPartCoeff_universal_pole_bound := by sorry
+    ¬ sLocalPrincipalPartCoeff_universal_pole_bound :=
+  sLocalPrincipalPartCoeff_universal_pole_bound_false_aux
 
 /-- Paper: Theorem 7.2.1.1(4), p. 334.
 For every supported pole bound, its annihilator is generated in the strong dual
