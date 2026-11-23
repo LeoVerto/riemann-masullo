@@ -58,7 +58,17 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
    fix: make the private lemmas it uses public in place per AGENTS.md, plain imports). One Sonnet fixer
    (general-purpose, model sonnet, 1 unit) per PR, first free units; each re-checks the PR is OPEN, edits
    its worktree, rebuilds, lint, signatures compare (expect only the made-public names), axioms unchanged,
-   pushes, one-line PR comment. LAUNCHED 05:0xZ: fix6072 (fix6071 stopped by the user). Then: #4911 opus (Fable ROUTE; needs #6066 merged or its branch), then #4666.
+   pushes, one-line PR comment. fix6072 stopped 05:2xZ: #6072 had merged 04:53Z with its import all (left to #5966); fix6071 stopped by the user. Step done except #6071 awaiting the integrator. Then: #4666 FIRST (warm has #6043; user 05:3xZ: it was closed by mistake at 04:46Z by the phrase "does not close #4666" in the vendor PR, so nobody else will pick it up: get it done; PR still says `Closes #4666`; if we must release it, ask the user about reopening it), then #4911 opus (Fable ROUTE; #6066 MERGED, build on main). 05:2xZ: 5h 87%, budget 2, held until usage allows.
+0e. **#5966 "make helpers public" quick wins** (user 05:3xZ: "should be handle-able by sonnet, they just take
+   CPU time"): #5998 (AppA Sec2; koffie claimed 05:43Z), #5999 (AppA Sec1), #6000 (Ch02 Sec2a), #6001 (AppC Sec1), #6002 (AppD Sec1a),
+   #6003 (AppA Sec3), #6004 (AppD Sec1b); #5997 is sflicht's. Not proof issues; the issue body is the task
+   (remove `private` in place, descriptive names + docstrings, private instances stay private, plain imports in
+   the listed importers, signatures compare lists only the renamed names, PR `Closes #n` + "part of #5966").
+   Claim each only when an agent starts it (`claims.py` first). Sonnet `hunter`, 1 unit, ONE issue per agent at
+   a time, and AT MOST TWO quick-win agents running at once (user 06:0xZ: "they do tend to peg CPU"; w33/w34/w35 were
+   already running when this was set, so launch the next only when fewer than two remain) (importer edits overlap across issues: two agents must not touch the same importer file at once;
+   check the issue's "Files with import all" lists). Order (user 05:5xZ: "the quick wins have priority and CPU is plentiful … prioritize them first"): FIRST, before #4666 and #4911. 05:5xZ: w33 #5999, w34 #6004 launched (disjoint importer lists). 06:0xZ: w35 #6001 (minor import-line overlap with w33/w34). Next, as each finishes: #6002, #6000, #6003, picking one whose importer list is disjoint from those running.
+   The brief must quote HUNTER "Builds and processes" (never pkill -f) and say full builds are expected.
 1. Run `status.sh --mark` (advances the new-comments window) and `cleanup.sh` under timeout,
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
