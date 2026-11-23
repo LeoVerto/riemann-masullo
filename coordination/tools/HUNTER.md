@@ -272,7 +272,7 @@ declarations do not collide with the sweeper's).
   Do not post it yourself: the coordinator queues it in `$S/findings.txt`, and a Fable evaluator
   (`$S/FINDINGS.md`) checks it against the page image and posts it on the issue if it holds.
   "I could not prove it" is not a finding.
-- **Refutations** (`refute` rows in `escalations.txt`, queued by the Fable findings evaluator;
+- **Refutations** (ONLY `refute` rows; an issue labelled `refutation` whose `Printed.*_false` sorry already exists is an ordinary proof issue: prove it, body `Closes #<n>`, as on PR #5930 after a fix) (`refute` rows in `escalations.txt`, queued by the Fable findings evaluator;
   user, 2026-11-22): the statement is false and the finding is already posted on the issue.
   - Start from `## Refutation sketch` in `notes/<n>.md` and the finding comment it links.
   - Write `RiemannMasullo/<Chapter>/<section file>_Printed.lean` (e.g. `Sec4a.lean` → `Sec4a_Printed.lean`).
