@@ -118,7 +118,7 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
 2. **Token:** `S/tokencheck.sh` must print `TOKEN OK`. On `TOKEN FAIL` ask the user to run
    `sbx secret set github --sandbox riemann-masullo-faststorage -t <classic token>`.
 3. **Services:** start any missing one with
-   `cd S && setsid nohup ./<name>.sh >> <name>.log 2>&1 < /dev/null &` for watchdog and memguard, and the same with `nice -n 19` before `./<name>.sh` for warm and sieve (user, 2026-11-22 17:25Z: agents hit timeouts under CPU load; the services must yield; sieve details in `SIEVE.md`). Check that `warm.log` says "ready" at a recent main. The
+   `cd S && setsid nohup ./<name>.sh >> <name>.log 2>&1 < /dev/null &` for watchdog and memguard, and the same with `nice -n 19` before `./<name>.sh` for warm (the sieve is stopped since 2026-11-23 ~02:45Z, user: "I think we can stop the sieve at this point"; do not restart it) (user, 2026-11-22 17:25Z: agents hit timeouts under CPU load; the services must yield; sieve details in `SIEVE.md`). Check that `warm.log` says "ready" at a recent main. The
    watchdog's auto-resume uses a hard-coded old `SESSION`: leave `no-resume` in place unless you
    restart it with `SESSION=<your id>`.
 4. **Subagent types:** the Agent tool must list `hunter`, `escalator`, `opus-hunter`, `siever`,
@@ -149,7 +149,7 @@ Launch prompts: HOURLY.md "Launching agents".
   ended in escalations. Caveats: `paper: no proof` only means no proof before the next item, and
   `paper:SHORT` over-fires on "This follows…".
 - **Opus work and Fable:** HOURLY.md steps 8–8b; Opus-hunter results in `critical/status.txt`.
-- **Sieve:** the service (`SIEVE.md`) tries cheap, `exact?`, `grind` and unfold-defs passes on every
+- **Sieve (STOPPED 2026-11-23 by the user):** the service (`SIEVE.md`) tries cheap, `exact?`, `grind` and unfold-defs passes on every
   new or changed file, one Lean process at a time, into `sieve/hits.tsv`; `status.sh` classifies
   hits READY / HINT / CLAIMED / WAIT / DONE, and a siever hands in READY and posts HINT hits on
   the sweep issue. Low yield so far (e.g. #4035). If it pays off, propose it upstream as an

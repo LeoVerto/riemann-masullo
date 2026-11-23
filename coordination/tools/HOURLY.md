@@ -73,11 +73,11 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
    each in one line, move the file to `notes/reports-done/`. TaskStop them once no Lean process
    remains in their worktree; record in `hunters.txt`; remove their line from `agents.txt`. If
    `pgrep -f nag-wait.sh` finds nothing while agents run, launch the nagger once.
-5. Services: warm, watchdog, memguard, sieve (restart commands in HANDOVER startup step 3). RAM:
+5. Services: warm, watchdog, memguard (the sieve is stopped: user, 2026-11-23 ~02:45Z "I think we can stop the sieve at this point"; do not restart it) (restart commands in HANDOVER startup step 3). RAM:
    count memguard kills of agent builds (not sieve runs) in `memguard.log` over the last hour. If
    there are more than 3, launch no new agents this tick and say so in the report; tell the user if
    it repeats.
-6. READY or HINT lines in `== sieve`: launch ONE siever unless one runs. No blind hunters.
+6. (Sieve stopped 2026-11-23; no sievers.)
 7. Staffing (user, 2026-11-22: "when two sonnets are idle, spawn an opus instead. keep at minimum
    two opuses and at maximum six sonnets"; 20:20Z: "bump the budget to twelve"; 23:10Z, CPU pegged:
    "let's drop to 10 slots for now"). **Max budget 10 units.** Scale it down by token usage (user,
