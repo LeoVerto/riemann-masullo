@@ -900,6 +900,98 @@ theorem archNuclearity_trace (φ : 𝒟)
         let diagonal := fun n ↦ b n ((d n).comp T)
         Summable (fun n ↦ ‖diagonal n‖) ∧ HasSum diagonal ((∑' z, term z) - correction) := by sorry
 
+/-- A von Neumann bounded set in a space carrying the finest locally convex topology
+spans a finite-dimensional subspace: otherwise a linear functional unbounded on it
+would be continuous. -/
+private theorem archNuclearityStrongDual_finiteRank_bounded {E : Type*} [AddCommGroup E]
+    [Module ℂ E] [TopologicalSpace E]
+    (h : (inferInstance : TopologicalSpace E) =
+      (inferInstance : TopologicalSpace (FinestLocallyConvex E)))
+    (S : Set E) (hS : Bornology.IsVonNBounded ℂ S) :
+    FiniteDimensional ℂ (Submodule.span ℂ S) := by
+  by_contra hfin
+  obtain ⟨b, hbS, hspan, hli⟩ := exists_linearIndependent ℂ S
+  have hinf : b.Infinite := by
+    intro hb
+    apply hfin
+    rw [← hspan]
+    exact FiniteDimensional.span_of_finite ℂ hb
+  let f := hinf.natEmbedding
+  let v : ℕ → E := fun n ↦ (f n).val
+  have hv : LinearIndependent ℂ v := hli.comp f f.injective
+  let ℓ₀ : Submodule.span ℂ (Set.range v) →ₗ[ℂ] ℂ :=
+    (Finsupp.linearCombination ℂ (fun n : ℕ ↦ (n : ℂ))).comp hv.repr
+  obtain ⟨ℓ, hℓ⟩ := LinearMap.exists_extend ℓ₀
+  have hℓv (n : ℕ) : ℓ (v n) = n := by
+    have h1 := congrArg (fun g ↦ g ⟨v n, Submodule.subset_span ⟨n, rfl⟩⟩) hℓ
+    simp only [LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype] at h1
+    rw [h1]
+    simp [ℓ₀, hv.repr_eq_single n ⟨v n, Submodule.subset_span ⟨n, rfl⟩⟩ rfl]
+  have hcont' : Continuous (show FinestLocallyConvex E →ₗ[ℂ] ℂ from ℓ) := by
+    apply WithSeminorms.continuous_normedSpace_rng ℂ (finestLocallyConvex_withSeminorms (E := E))
+    refine ⟨{(normSeminorm ℂ ℂ).comp ℓ}, 1, ?_⟩
+    rw [one_smul]
+    exact Finset.le_sup (f := id) (Finset.mem_singleton_self _)
+  have hcont : Continuous ℓ := by
+    have : @Continuous E ℂ (inferInstance : TopologicalSpace (FinestLocallyConvex E)) _ ℓ :=
+      hcont'
+    rwa [← h] at this
+  let L : E →L[ℂ] ℂ := ⟨ℓ, hcont⟩
+  have hb := (hS.image L)
+  rw [NormedSpace.isVonNBounded_iff] at hb
+  obtain ⟨C, hC⟩ := isBounded_iff_forall_norm_le.mp hb
+  obtain ⟨n, hn⟩ := exists_nat_gt C
+  have := hC (L (v n)) ⟨v n, hbS (f n).property, rfl⟩
+  change ‖ℓ (v n)‖ ≤ C at this
+  rw [hℓv, Complex.norm_natCast] at this
+  linarith
+
+/-- In a Hausdorff space with the finest locally convex topology, an operator with a
+nuclear presentation has range inside the span of its Banach disc, which is
+finite-dimensional. -/
+private theorem archNuclearityStrongDual_finiteRank_gen {E : Type*} [AddCommGroup E]
+    [Module ℂ E] [UniformSpace E] [IsUniformAddGroup E] [T2Space E] [ContinuousSMul ℂ E]
+    (h : (inferInstance : TopologicalSpace E) =
+      (inferInstance : TopologicalSpace (FinestLocallyConvex E)))
+    (T : E →L[ℂ] E) (hT : Nonempty (NuclearPresentation T)) :
+    FiniteDimensional ℂ T.toLinearMap.range := by
+  obtain ⟨r⟩ := hT
+  let W := Submodule.span ℂ r.disc
+  have hW : FiniteDimensional ℂ W :=
+    archNuclearityStrongDual_finiteRank_bounded h r.disc r.isBanachDisc.bounded
+  have hWc : IsClosed (W : Set E) := W.isClosed_of_finiteDimensional
+  have hle : T.toLinearMap.range ≤ W := by
+    rintro _ ⟨x, rfl⟩
+    apply hWc.mem_of_tendsto (r.hasSum x)
+    filter_upwards with s
+    exact W.sum_mem fun n _ ↦ W.smul_mem _ (r.vector n).property
+  exact Submodule.finiteDimensional_of_le hle
+
+private theorem archNuclearityStrongDual_finiteRank_dual {Q : Type*} [AddCommGroup Q]
+    [Module ℂ Q] [TopologicalSpace Q] [IsTopologicalAddGroup Q] [ContinuousSMul ℂ Q]
+    (h : (inferInstance : TopologicalSpace (StrongDual ℂ Q)) =
+      (inferInstance : TopologicalSpace (FinestLocallyConvex (StrongDual ℂ Q))))
+    (T : StrongDual ℂ Q →L[ℂ] StrongDual ℂ Q) (hT : Nonempty (NuclearPresentation T)) :
+    FiniteDimensional ℂ T.toLinearMap.range :=
+  archNuclearityStrongDual_finiteRank_gen h T hT
+
+-- Stated over the same tower of quotients as `ArchNuclearityQuotient`, and concluding `FG`,
+-- so that applying it to the concrete space needs only syntactic unification (#5398).
+private theorem archNuclearityStrongDual_finiteRank_tower {X : Type*} {_ : AddCommGroup X}
+    {_ : Module ℂ X} {_ : TopologicalSpace X} [IsTopologicalAddGroup X] [ContinuousSMul ℂ X]
+    (P0 : Submodule ℂ X) (k : Submodule ℂ P0) (p : Submodule ℂ (P0 ⧸ k))
+    (h : let E := StrongDual ℂ ((P0 ⧸ k) ⧸ p)
+      (inferInstance : TopologicalSpace E) =
+      (inferInstance : TopologicalSpace (FinestLocallyConvex E)))
+    (T : StrongDual ℂ ((P0 ⧸ k) ⧸ p) →L[ℂ] StrongDual ℂ ((P0 ⧸ k) ⧸ p))
+    (hT : Nonempty (NuclearPresentation T)) :
+    (LinearMap.range T.toLinearMap).FG :=
+  Module.Finite.iff_fg.mp (archNuclearityStrongDual_finiteRank_dual h T hT)
+
+private theorem archNuclearityStrongDual_finiteRank_fd {E : Type*} {_ : AddCommGroup E}
+    {_ : Module ℂ E} {S : Submodule ℂ E} (h : S.FG) : FiniteDimensional ℂ S :=
+  Module.Finite.iff_fg.mpr h
+
 /-- Paper: Remark 7.4.3.3, p. 373.
 Nuclear endomorphisms of the strong dual of the archimedean quotient have finite rank.
 Deviation: The printed universal nonnuclearity conclusion needs infinite rank,
@@ -907,7 +999,9 @@ which fails for the zero test. -/
 theorem archNuclearityStrongDual_finiteRank
     (T : StrongDual ℂ (ArchNuclearityQuotient χ) →L[ℂ] StrongDual ℂ (ArchNuclearityQuotient χ))
     (_hT : Nonempty (NuclearPresentation T)) :
-    FiniteDimensional ℂ T.toLinearMap.range := by sorry
+    FiniteDimensional ℂ T.toLinearMap.range :=
+  archNuclearityStrongDual_finiteRank_fd
+    (archNuclearityStrongDual_finiteRank_tower _ _ _ (archNuclearityStrongDual_finest χ) T _hT)
 
 /-- Paper: Remark 7.4.3.3, p. 373.
 A nuclear endomorphism of the archimedean quotient has finite-dimensional range,
