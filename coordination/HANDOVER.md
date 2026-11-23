@@ -33,9 +33,7 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
      vendored StrongPNT #5822) → `adelePrincipalValue_empty` cleanup (leads.txt). Paused rows' 2 h grace
      ends ~02:30Z: launch or release then.
   3. Nagger: relaunch (step 4) once agents run. Watch #5724 (conflict fixed d2381d0, Verdict pending).
-  4. Open question to the user, unanswered: post on #4454 about elmismisimoxhunca's later double claim
-     (their #5635 merged first; our proof is unpushed on `esc/ch06sec3-1` 1e749c6)? Default: post nothing.
-  5. A peer session edits the live files and this branch for the user and messages the coordinator
+  4. A peer session edits the live files and this branch for the user and messages the coordinator
      (find it with ListAgents); `git pull` before editing.
 - **Lead:** Ch05 Sec3a has ~30 more issues with failed automated attempts by elmismisimoxhunca, most
   failing only on inherited sorryAx: good Opus work (`resumable.sh`).
@@ -90,7 +88,7 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
 - **Token:** only for `mccorvie/riemann-masullo` (`origin`) and `LeoVerto/riemann-masullo`
   (`fork`). It must be a CLASSIC token (repo, workflow, read:org); check with `tokencheck.sh`.
 - **Upstream posting:** ask the user before posting anything new. Standing exceptions: normal
-  Claiming/Releasing; sieve hints on open `sweep` issues; extensions of #1288, #561 and #3230;
+  Claiming/Releasing; sieve hints on open `sweep` issues;
   paper findings that the Fable evaluator confirmed (`FINDINGS.md`). **Never raise BLOCKERS §0**
   (Main.lean integration is wave 4+, by the project's choice).
 - **Read AGENTS.md, CONTRIBUTING.md and ERRATA.md from origin/main** (`git show origin/main:<file>`)
