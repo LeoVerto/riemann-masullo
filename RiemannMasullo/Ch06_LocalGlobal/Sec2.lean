@@ -759,6 +759,461 @@ local notation "archPart(" D ")" => Units.map (RingHom.fst (InfiniteAdeleRing F)
 local notation "archInsert(" D ")" =>
   Units.map (MonoidHom.inl (InfiniteAdeleRing F) (∀ v : D, L(v.val)))
 
+/-- The S-idele norm with no finite places is the archimedean norm of the archimedean part. -/
+private theorem sIdeleNorm_empty_eq_infiniteIdeleNorm (g : Iₛ((∅ : Finset V))) :
+    sIdeleNorm F ∅ g = infiniteIdeleNorm F (archPart((∅ : Finset V)) g) := by
+  apply Units.ext
+  simp [sIdeleNorm, infiniteIdeleNorm, Units.coe_prod]
+  rfl
+
+/-- The coordinates of the archimedean logarithm sum to the logarithm of the norm. -/
+private theorem sum_infiniteIdeleLog_eq_log_norm (y : I∞) :
+    ∑ w, infiniteIdeleLog F y w = Real.log (infiniteIdeleNorm F y).val := by
+  have hne (v : InfinitePlace F) : y.val v ≠ 0 :=
+    (Units.map (Pi.evalRingHom InfinitePlace.Completion v).toMonoidHom y).ne_zero
+  have hprod : (((infiniteIdeleNorm F y : ℝ≥0ˣ) : ℝ≥0) : ℝ) =
+      ∏ v : InfinitePlace F, ‖y.val v‖ ^ v.mult := by
+    simp [infiniteIdeleNorm, Units.coe_prod]
+    rfl
+  rw [hprod, Real.log_prod (fun v _ ↦ pow_ne_zero v.mult (norm_ne_zero_iff.mpr (hne v)))]
+  simp only [infiniteIdeleLog, Real.log_pow]
+
+open Classical in
+/-- In the inverse logarithm of a norm-one archimedean idele, the coordinate at one
+place is minus the sum of the other coordinates. -/
+private theorem infiniteIdeleLog_inv_omitted (w₀ : InfinitePlace F) (g : N∞) :
+    infiniteIdeleLog F (archPart((∅ : Finset V)) g.val)⁻¹ w₀ =
+      -∑ w : {w : InfinitePlace F // w ≠ w₀},
+        infiniteIdeleLog F (archPart((∅ : Finset V)) g.val)⁻¹ w.val := by
+  classical
+  have hn : infiniteIdeleNorm F (archPart((∅ : Finset V)) g.val) = 1 := by
+    rw [← sIdeleNorm_empty_eq_infiniteIdeleNorm]
+    exact g.property
+  have hsum := sum_infiniteIdeleLog_eq_log_norm (F := F) (archPart((∅ : Finset V)) g.val)⁻¹
+  rw [map_inv, hn, inv_one, Units.val_one, NNReal.coe_one, Real.log_one,
+    Fintype.sum_eq_add_sum_subtype_ne _ w₀] at hsum
+  exact eq_neg_of_add_eq_zero_left hsum
+
+open Classical in
+/-- In logarithmic coordinates off one place, the norm-one Tamagawa measure is a
+multiple of Lebesgue measure. -/
+private theorem normOneArchLog_lintegral (w₀ : InfinitePlace F) :
+    ∃ c : ℝ≥0, ∀ Φ : ({w : InfinitePlace F // w ≠ w₀} → ℝ) → ENNReal, Measurable Φ →
+      ∫⁻ g : N∞, Φ (fun w ↦ infiniteIdeleLog F (archPart((∅ : Finset V)) g.val)⁻¹ w.val)
+        ∂sNormOneIdeleTamagawaMeasure F ∅ = c * ∫⁻ u, Φ u := by
+  classical
+  let D : Finset V := ∅
+  let (w : InfinitePlace F) : MeasurableSpace w.Completion := borel _
+  let (v : V) : MeasurableSpace (v.adicCompletion F) := borel _
+  let (w : InfinitePlace F) : BorelSpace w.Completion := ⟨rfl⟩
+  let (v : V) : BorelSpace (v.adicCompletion F) := ⟨rfl⟩
+  let (w : InfinitePlace F) : SecondCountableTopology w.Completion :=
+    (InfinitePlace.Completion.isometry_extensionEmbedding w).isEmbedding.secondCountableTopology
+  let (v : V) : ProperSpace (v.adicCompletion F) := properSpace_adicCompletion v
+  let : MeasurableSpace (SAdeleRing F D) := inferInstanceAs
+    (MeasurableSpace (((w : InfinitePlace F) → w.Completion) × ((v : D) → v.val.adicCompletion F)))
+  let : BorelSpace (SAdeleRing F D) := inferInstanceAs
+    (BorelSpace (((w : InfinitePlace F) → w.Completion) × ((v : D) → v.val.adicCompletion F)))
+  let : BorelSpace Iₛ(D) := by
+    refine ⟨?_⟩
+    rw [(sIdeleGroup_description F D).1.eq_induced, borel_comap, ← BorelSpace.measurable_eq]
+    rfl
+  let ν := sNormOneIdeleTamagawaMeasure F (∅ : Finset V)
+  let : LocallyCompactSpace Iₛ((∅ : Finset V)) := (sIdeleGroup_description F ∅).2.2.1
+  have hn : Continuous (sIdeleNorm F (∅ : Finset V)) :=
+    (isProperMap_sIdeleQuotientNorm F ∅).continuous.comp continuous_quotient_mk'
+  have hK : IsClosed (N∞ : Set Iₛ((∅ : Finset V))) :=
+    isClosed_eq hn continuous_const
+  let : LocallyCompactSpace N∞ := hK.locallyCompactSpace
+  let : ν.IsHaarMeasure := (sNormOneIdeleTamagawaMeasure_existsUnique F ∅).exists.choose_spec.1
+  let ι := {w : InfinitePlace F // w ≠ w₀}
+  let Λ : N∞ → (ι → ℝ) :=
+    fun g w ↦ infiniteIdeleLog F (archPart((∅ : Finset V)) g.val)⁻¹ w.val
+  have harch : Continuous (archPart((∅ : Finset V))) :=
+    Continuous.units_map _ continuous_fst
+  have hΛc : Continuous Λ := continuous_pi fun w ↦ (continuous_apply w.val).comp
+    ((infiniteIdeleLog_continuous F).comp ((harch.comp continuous_subtype_val).inv))
+  have hΛm : Measurable Λ := hΛc.measurable
+  have hΛmul (g h : N∞) : Λ (g * h) = Λ g + Λ h := by
+    funext w
+    simp only [Λ, Subgroup.coe_mul, map_mul, mul_inv, infiniteIdeleLog_mul, Pi.add_apply]
+  -- the extension of a tuple off `w₀` to a hyperplane tuple
+  let E : (ι → ℝ) → (InfinitePlace F → ℝ) :=
+    fun v w ↦ if h : w = w₀ then -∑ i, v i else v ⟨w, h⟩
+  have hEc : Continuous E := by
+    refine continuous_pi fun w ↦ ?_
+    by_cases h : w = w₀
+    · simp only [E, h, dite_true]
+      fun_prop
+    · simp only [E, h, dite_false]
+      fun_prop
+  have hΛE (g : N∞) : infiniteIdeleLog F (archPart((∅ : Finset V)) g.val)⁻¹ = E (Λ g) := by
+    funext w
+    by_cases h : w = w₀
+    · subst h
+      simp only [E, dite_true, Λ]
+      exact infiniteIdeleLog_inv_omitted w g
+    · simp only [E, h, dite_false, Λ]
+  have hΛsurj : Surjective Λ := by
+    intro v
+    obtain ⟨y, hy⟩ := infiniteIdeleLog_surjective F (E v)
+    have hy1 : infiniteIdeleNorm F y = 1 := by
+      have hs := sum_infiniteIdeleLog_eq_log_norm (F := F) y
+      rw [hy, Fintype.sum_eq_add_sum_subtype_ne _ w₀] at hs
+      have hEsub (x : ι) : E v x.val = v x := dite_eq_right x.property
+      have hE0 : E v w₀ = -∑ i, v i := dite_eq_left rfl
+      have h0 : Real.log (infiniteIdeleNorm F y).val = 0 := by
+        rw [← hs, hE0]
+        simp only [hEsub]
+        exact neg_add_cancel _
+      have hpos : (0 : ℝ) < (infiniteIdeleNorm F y).val :=
+        NNReal.coe_pos.mpr (pos_iff_ne_zero.mpr (infiniteIdeleNorm F y).ne_zero)
+      apply Units.ext
+      apply NNReal.coe_injective
+      simpa using Real.eq_one_of_pos_of_log_eq_zero hpos h0
+    let g : Iₛ((∅ : Finset V)) := archInsert((∅ : Finset V)) y⁻¹
+    have hag : archPart((∅ : Finset V)) g = y⁻¹ := Units.ext rfl
+    have hg : g ∈ N∞ := by
+      change sIdeleNorm F ∅ g = 1
+      rw [sIdeleNorm_empty_eq_infiniteIdeleNorm, hag, map_inv, hy1, inv_one]
+    refine ⟨⟨g, hg⟩, ?_⟩
+    funext w
+    simp only [Λ, hag, inv_inv, hy, E, w.property, dite_false]
+    rfl
+  have hΛcpt (K : Set (ι → ℝ)) (hKc : IsCompact K) : IsCompact (Λ ⁻¹' K) := by
+    have hC : IsCompact (infiniteIdeleLog F ⁻¹' (E '' K)) :=
+      (infiniteIdeleLog_proper F).isCompact_preimage (hKc.image hEc)
+    let P : Set Iₛ((∅ : Finset V)) := archInsert((∅ : Finset V)) '' ((· ⁻¹) '' (infiniteIdeleLog F ⁻¹' (E '' K)))
+    have hinsc : Continuous (archInsert((∅ : Finset V))) :=
+      Continuous.units_map _ (continuous_id.prodMk continuous_const)
+    have hP : IsCompact P := (hC.image continuous_inv).image hinsc
+    have hPN : IsCompact (Subtype.val ⁻¹' P : Set N∞) :=
+      hK.isClosedEmbedding_subtypeVal.isCompact_preimage hP
+    refine hPN.of_isClosed_subset (hKc.isClosed.preimage hΛc) ?_
+    intro g hg
+    refine ⟨(archPart((∅ : Finset V)) g.val)⁻¹⁻¹, ⟨(archPart((∅ : Finset V)) g.val)⁻¹,
+      ?_, rfl⟩, ?_⟩
+    · change infiniteIdeleLog F (archPart((∅ : Finset V)) g.val)⁻¹ ∈ E '' K
+      rw [hΛE]
+      exact ⟨_, hg, rfl⟩
+    · rw [inv_inv]
+      apply Units.ext
+      exact Prod.ext rfl (Subsingleton.elim _ _)
+  let μ' : Measure (ι → ℝ) := ν.map Λ
+  have : μ'.IsAddLeftInvariant := by
+    refine ⟨fun v ↦ ?_⟩
+    obtain ⟨g₀, hg₀⟩ := hΛsurj v
+    have hcomp : (fun u ↦ v + u) ∘ Λ = Λ ∘ (fun g ↦ g₀ * g) := by
+      funext g
+      simp only [comp_apply, hΛmul, hg₀]
+    change Measure.map (fun u ↦ v + u) (ν.map Λ) = ν.map Λ
+    rw [Measure.map_map (measurable_const_add v) hΛm, hcomp,
+      ← Measure.map_map hΛm (measurable_const_mul g₀), map_mul_left_eq_self ν g₀]
+  have : IsFiniteMeasureOnCompacts μ' := by
+    refine ⟨fun K hKc ↦ ?_⟩
+    change ν.map Λ K < ⊤
+    rw [Measure.map_apply hΛm hKc.measurableSet]
+    exact (hΛcpt K hKc).measure_lt_top
+  have hμ' : μ' = Measure.addHaarScalarFactor μ' volume • volume := Measure.isAddLeftInvariant_eq_smul μ' volume
+  refine ⟨Measure.addHaarScalarFactor μ' volume, fun Φ hΦ ↦ ?_⟩
+  have h1 : ∫⁻ g : N∞, Φ (Λ g) ∂ν = ∫⁻ u, Φ u ∂μ' := (lintegral_map hΦ hΛm).symm
+  rw [hμ', lintegral_smul_measure] at h1
+  exact h1
+
+/-- A logarithmic kernel on `ι → ℝ` has Lebesgue integral at most polynomial in the
+shift `T`. -/
+private theorem logKernel_integral_le (ι : Type*) [Fintype ι] [DecidableEq ι] :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ T : ℝ, 0 ≤ T →
+      Integrable (fun u : ι → ℝ ↦
+        min 1 (Real.exp (T + ∑ i, u i)) * ∏ i, min 1 (Real.exp (-u i))) ∧
+      ∫ u : ι → ℝ, min 1 (Real.exp (T + ∑ i, u i)) * ∏ i, min 1 (Real.exp (-u i)) ≤
+        C * (1 + T) ^ Fintype.card ι := by
+  let φ : ℝ → ℝ := fun x ↦ Real.exp (-|x| / 2)
+  have hφ : Integrable φ := by
+    rw [← integrableOn_univ, ← Set.Iic_union_Ioi (a := (0 : ℝ)), integrableOn_union]
+    constructor
+    · refine (integrableOn_exp_mul_Iic (a := 1 / 2) (by norm_num) 0).congr_fun
+        (fun x hx ↦ ?_) measurableSet_Iic
+      simp only [φ, abs_of_nonpos (Set.mem_Iic.mp hx)]
+      ring_nf
+    · refine (exp_neg_integrableOn_Ioi 0 (b := 1 / 2) (by norm_num)).congr_fun
+        (fun x hx ↦ ?_) measurableSet_Ioi
+      simp only [φ, abs_of_pos (Set.mem_Ioi.mp hx)]
+      ring_nf
+  have hφ0 (x : ℝ) : 0 ≤ φ x := (Real.exp_pos _).le
+  set c := ∫ x, φ x with hc
+  have hc0 : 0 ≤ c := integral_nonneg hφ0
+  set n := Fintype.card ι
+  refine ⟨(n + 1) * (1 + c) ^ n, by positivity, fun T hT ↦ ?_⟩
+  let ψ : ℝ → ℝ := fun x ↦ (Set.Icc (-T) 0).indicator (fun _ ↦ (1 : ℝ)) x + φ x
+  have hψ : Integrable ψ :=
+    ((integrable_indicator_iff measurableSet_Icc).mpr continuous_const.integrableOn_Icc).add hφ
+  have hψ0 (x : ℝ) : 0 ≤ ψ x :=
+    add_nonneg (Set.indicator_nonneg (fun _ _ ↦ zero_le_one) x) (hφ0 x)
+  let d (j i : ι) : ℝ := if i = j then T else 0
+  let k : (ι → ℝ) → ℝ := fun u ↦
+    min 1 (Real.exp (T + ∑ i, u i)) * ∏ i, min 1 (Real.exp (-u i))
+  have hMint : Integrable (fun u : ι → ℝ ↦ ∏ i, ψ (u i) + ∑ j, ∏ i, φ (u i + d j i)) := by
+    refine (Integrable.fintype_prod (f := fun _ ↦ ψ) (fun _ ↦ hψ)).add ?_
+    refine integrable_finsetSum _ (fun j _ ↦ ?_)
+    exact Integrable.fintype_prod (f := fun i x ↦ φ (x + d j i))
+      (fun i ↦ hφ.comp_add_right _)
+  have hmin0 (x : ℝ) : 0 ≤ min 1 (Real.exp x) := le_min zero_le_one (Real.exp_pos _).le
+  have hk0 (u : ι → ℝ) : 0 ≤ k u :=
+    mul_nonneg (hmin0 _) (Finset.prod_nonneg fun i _ ↦ hmin0 _)
+  have hprod0 (j : ι) (u : ι → ℝ) : 0 ≤ ∏ i, φ (u i + d j i) :=
+    Finset.prod_nonneg fun i _ ↦ hφ0 _
+  have hfac (x e : ℝ) (he : e = 0 ∨ x + e < 0) :
+      Real.exp ((e + x) / 2) * min 1 (Real.exp (-x)) ≤ φ (x + e) := by
+    rcases he with he | he
+    · subst he
+      simp only [zero_add, add_zero, φ]
+      rcases le_or_gt 0 x with hx | hx
+      · rw [abs_of_nonneg hx]
+        calc Real.exp (x / 2) * min 1 (Real.exp (-x))
+            ≤ Real.exp (x / 2) * Real.exp (-x) :=
+              mul_le_mul_of_nonneg_left (min_le_right _ _) (Real.exp_pos _).le
+          _ = Real.exp (-x / 2) := by rw [← Real.exp_add]; ring_nf
+      · rw [abs_of_neg hx]
+        calc Real.exp (x / 2) * min 1 (Real.exp (-x))
+            ≤ Real.exp (x / 2) * 1 :=
+              mul_le_mul_of_nonneg_left (min_le_left _ _) (Real.exp_pos _).le
+          _ = Real.exp (- -x / 2) := by rw [mul_one, neg_neg]
+    · simp only [φ, abs_of_neg he]
+      calc Real.exp ((e + x) / 2) * min 1 (Real.exp (-x))
+          ≤ Real.exp ((e + x) / 2) * 1 :=
+            mul_le_mul_of_nonneg_left (min_le_left _ _) (Real.exp_pos _).le
+        _ = Real.exp (- -(x + e) / 2) := by rw [mul_one, neg_neg, add_comm]
+  have hkM (u : ι → ℝ) : k u ≤ ∏ i, ψ (u i) + ∑ j, ∏ i, φ (u i + d j i) := by
+    by_cases h : ∀ i, -T ≤ u i
+    · have h1 : k u ≤ ∏ i, ψ (u i) := by
+        calc k u ≤ 1 * ∏ i, min 1 (Real.exp (-u i)) :=
+              mul_le_mul_of_nonneg_right (min_le_left _ _)
+                (Finset.prod_nonneg fun i _ ↦ hmin0 _)
+          _ = ∏ i, min 1 (Real.exp (-u i)) := one_mul _
+          _ ≤ ∏ i, ψ (u i) := by
+            refine Finset.prod_le_prod₀ (fun i _ ↦ hmin0 _) (fun i _ ↦ ?_)
+            rcases le_or_gt (u i) 0 with hx | hx
+            · have hmem : u i ∈ Set.Icc (-T) 0 := ⟨h i, hx⟩
+              simp only [ψ, Set.indicator_of_mem hmem]
+              exact (min_le_left _ _).trans (le_add_of_nonneg_right (hφ0 _))
+            · refine (min_le_right _ _).trans ?_
+              refine le_add_of_nonneg_of_le (Set.indicator_nonneg (fun _ _ ↦ zero_le_one) _) ?_
+              simp only [φ, abs_of_pos hx]
+              exact Real.exp_le_exp.mpr (by linarith)
+      exact h1.trans (le_add_of_nonneg_right (Finset.sum_nonneg fun j _ ↦ hprod0 j u))
+    · push Not at h
+      obtain ⟨j, hj⟩ := h
+      have hsum : (T + ∑ i, u i) / 2 = ∑ i, (d j i + u i) / 2 := by
+        rw [← Finset.sum_div, Finset.sum_add_distrib]
+        simp [d]
+      have h1 : k u ≤ ∏ i, φ (u i + d j i) := by
+        calc k u ≤ Real.exp ((T + ∑ i, u i) / 2) * ∏ i, min 1 (Real.exp (-u i)) := by
+              refine mul_le_mul_of_nonneg_right ?_ (Finset.prod_nonneg fun i _ ↦ hmin0 _)
+              rcases le_or_gt (T + ∑ i, u i) 0 with ha | ha
+              · exact (min_le_right _ _).trans (Real.exp_le_exp.mpr (by linarith))
+              · exact (min_le_left _ _).trans (Real.one_le_exp (by linarith))
+          _ = ∏ i, (Real.exp ((d j i + u i) / 2) * min 1 (Real.exp (-u i))) := by
+              rw [hsum, Real.exp_sum, Finset.prod_mul_distrib]
+          _ ≤ ∏ i, φ (u i + d j i) := by
+              refine Finset.prod_le_prod₀ (fun i _ ↦ mul_nonneg (Real.exp_pos _).le (hmin0 _))
+                (fun i _ ↦ hfac _ _ ?_)
+              by_cases hi : i = j
+              · subst hi
+                right
+                simp only [d, ite_true]
+                linarith
+              · left
+                simp [d, hi]
+      refine h1.trans ?_
+      refine le_add_of_nonneg_of_le (Finset.prod_nonneg fun i _ ↦ hψ0 _) ?_
+      exact Finset.single_le_sum (f := fun j ↦ ∏ i, φ (u i + d j i))
+        (fun j _ ↦ hprod0 j u) (Finset.mem_univ j)
+  have hkcont : Continuous k := by
+    simp only [k]
+    fun_prop
+  have hkint : Integrable k := by
+    refine hMint.mono' hkcont.aestronglyMeasurable (Filter.Eventually.of_forall fun u ↦ ?_)
+    rw [Real.norm_eq_abs, abs_of_nonneg (hk0 u)]
+    exact hkM u
+  refine ⟨hkint, ?_⟩
+  have hψint : ∫ x, ψ x = T + c := by
+    rw [integral_add ((integrable_indicator_iff measurableSet_Icc).mpr
+      continuous_const.integrableOn_Icc) hφ, integral_indicator measurableSet_Icc]
+    simp [Real.volume_real_Icc_of_le (by linarith : -T ≤ 0)]
+    exact hc.symm
+  have hMval : ∫ u : ι → ℝ, (∏ i, ψ (u i) + ∑ j, ∏ i, φ (u i + d j i)) =
+      (T + c) ^ n + n * c ^ n := by
+    have hP : Integrable (fun u : ι → ℝ ↦ ∏ i, ψ (u i)) :=
+      Integrable.fintype_prod (f := fun _ ↦ ψ) (fun _ ↦ hψ)
+    have hQ (j : ι) : Integrable (fun u : ι → ℝ ↦ ∏ i, φ (u i + d j i)) :=
+      Integrable.fintype_prod (f := fun i x ↦ φ (x + d j i)) (fun i ↦ hφ.comp_add_right _)
+    rw [integral_add hP (integrable_finsetSum _ fun j _ ↦ hQ j),
+      integral_finsetSum _ (fun j _ ↦ hQ j)]
+    have e1 : ∫ u : ι → ℝ, ∏ i, ψ (u i) = (T + c) ^ n := by
+      rw [show (∫ u : ι → ℝ, ∏ i, ψ (u i)) = ∫ u : ι → ℝ, ∏ i, ψ (u i)
+          ∂(Measure.pi fun _ ↦ volume) from rfl, integral_fintype_prod_eq_pow, hψint]
+    have e2 (j : ι) : ∫ u : ι → ℝ, ∏ i, φ (u i + d j i) = c ^ n := by
+      rw [integral_fintype_prod_volume_eq_prod (fun i x ↦ φ (x + d j i))]
+      simp only [integral_add_right_eq_self (μ := volume) φ, Finset.prod_const,
+        Finset.card_univ, n, hc]
+    simp only [e1, e2, Finset.sum_const, Finset.card_univ, nsmul_eq_mul, n]
+  calc ∫ u, k u ≤ ∫ u : ι → ℝ, (∏ i, ψ (u i) + ∑ j, ∏ i, φ (u i + d j i)) :=
+        integral_mono hkint hMint hkM
+    _ = (T + c) ^ n + n * c ^ n := hMval
+    _ ≤ ((1 + c) * (1 + T)) ^ n + n * ((1 + c) * (1 + T)) ^ n := by
+        gcongr
+        · nlinarith
+        · nlinarith
+    _ = (n + 1) * (1 + c) ^ n * (1 + T) ^ n := by rw [mul_pow]; ring
+
+open Classical in
+/-- An archimedean Schwartz–Bruhat function is bounded by the product over the places of
+`min 1 (exp (-log))` of the archimedean logarithm. -/
+private theorem archSchwartz_le_logKernel (f : ℬ∞) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ z : I∞, ‖f (Multiplicative.ofAdd z.val)‖ ≤
+      C * ∏ w, min 1 (Real.exp (-infiniteIdeleLog F z w)) := by
+  obtain ⟨G, hG⟩ := (mem_archimedeanSchwartzBruhat_iff
+    (fun x ↦ f (Multiplicative.ofAdd x))).mp f.property
+  set r := Fintype.card (InfinitePlace F)
+  set Cz := SchwartzMap.seminorm ℝ 0 0 G
+  set Cf := SchwartzMap.seminorm ℝ (2 * r) 0 G
+  refine ⟨max Cz Cf, le_max_of_le_left (apply_nonneg _ _), fun z ↦ ?_⟩
+  set x := InfiniteAdeleRing.ringEquiv_mixedSpace F z.val with hx
+  set R := ‖x‖ with hR
+  have hf : f (Multiplicative.ofAdd z.val) = G x := (hG z.val).symm
+  have hzw (w : InfinitePlace F) : ‖z.val w‖ ≤ R := by
+    have h1 : mixedEmbedding.normAtPlace w x = ‖z.val w‖ := by
+      by_cases hw : w.IsReal
+      · rw [mixedEmbedding.normAtPlace_apply_of_isReal hw]
+        exact (InfinitePlace.Completion.isometry_extensionEmbeddingOfIsReal hw).norm_map_of_map_zero
+          (map_zero _) (z.val w)
+      · have hw' := InfinitePlace.not_isReal_iff_isComplex.mp hw
+        rw [mixedEmbedding.normAtPlace_apply_of_isComplex hw']
+        exact (InfinitePlace.Completion.isometry_extensionEmbedding w).norm_map_of_map_zero
+          (map_zero _) (z.val w)
+    rw [← h1, hR, mixedEmbedding.norm_eq_sup'_normAtPlace]
+    exact Finset.le_sup' (fun w ↦ mixedEmbedding.normAtPlace w x) (Finset.mem_univ w)
+  have hz0 (w : InfinitePlace F) : 0 < ‖z.val w‖ :=
+    norm_pos_iff.mpr (Units.map (Pi.evalRingHom InfinitePlace.Completion w).toMonoidHom z).ne_zero
+  set L := max 0 (Real.log R) with hL
+  have hL0 : 0 ≤ L := le_max_left _ _
+  have hlog (w : InfinitePlace F) : infiniteIdeleLog F z w ≤ 2 * L := by
+    have hm2 : (w.mult : ℝ) ≤ 2 := by
+      have : w.mult ≤ 2 := by
+        unfold InfinitePlace.mult
+        split_ifs <;> norm_num
+      exact_mod_cast this
+    have hm0 : (0 : ℝ) ≤ w.mult := Nat.cast_nonneg _
+    calc infiniteIdeleLog F z w = w.mult * Real.log ‖z.val w‖ := rfl
+      _ ≤ w.mult * L := mul_le_mul_of_nonneg_left
+          ((Real.log_le_log (hz0 w) (hzw w)).trans (le_max_right _ _)) hm0
+      _ ≤ 2 * L := mul_le_mul_of_nonneg_right hm2 hL0
+  have hprod : Real.exp (-2 * L) ^ r ≤ ∏ w, min 1 (Real.exp (-infiniteIdeleLog F z w)) := by
+    have hc : ∏ _w : InfinitePlace F, Real.exp (-2 * L) = Real.exp (-2 * L) ^ r := by
+      simp [r]
+    rw [← hc]
+    refine Finset.prod_le_prod₀ (fun w _ ↦ (Real.exp_pos _).le) (fun w _ ↦ ?_)
+    refine le_min (Real.exp_le_one_iff.mpr (by linarith)) (Real.exp_le_exp.mpr ?_)
+    linarith [hlog w]
+  have hC : 0 ≤ max Cz Cf := le_max_of_le_left (apply_nonneg _ _)
+  rw [hf]
+  refine le_trans ?_ (mul_le_mul_of_nonneg_left hprod hC)
+  rcases le_or_gt R 1 with hR1 | hR1
+  · have hL' : L = 0 := max_eq_left (Real.log_nonpos (norm_nonneg _) hR1)
+    rw [hL', mul_zero, Real.exp_zero, one_pow, mul_one]
+    exact (SchwartzMap.norm_le_seminorm ℝ G x).trans (le_max_left _ _)
+  · have hR0 : 0 < R := by linarith
+    have hL' : L = Real.log R := max_eq_right (Real.log_nonneg hR1.le)
+    have he : Real.exp (-2 * L) ^ r = (R ^ (2 * r))⁻¹ := by
+      rw [hL', show -2 * Real.log R = -Real.log (R ^ 2) by rw [Real.log_pow]; push_cast; ring,
+        Real.exp_neg, Real.exp_log (by positivity), inv_pow, ← pow_mul]
+    rw [he]
+    have h2 := SchwartzMap.norm_pow_mul_le_seminorm ℝ G (2 * r) x
+    rw [← hR] at h2
+    calc ‖G x‖ ≤ Cf / R ^ (2 * r) := (le_div_iff₀' (by positivity)).mpr h2
+      _ = Cf * (R ^ (2 * r))⁻¹ := div_eq_mul_inv _ _
+      _ ≤ max Cz Cf * (R ^ (2 * r))⁻¹ :=
+          mul_le_mul_of_nonneg_right (le_max_right _ _) (by positivity)
+
+/-- The integral over the norm-one archimedean ideles of a translated archimedean test
+grows at most polynomially in the logarithm of the norm near norm zero. -/
+private theorem normOneArch_lintegral_le (f : ℬ∞) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ y : I∞,
+      ∫⁻ g : N∞, ‖f (Multiplicative.ofAdd ((archPart((∅ : Finset V)) g.val)⁻¹ * y).val)‖ₑ
+        ∂sNormOneIdeleTamagawaMeasure F ∅ ≤
+      ENNReal.ofReal (C * (1 + max 0 (-Real.log (infiniteIdeleNorm F y).val)) ^
+        (Fintype.card (InfinitePlace F) - 1)) := by
+  classical
+  obtain ⟨w₀⟩ := (inferInstance : Nonempty (InfinitePlace F))
+  let ι := {w : InfinitePlace F // w ≠ w₀}
+  obtain ⟨Cf, hCf, hf⟩ := archSchwartz_le_logKernel f
+  obtain ⟨c, hc⟩ := normOneArchLog_lintegral (F := F) w₀
+  obtain ⟨Ck, hCk, hA⟩ := logKernel_integral_le ι
+  have hcard : Fintype.card ι = Fintype.card (InfinitePlace F) - 1 := by
+    simp [ι, Fintype.card_subtype_compl]
+  refine ⟨c * (Cf * Ck), by positivity, fun y ↦ ?_⟩
+  set ℓ := infiniteIdeleLog F y with hℓ
+  let ℓ' : ι → ℝ := fun i ↦ ℓ i.val
+  set T := max 0 (-Real.log (infiniteIdeleNorm F y).val) with hT
+  have hT0 : 0 ≤ T := le_max_left _ _
+  let K : (ι → ℝ) → ℝ := fun u ↦
+    min 1 (Real.exp (T + ∑ i, u i)) * ∏ i, min 1 (Real.exp (-u i))
+  have hK0 (u : ι → ℝ) : 0 ≤ K u :=
+    mul_nonneg (le_min zero_le_one (Real.exp_pos _).le)
+      (Finset.prod_nonneg fun i _ ↦ le_min zero_le_one (Real.exp_pos _).le)
+  have hKc : Continuous K := by
+    simp only [K]
+    fun_prop
+  let Φ : (ι → ℝ) → ENNReal := fun v ↦ ENNReal.ofReal (Cf * K (ℓ' + v))
+  have hΦm : Measurable Φ :=
+    ENNReal.measurable_ofReal.comp
+      ((continuous_const.mul (hKc.comp (continuous_const.add continuous_id))).measurable)
+  have hsumℓ : ℓ w₀ + ∑ i, ℓ' i = Real.log (infiniteIdeleNorm F y).val := by
+    rw [← sum_infiniteIdeleLog_eq_log_norm, Fintype.sum_eq_add_sum_subtype_ne _ w₀]
+  have hpt (g : N∞) :
+      ‖f (Multiplicative.ofAdd ((archPart((∅ : Finset V)) g.val)⁻¹ * y).val)‖ₑ ≤
+        Φ (fun w ↦ infiniteIdeleLog F (archPart((∅ : Finset V)) g.val)⁻¹ w.val) := by
+    set h := archPart((∅ : Finset V)) g.val
+    set lg : ι → ℝ := fun w ↦ infiniteIdeleLog F h⁻¹ w.val
+    have hlz : infiniteIdeleLog F (h⁻¹ * y) = infiniteIdeleLog F h⁻¹ + ℓ :=
+      infiniteIdeleLog_mul F h⁻¹ y
+    have h0 := infiniteIdeleLog_inv_omitted w₀ g
+    rw [← ofReal_norm]
+    refine ENNReal.ofReal_le_ofReal ((hf (h⁻¹ * y)).trans
+      (mul_le_mul_of_nonneg_left ?_ hCf))
+    rw [Fintype.prod_eq_mul_prod_subtype_ne _ w₀]
+    refine mul_le_mul ?_ (le_of_eq (Finset.prod_congr rfl fun i _ ↦ ?_))
+      (Finset.prod_nonneg fun i _ ↦ le_min zero_le_one (Real.exp_pos _).le)
+      (le_min zero_le_one (Real.exp_pos _).le)
+    · refine min_le_min le_rfl (Real.exp_le_exp.mpr ?_)
+      rw [hlz, Pi.add_apply, h0]
+      have hTge : -Real.log (infiniteIdeleNorm F y).val ≤ T := le_max_right _ _
+      have hs : ∑ i, (ℓ' + lg) i = ∑ i, ℓ' i + ∑ i, lg i := by
+        simp only [Pi.add_apply, Finset.sum_add_distrib]
+      rw [hs]
+      simp only [lg]
+      linarith
+    · rw [hlz]
+      simp only [Pi.add_apply, ℓ', lg, add_comm]
+  calc ∫⁻ g : N∞, ‖f (Multiplicative.ofAdd ((archPart((∅ : Finset V)) g.val)⁻¹ * y).val)‖ₑ
+        ∂sNormOneIdeleTamagawaMeasure F ∅
+      ≤ ∫⁻ g : N∞, Φ (fun w ↦ infiniteIdeleLog F (archPart((∅ : Finset V)) g.val)⁻¹ w.val)
+        ∂sNormOneIdeleTamagawaMeasure F ∅ := lintegral_mono hpt
+    _ = c * ∫⁻ u, Φ u := hc Φ hΦm
+    _ = c * ∫⁻ u, ENNReal.ofReal (Cf * K u) := by
+        rw [lintegral_add_left_eq_self (fun u ↦ ENNReal.ofReal (Cf * K u)) ℓ']
+    _ = c * ENNReal.ofReal (∫ u, Cf * K u) := by
+        rw [ofReal_integral_eq_lintegral_ofReal ((hA T hT0).1.const_mul Cf)
+          (Filter.Eventually.of_forall fun u ↦ mul_nonneg hCf (hK0 u))]
+    _ ≤ c * ENNReal.ofReal (Cf * (Ck * (1 + T) ^ Fintype.card ι)) := by
+        gcongr
+        rw [integral_const_mul]
+        exact mul_le_mul_of_nonneg_left (hA T hT0).2 hCf
+    _ = ENNReal.ofReal (c * (Cf * Ck) * (1 + T) ^ (Fintype.card (InfinitePlace F) - 1)) := by
+        rw [← hcard, ← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_mul c.coe_nonneg]
+        ring_nf
+
 /-- Paper: (6.2.2.3), p. 298.
 Every term of the archimedean integral is absolutely integrable. The norm-one
 archimedean measure is the Tamagawa measure for the stage with no finite places. -/
@@ -767,7 +1222,41 @@ theorem infiniteStandardThetaAverage_integrable (χ : PontryaginDual Iₛ(S))
     Integrable (fun g : N∞ ↦
       f (Multiplicative.ofAdd ((a * archPart((∅ : Finset V)) g.val)⁻¹ * x).val) *
         (χ (archInsert(S) (a * archPart((∅ : Finset V)) g.val)) : ℂ))
-      (sNormOneIdeleTamagawaMeasure F ∅) := by sorry
+      (sNormOneIdeleTamagawaMeasure F ∅) := by
+  let D : Finset V := ∅
+  let (w : InfinitePlace F) : MeasurableSpace w.Completion := borel _
+  let (v : V) : MeasurableSpace (v.adicCompletion F) := borel _
+  let (w : InfinitePlace F) : BorelSpace w.Completion := ⟨rfl⟩
+  let (v : V) : BorelSpace (v.adicCompletion F) := ⟨rfl⟩
+  let (w : InfinitePlace F) : SecondCountableTopology w.Completion :=
+    (InfinitePlace.Completion.isometry_extensionEmbedding w).isEmbedding.secondCountableTopology
+  let (v : V) : ProperSpace (v.adicCompletion F) := properSpace_adicCompletion v
+  let : MeasurableSpace (SAdeleRing F D) := inferInstanceAs
+    (MeasurableSpace (((w : InfinitePlace F) → w.Completion) × ((v : D) → v.val.adicCompletion F)))
+  let : BorelSpace (SAdeleRing F D) := inferInstanceAs
+    (BorelSpace (((w : InfinitePlace F) → w.Completion) × ((v : D) → v.val.adicCompletion F)))
+  let : BorelSpace Iₛ(D) := by
+    refine ⟨?_⟩
+    rw [(sIdeleGroup_description F D).1.eq_induced, borel_comap, ← BorelSpace.measurable_eq]
+    rfl
+  have harch : Continuous (archPart((∅ : Finset V))) :=
+    Continuous.units_map _ continuous_fst
+  have hins : Continuous (archInsert(S)) :=
+    Continuous.units_map _ (continuous_id.prodMk continuous_const)
+  have hh : Continuous (fun g : N∞ ↦ a * archPart((∅ : Finset V)) g.val) :=
+    continuous_const.mul (harch.comp continuous_subtype_val)
+  have hcont : Continuous (fun g : N∞ ↦
+      f (Multiplicative.ofAdd ((a * archPart((∅ : Finset V)) g.val)⁻¹ * x).val) *
+        (χ (archInsert(S) (a * archPart((∅ : Finset V)) g.val)) : ℂ)) := by
+    refine Continuous.mul ?_ ?_
+    · exact (schwartzBruhat_continuous f).comp (continuous_ofAdd.comp
+        (Units.continuous_val.comp (hh.inv.mul continuous_const)))
+    · exact continuous_subtype_val.comp ((map_continuous χ).comp (hins.comp hh))
+  obtain ⟨C, -, hD⟩ := normOneArch_lintegral_le f
+  refine ⟨hcont.aestronglyMeasurable, ?_⟩
+  refine lt_of_le_of_lt (lintegral_mono fun g ↦ ?_) ((hD (a⁻¹ * x)).trans_lt ENNReal.ofReal_lt_top)
+  rw [eNorm_mul, ← ofReal_norm (χ _ : ℂ), Circle.norm_coe, ENNReal.ofReal_one, mul_one,
+    mul_inv_rev, mul_assoc]
 
 /-- Paper: (6.2.2.3), p. 298.
 The sum of archimedean integrals specifies a continuous linear map into the
@@ -1104,7 +1593,63 @@ theorem infiniteStandardThetaAverage_logBound (χ : PontryaginDual Iₛ(S))
     ∃ C ε : ℝ, 0 < C ∧ 0 < ε ∧ ∀ x : I∞,
       ((infiniteIdeleNorm F x).val : ℝ) < ε →
       ‖infiniteStandardThetaAverage χ r f x‖ ≤
-        C * |Real.log (infiniteIdeleNorm F x).val| ^ (Fintype.card (InfinitePlace F) - 1) := by sorry
+        C * |Real.log (infiniteIdeleNorm F x).val| ^ (Fintype.card (InfinitePlace F) - 1) := by
+  obtain ⟨C, hC, hD⟩ := normOneArch_lintegral_le f
+  set m := Fintype.card (InfinitePlace F) - 1
+  let b (k : Fin (classNumber F)) : I∞ := archPart(S) (r k).val
+  set L := ∑ k, |Real.log (infiniteIdeleNorm F (b k)).val| with hL
+  have hL0 : 0 ≤ L := Finset.sum_nonneg fun k _ ↦ abs_nonneg _
+  refine ⟨classNumber F * (C * (2 + L) ^ m) + 1, Real.exp (-1), by positivity, Real.exp_pos _,
+    fun x hx ↦ ?_⟩
+  have hpos (u : ℝ≥0ˣ) : (0 : ℝ) < (u : ℝ≥0) := NNReal.coe_pos.mpr (pos_iff_ne_zero.mpr u.ne_zero)
+  set lam := -Real.log (infiniteIdeleNorm F x).val with hlam
+  have hlam1 : 1 < lam := by
+    have := Real.log_lt_log (hpos _) hx
+    rw [Real.log_exp] at this
+    linarith
+  have habs : |Real.log (infiniteIdeleNorm F x).val| = lam := by
+    rw [abs_of_neg (by linarith)]
+  have hlogmul (u v : ℝ≥0ˣ) :
+      Real.log (((u⁻¹ * v : ℝ≥0ˣ) : ℝ≥0) : ℝ) = Real.log ((v : ℝ≥0) : ℝ) - Real.log ((u : ℝ≥0) : ℝ) := by
+    rw [Units.val_mul, Units.val_inv_eq_inv_val, NNReal.coe_mul, NNReal.coe_inv,
+      Real.log_mul (inv_ne_zero (hpos u).ne') (hpos v).ne', Real.log_inv]
+    ring
+  have hk (k : Fin (classNumber F)) :
+      ‖∫ g : N∞,
+        (let a := archPart(S) (r k).val * archPart((∅ : Finset V)) g.val
+        f (Multiplicative.ofAdd (a⁻¹ * x).val) * (χ (archInsert(S) a) : ℂ))
+        ∂sNormOneIdeleTamagawaMeasure F ∅‖ ≤ C * ((2 + L) * lam) ^ m := by
+    let Fk : N∞ → ℂ := fun g ↦
+      (let a := archPart(S) (r k).val * archPart((∅ : Finset V)) g.val
+      f (Multiplicative.ofAdd (a⁻¹ * x).val) * (χ (archInsert(S) a) : ℂ))
+    have hpt (g : N∞) : ‖Fk g‖ₑ = ‖f (Multiplicative.ofAdd
+        ((archPart((∅ : Finset V)) g.val)⁻¹ * ((b k)⁻¹ * x)).val)‖ₑ := by
+      simp only [Fk, eNorm_mul]
+      rw [← ofReal_norm (χ _ : ℂ), Circle.norm_coe, ENNReal.ofReal_one, mul_one,
+        mul_inv_rev, mul_assoc]
+    have hle : ‖∫ g : N∞, Fk g ∂sNormOneIdeleTamagawaMeasure F ∅‖ₑ ≤ _ :=
+      (eNorm_integral_le_lintegral_eNorm Fk).trans ((lintegral_congr hpt).le.trans
+        (hD ((b k)⁻¹ * x)))
+    change ‖∫ g : N∞, Fk g ∂sNormOneIdeleTamagawaMeasure F ∅‖ ≤ _
+    have hnn : 0 ≤ C * (1 + max 0 (-Real.log (infiniteIdeleNorm F ((b k)⁻¹ * x)).val)) ^ m :=
+      mul_nonneg hC (pow_nonneg (by positivity) _)
+    have h1 := ENNReal.toReal_mono ENNReal.ofReal_ne_top hle
+    rw [ENNReal.toReal_ofReal hnn, toReal_eNorm] at h1
+    refine h1.trans (mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) ?_ m) hC)
+    have hbk : |Real.log (infiniteIdeleNorm F (b k)).val| ≤ L :=
+      Finset.single_le_sum (f := fun k ↦ |Real.log (infiniteIdeleNorm F (b k)).val|)
+        (fun k _ ↦ abs_nonneg _) (Finset.mem_univ k)
+    have hlb := le_abs_self (Real.log (infiniteIdeleNorm F (b k)).val)
+    rw [map_mul, map_inv, hlogmul]
+    have hm : max 0 (-(Real.log (infiniteIdeleNorm F x).val -
+        Real.log (infiniteIdeleNorm F (b k)).val)) ≤ lam + L :=
+      max_le (by linarith) (by linarith)
+    nlinarith
+  rw [infiniteStandardThetaAverage_apply, habs]
+  refine (norm_sum_le _ _).trans ((Finset.sum_le_sum fun k _ ↦ hk k).trans ?_)
+  rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_pow]
+  have hlm : 0 ≤ lam ^ m := pow_nonneg (by linarith) _
+  nlinarith
 
 end StandardFunctions
 
