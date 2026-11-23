@@ -9,6 +9,7 @@ import Mathlib.Analysis.Distribution.SchwartzSpace.CompactSupport
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec3a
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec2b
 import RiemannMasullo.AppD_SchwartzBruhat.Sec1b
+import RiemannMasullo.ForMathlib.Topology.Covering.AddCircle
 import RiemannMasullo.ForMathlib.Topology.Algebra.PontryaginDual.Real
 
 /-!
