@@ -228,7 +228,8 @@ and say in the PR body that the file is now under sweep #<n> (private helpers na
 declarations do not collide with the sweeper's).
 
 ## Where helper lemmas go (CONTRIBUTING "Build as little as possible", "Get merged without waiting")
-- **Edit only the file your issues are in.** Put helpers directly above the declaration that needs
+- **Edit only the file your issues are in** (one exception: making another file's private lemma
+  public, "Imports and vendored code" below). Put helpers directly above the declaration that needs
   them, as `private theorem`/`private lemma` with all arguments written out, named after the
   declaration they serve. A helper added to a file lower in the import order recompiles everything
   above it, for everyone.
@@ -247,12 +248,44 @@ declarations do not collide with the sweeper's).
   names unchanged (AGENTS "Building and checking": a new `variable` or auto-bound `Type*` above them
   renames `u_1` and the signature compare flags them).
 
+### Imports and vendored code (AGENTS.md 9d44796 / #6034, `External/README.md`; binding)
+Your own new helpers still go in your file as private helpers (above). These rules cover *using*
+declarations that live in other files.
+- **Never add `import all`.** The PR check refuses it (#6103). It makes every proof edit in the
+  imported module rebuild yours, and through further `import all`s much of the library (#5960).
+  The #5966 issues are removing the existing ones; leave those alone unless one is your issue.
+- **A private lemma of another `RiemannMasullo` paper file** that you need: make it public in place
+  (remove `private`, give it a descriptive name and a short docstring; leave private instances
+  private; do not move it into a `section` with `variable`s or auto-bound universes, so the
+  universe names of later declarations do not change). If it is general (the ForMathlib test
+  above), move it instead to `RiemannMasullo/ForMathlib/` in a `section` of its own. Then use a
+  plain `import`. This is the one case where your PR may touch a second file: say which lemma and
+  why in the PR body (the PR goes to a reader). Prefer this to copying a private helper into your file.
+- **`RiemannMasullo/External/` is integrator-only.** Never edit it (apart from adding an
+  `ATTRIBUTION.md` row, below), and never vendor a project into
+  it: new vendoring comes only from the integrator or from a vendoring session the user starts.
+  Never copy code out of it into project files (user, 2026-11-23: "Vendoring means we *don't* copy
+  in code wildly like that"). Use vendored declarations through a plain `import`. If one you need
+  is private, name it in your notes, report and PR; the coordinator then asks the integrator, who
+  exports it in `External/` with a `MODIFICATIONS.md` line (confirmed on #6071). Until then a
+  proof that needs it cannot build: say so in your report rather than working around it. A
+  vendored result that needs strengthening is strengthened in your paper file, which imports it
+  (`External/README.md`).
+- Porting one proof from a project in `External/SURVEY.md` that is *not* vendored (reference copies,
+  other Lean versions) stays allowed, as AGENTS "Using existing Lean" says: adapt it into your file
+  as a private helper, add an `ATTRIBUTION.md` row, and never copy from a project with no license.
+- **`ATTRIBUTION.md`** gets a row only when you *adapt* a proof or definition from another project,
+  that is, port or rewrite it (AGENTS "Using existing Lean"). Importing and calling vendored
+  declarations needs no row (#6133 used `External/Grh` by import and added none; #6071 adapted
+  Patel's integral bound and added one).
+
 ## Paper errors, gaps, ERRATA (AGENTS "False statements and gaps", CONTRIBUTING "When the paper is wrong"; binding)
 - `grep` ERRATA.md (origin/main) for the declaration name. If it is listed as false, imprecise or a
   placeholder, skip it unless the entry says what to do.
 - Skip `gap` issues and declarations with a `Gap:` docstring line. `refutation` issues are proof
   issues like any other (user, 2026-11-22): the `Printed.<name>_false` sorry is already on main;
-  prove it in place and hand in with `Closes #<n>`. **No `import all`** (AGENTS.md 9d44796): never add one. For a private lemma of another RiemannMasullo file, make it public in place (remove `private`, descriptive name, docstring; private instances stay private) and say so in the PR; for a private lemma under `External/` (integrator-only), never copy it (vendoring means no copied code; user 2026-11-23): keep the `import all`, say so in the PR, and the coordinator asks the integrator. ERRATA (0d2e5b1) counts a refutation as *Lean*-checked only when `#print axioms` shows no `sorryAx`; one resting on open library theorems is accepted but stays unchecked until they are proved, so prefer a sorry-free counterexample when one is cheap, and name the open theorems in the PR. Read any nearby
+  prove it in place and hand in with `Closes #<n>`. To use another file's private lemmas, follow
+  "Imports and vendored code" above (no `import all`, nothing copied from `External/`). ERRATA (0d2e5b1) counts a refutation as *Lean*-checked only when `#print axioms` shows no `sorryAx`; one resting on open library theorems is accepted but stays unchecked until they are proved, so prefer a sorry-free counterexample when one is cheap, and name the open theorems in the PR. Read any nearby
   `TODO(paper-gap)` first: it often explains why the obvious route fails.
 - Never change a statement, never prove something else in its place, and never leave a `sorry`
   inside a larger proof. A split states the missing piece as its own named theorem with a
@@ -316,7 +349,8 @@ declarations do not collide with the sweeper's).
 - **Body:** `Closes #<n>` per issue, one line per proof, the axioms output, and notes on anything
   degenerate (true only by construction, hypothesis restates the conclusion). If you adapted a
   proof from a project in `RiemannMasullo/External/SURVEY.md`, say so and add a line to
-  `RiemannMasullo/External/ATTRIBUTION.md` (AGENTS "Using existing Lean"). End with
+  `RiemannMasullo/External/ATTRIBUTION.md` (AGENTS "Using existing Lean"; importing vendored
+  declarations needs none, see "Imports and vendored code"). Name every lemma you made public. End with
   `Prover: <M>` and then `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
 - **CI:** the "PR check" Verdict gates merging (merge → auto-merge, read → the integrator reads it,
   fail → fix it). Cancelled "Lean Action CI" runs are expected; do not re-run them. Do not babysit CI.

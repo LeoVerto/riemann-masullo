@@ -38,7 +38,7 @@ Skeleton (checked to elaborate: yes/no):
   ```lean
   <statement-preserving skeleton: named helper lemmas with sorry, main proof from them; <= 80 lines>
   ```
-Lemmas: <Mathlib/project names to use, with file:line>
+Lemmas: <Mathlib/project names to use, with file:line; mark any that are private: HUNTER.md "Imports and vendored code" (never `import all`, never copy from External/)>
 Traps: <what will be slow or fail, and how to avoid it>
 Next for Opus: <ordered steps, at most 5>
 ```
