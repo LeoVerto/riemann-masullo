@@ -9,6 +9,9 @@ public import RiemannMasullo.ForMathlib.NumberTheory.NumberField.DedekindZeta
 
 import RiemannMasullo.AppA_AlgebraicNT.Sec2
 import RiemannMasullo.AppA_AlgebraicNT.Sec3
+import Mathlib.Topology.Algebra.IsOpenUnits
+import RiemannMasullo.ForMathlib.MeasureTheory.Measure.Haar.Unique
+import RiemannMasullo.ForMathlib.RingTheory.Trace.Defs
 import all RiemannMasullo.Ch02_AdelicTheta.Sec1
 import RiemannMasullo.Ch02_AdelicTheta.Sec2a
 import RiemannMasullo.ForMathlib.Topology.Algebra.OpenSubgroup

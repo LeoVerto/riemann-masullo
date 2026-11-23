@@ -5917,7 +5917,7 @@ private theorem splitQuotient_productHaar (n : X →* ℝ≥0ˣ) (hn : Continuou
   have : T2Space Q := quotient_t2_of_compact K hk
   have : BorelSpace ℝ≥0ˣ := borelSpace_units_of_continuousInv₀ ℝ≥0
   have : SecondCountableTopology ℝ≥0ˣ := Units.isEmbedding_val₀.secondCountableTopology
-  have : positiveRealHaar.IsHaarMeasure := positiveRealHaar_isHaarMeasure
+  have : positiveRealHaar.IsHaarMeasure := positiveRealHaar_isHaarMeasure_of_lebesgue
   let q : X →ₜ* Q := ⟨QuotientGroup.mk' K, QuotientGroup.continuous_mk⟩
   let φ := q.comp (τ.coprod (kernelIncl n))
   have hs : Surjective φ := by

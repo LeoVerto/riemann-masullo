@@ -7,6 +7,7 @@ import all RiemannMasullo.Ch03_IdelicZeta.Sec3b
 import RiemannMasullo.External.AlgebraicNumberTheoryLean.Chebotarev.DirichletHecke
 import Mathlib.NumberTheory.MulChar.Duality
 import Mathlib.NumberTheory.DirichletCharacter.Bounds
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 /-! # Chapter 6.2: statements that are false as printed -/
 

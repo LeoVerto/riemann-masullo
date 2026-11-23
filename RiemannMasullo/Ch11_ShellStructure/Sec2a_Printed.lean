@@ -7,6 +7,7 @@ import all RiemannMasullo.Ch11_ShellStructure.Sec2a
 import RiemannMasullo.External.AlgebraicNumberTheoryLean.Chebotarev.DirichletHecke
 import Mathlib.NumberTheory.MulChar.Duality
 import Mathlib.NumberTheory.DirichletCharacter.Bounds
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 /-! # §11.2.0 assertions that are false as printed -/
 

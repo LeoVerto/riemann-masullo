@@ -4,6 +4,8 @@ public import RiemannMasullo.Ch10_TraceSpectral.Sec1
 public import RiemannMasullo.Ch11_ShellStructure.Sec1a
 
 import RiemannMasullo.AppA_AlgebraicNT.Sec3
+import Mathlib.MeasureTheory.Measure.Haar.DistribChar
+import RiemannMasullo.ForMathlib.MeasureTheory.Group.Arithmetic
 import Mathlib.MeasureTheory.Integral.ExpDecay
 
 /-!

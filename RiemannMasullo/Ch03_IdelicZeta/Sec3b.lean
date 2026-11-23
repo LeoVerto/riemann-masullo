@@ -5,6 +5,7 @@ public import RiemannMasullo.AppB_AnalyticNT.Sec2
 public import RiemannMasullo.AppC_LCTVS.Sec5b
 import all RiemannMasullo.Ch02_AdelicTheta.Sec2b
 import RiemannMasullo.Ch02_AdelicTheta.Sec2a
+import Mathlib.Analysis.Normed.Field.ProperSpace
 import all RiemannMasullo.Ch02_AdelicTheta.Sec3
 import all RiemannMasullo.Ch03_IdelicZeta.Sec3
 import all RiemannMasullo.AppB_AnalyticNT.Sec2

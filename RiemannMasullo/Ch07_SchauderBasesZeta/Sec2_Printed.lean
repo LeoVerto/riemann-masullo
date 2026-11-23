@@ -4,6 +4,9 @@ public import Mathlib.Algebra.Field.ULift
 public import RiemannMasullo.Ch07_SchauderBasesZeta.Sec2
 import all RiemannMasullo.Ch03_IdelicZeta.Sec4
 import all RiemannMasullo.Ch07_SchauderBasesZeta.Sec1a
+import Mathlib.NumberTheory.Cyclotomic.Basic
+import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
+import Mathlib.NumberTheory.NumberField.Discriminant.Different
 
 /-! # §7.2 Claims that are false as printed -/
 

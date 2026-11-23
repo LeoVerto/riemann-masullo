@@ -5461,7 +5461,8 @@ private theorem exists_sAdeleExtension :
   · change (j _).val.2 v = a.2 v * (j y).val.2 v
     rw [hout _ v hv, hout _ v hv, mul_zero]
 
-private theorem continuous_adeleProjection : Continuous (adeleProjection F S) :=
+/-- The projection of an adele to its S-adelic part is continuous. -/
+theorem continuous_adeleProjection : Continuous (adeleProjection F S) :=
   continuous_fst.prodMk (continuous_pi fun v ↦ (RestrictedProduct.continuous_eval v.val).comp continuous_snd)
 
 /-- Restrict the global self-duality to the summand supported at the places of S. -/
@@ -5733,7 +5734,7 @@ local notation "classVolume(" F ")" =>
       Nat.cast (Units.torsionOrder F)))
 
 /-- The exponential pushforward of Lebesgue measure is Haar measure on the positive reals. -/
-theorem positiveRealHaar_isHaarMeasure : positiveRealHaar.IsHaarMeasure := by
+theorem positiveRealHaar_isHaarMeasure_of_lebesgue : positiveRealHaar.IsHaarMeasure := by
   let : BorelSpace ℝ≥0ˣ := borelSpace_units_of_continuousInv₀ ℝ≥0
   let μ : Measure (Multiplicative ℝ) := (volume : Measure ℝ)
   let : μ.IsHaarMeasure := by
@@ -5838,7 +5839,7 @@ theorem multiplicativeTamagawaMeasures_existsUnique :
       continuous_toFun := (QuotientGroup.isQuotientMap_mk K).continuous_iff.mpr hn
       continuous_invFun := QuotientGroup.continuous_mk.comp hs }
   let dt : Measure Q := positiveRealHaar.comap (QuotientGroup.kerLift (ideleClassNorm F))
-  let : positiveRealHaar.IsHaarMeasure := positiveRealHaar_isHaarMeasure
+  let : positiveRealHaar.IsHaarMeasure := positiveRealHaar_isHaarMeasure_of_lebesgue
   let : SecondCountableTopology ℝ≥0ˣ := Units.isEmbedding_val₀.secondCountableTopology
   have hdt : positiveRealHaar.map e.symm = dt :=
     e.toHomeomorph.toMeasurableEquiv.map_symm
@@ -7417,7 +7418,7 @@ private theorem existsUnique_normKernelMeasure {G : Type*} [CommGroup G]
   let e := normQuotientEquiv n hn s hs hr
   let dt := positiveRealHaar.comap (QuotientGroup.kerLift n)
   have hdt : positiveRealHaar.map e.symm = dt := e.toHomeomorph.toMeasurableEquiv.map_symm
-  let := positiveRealHaar_isHaarMeasure
+  let := positiveRealHaar_isHaarMeasure_of_lebesgue
   let : dt.IsHaarMeasure := hdt ▸ e.symm.isHaarMeasure_map positiveRealHaar
   let : dt.Regular := hdt ▸ Measure.Regular.map e.symm.toHomeomorph
   let ν₀ := Measure.haar (G := H)
