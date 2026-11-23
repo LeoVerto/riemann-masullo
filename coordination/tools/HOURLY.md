@@ -54,17 +54,19 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
    square ∪ discs ∪ points; vendored Tau Ceti names live in `RiemannMasullo.External.TauCeti` except
    `_root_` ones. Weaker leads (leads.txt): #4072, #4079, #4078. Tell the user it merged (done 04:5xZ).
 0d. **`import all` fixes** (AGENTS.md 9d44796 bans new `import all`): #6071 KEEPS its `import all` of External/Grh (user 05:1xZ: vendoring means we don't copy code in; asked the
-   integrator on the PR 05:1xZ, wait for their answer) and #6072 (adds `import all` of Ch06 Sec2 and Ch03 Sec3;
+   integrator on the PR 05:1xZ, integrator 06:1xZ: check now refuses new `import all`; they will export what is needed in External/; we named
+   `logLoss`, `logLoss_nonneg`, `logLoss_translate` 06:2xZ. When those are public on main: one Sonnet fixer
+   switches #6071 to a plain import, rebuilds, pushes) and #6072 (adds `import all` of Ch06 Sec2 and Ch03 Sec3;
    fix: make the private lemmas it uses public in place per AGENTS.md, plain imports). One Sonnet fixer
    (general-purpose, model sonnet, 1 unit) per PR, first free units; each re-checks the PR is OPEN, edits
    its worktree, rebuilds, lint, signatures compare (expect only the made-public names), axioms unchanged,
-   pushes, one-line PR comment. fix6072 stopped 05:2xZ: #6072 had merged 04:53Z with its import all (left to #5966); fix6071 stopped by the user. Step done except #6071 awaiting the integrator. Then: #4666 FIRST (warm has #6043; user 05:3xZ: it was closed by mistake at 04:46Z by the phrase "does not close #4666" in the vendor PR, so nobody else will pick it up: get it done; PR still says `Closes #4666`; if we must release it, ask the user about reopening it), then #4911 opus (Fable ROUTE; #6066 MERGED, build on main). 05:2xZ: 5h 87%, budget 2, held until usage allows.
+   pushes, one-line PR comment. fix6072 stopped 05:2xZ: #6072 had merged 04:53Z with its import all (left to #5966); fix6071 stopped by the user. Step done except #6071 awaiting the integrator. Then: #4666 LAUNCHED 06:2xZ (esc-appbsec5p, user: start before the reset) (warm has #6043; user 05:3xZ: it was closed by mistake at 04:46Z by the phrase "does not close #4666" in the vendor PR, so nobody else will pick it up: get it done; PR still says `Closes #4666`; if we must release it, ask the user about reopening it), then #4911 LAUNCHED 06:3xZ (esc-ch10sec1p3, Fable route). 05:2xZ: 5h 87%, budget 2, held until usage allows.
 0e. **#5966 "make helpers public" quick wins** (user 05:3xZ: "should be handle-able by sonnet, they just take
    CPU time"): #5998 (AppA Sec2; koffie claimed 05:43Z), #5999 (AppA Sec1), #6000 (Ch02 Sec2a), #6001 (AppC Sec1), #6002 (AppD Sec1a),
    #6003 (AppA Sec3), #6004 (AppD Sec1b); #5997 is sflicht's. Not proof issues; the issue body is the task
    (remove `private` in place, descriptive names + docstrings, private instances stay private, plain imports in
    the listed importers, signatures compare lists only the renamed names, PR `Closes #n` + "part of #5966").
-   Claim each only when an agent starts it (`claims.py` first). Sonnet `hunter`, 1 unit, ONE issue per agent at
+   Claim each only when an agent starts it (`claims.py` first). Sonnet `hunter`, 2 UNITS each (user 06:3xZ: "the refactoring sonnets should cost 2 each due to their high cpu usage"), ONE issue per agent at
    a time, and AT MOST TWO quick-win agents running at once (user 06:0xZ: "they do tend to peg CPU"; w33/w34/w35 were
    already running when this was set, so launch the next only when fewer than two remain) (importer edits overlap across issues: two agents must not touch the same importer file at once;
    check the issue's "Files with import all" lists). Order (user 05:5xZ: "the quick wins have priority and CPU is plentiful … prioritize them first"): FIRST, before #4666 and #4911. 05:5xZ: w33 #5999, w34 #6004 launched (disjoint importer lists). 06:0xZ: w35 #6001 (minor import-line overlap with w33/w34). Next, as each finishes: #6002, #6000, #6003, picking one whose importer list is disjoint from those running.
