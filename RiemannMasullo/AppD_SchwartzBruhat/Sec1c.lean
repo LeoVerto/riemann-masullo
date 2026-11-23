@@ -12,6 +12,7 @@ import Mathlib.Analysis.PSeries
 import Mathlib.Analysis.SpecialFunctions.JapaneseBracket
 import Mathlib.Analysis.Calculus.ContDiff.FiniteDimension
 import RiemannMasullo.ForMathlib.Analysis.SpecialFunctions.Gaussian.Schwartz
+import RiemannMasullo.ForMathlib.Topology.Algebra.Module.OpenMapping
 import Mathlib.MeasureTheory.Function.Floor
 import Mathlib.MeasureTheory.Integral.Pi
 import Mathlib.MeasureTheory.Measure.Lebesgue.Basic

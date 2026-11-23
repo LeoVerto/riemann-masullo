@@ -17,9 +17,7 @@ import RiemannMasullo.ForMathlib.Topology.ContinuousMap.Sigma
 import RiemannMasullo.ForMathlib.MeasureTheory.Integral.Bochner.Regular
 import RiemannMasullo.ForMathlib.NumberTheory.NumberField.Completion.FinitePlace
 
-import all RiemannMasullo.AppC_LCTVS.Sec1
-
-import all RiemannMasullo.AppC_LCTVS.Sec1
+import RiemannMasullo.AppC_LCTVS.Sec1
 
 /-! # Homogeneous theta spaces and Fourier descent
 
