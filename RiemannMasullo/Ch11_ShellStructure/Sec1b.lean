@@ -2361,6 +2361,663 @@ theorem sLocalCarvingLimit_trivial_ae_translate {S : Finset V}
     rw [← hMv, ← sLocalCutoffCarving_le_cutoffIsotype_comm s hs₀ J hJ g v, hvfix]
   simpa only [hufix] using (hardySobolevTranslation_apply μ𝔽 m𝔽 0 0 s le_rfl hs₀ g.val u).symm
 
+/-- The trivial finite standard Gaussian is the indicator of the integers. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_gauss (w : V) (t : w.adicCompletion F) :
+    finiteStandardGaussian w 1 (Multiplicative.ofAdd t) =
+      if t ∈ w.adicCompletionIntegers F then 1 else 0 := by
+  change finiteStandardGaussianValue w 1 t = _
+  unfold finiteStandardGaussianValue
+  exact (ite_eq_left fun u _ ↦ rfl).trans (Set.indicator_apply _ _ _)
+
+/-- Weil's principal value of the integer indicator is the indicator of the integer units. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_pvGauss (w : V) (t : w.adicCompletion F) :
+    finitePlacePrincipalValue w (finiteStandardGaussian w 1) (Multiplicative.ofAdd t) =
+      if Valued.v t = 1 then 1 else 0 := by
+  let h := (Valued.v : Valuation (w.adicCompletion F)
+    (WithZero (Multiplicative ℤ))).exists_isUniformizer_of_isCyclic_of_nontrivial
+  let π := Units.mk0 (h.choose : w.adicCompletion F) h.choose_spec.ne_zero
+  let : MeasurableSpace (w.adicCompletion F)ˣ := borel _
+  have : BorelSpace (w.adicCompletion F)ˣ := ⟨rfl⟩
+  rw [finitePlacePrincipalValue_spec w π h.choose_spec]
+  have hd := finitePlaceDifference_integerIndicator w π h.choose_spec t
+  have hint : ∀ u ∈ (w.adicCompletionIntegers F).units,
+      finiteStandardGaussian w 1 (Multiplicative.ofAdd ((↑u⁻¹ : w.adicCompletion F) *
+        ((↑π⁻¹ : w.adicCompletion F) * t))) =
+      finiteStandardGaussian w 1 (Multiplicative.ofAdd ((↑π⁻¹ : w.adicCompletion F) * t)) := by
+    intro u hu
+    rw [sLocalCarvingLimit_eq_closedSpan_generator_mem_gauss, sLocalCarvingLimit_eq_closedSpan_generator_mem_gauss]
+    have hv : Valued.v ((↑u⁻¹ : w.adicCompletion F)) = 1 :=
+      HeightOneSpectrum.adicCompletionIntegers.mem_units_iff_valued_eq_one.mp
+        (Subgroup.inv_mem _ hu)
+    simp only [HeightOneSpectrum.mem_adicCompletionIntegers, map_mul, hv, one_mul]
+  have hU : MeasurableSet ((w.adicCompletionIntegers F).units : Set (w.adicCompletion F)ˣ) :=
+    (Submonoid.isOpen_units (Valued.isOpen_valuationSubring _)).measurableSet
+  have hpos := (finitePlacePrincipalValue_integrable w π (finiteStandardGaussian w 1)
+    (Multiplicative.ofAdd t)).1
+  unfold finitePlacePrincipalValueFun
+  simp only [toAdd_ofAdd]
+  rw [setIntegral_congr_fun hU hint, setIntegral_const, Complex.real_smul, ← mul_assoc,
+    inv_mul_cancel₀ (Complex.ofReal_ne_zero.mpr hpos.ne'), one_mul]
+  change finiteStandardGaussian w 1 (Multiplicative.ofAdd t) -
+    finiteStandardGaussian w 1 (Multiplicative.ofAdd ((↑π⁻¹ : w.adicCompletion F) * t)) = _ at hd
+  rw [hd, Set.indicator_apply]
+  congr 1
+  refine propext ⟨?_, fun hy ↦ ?_⟩
+  · rintro ⟨u, hu, rfl⟩
+    exact HeightOneSpectrum.adicCompletionIntegers.mem_units_iff_valued_eq_one.mp hu
+  · have hy0 : t ≠ 0 := fun h0 ↦ by simp [h0] at hy
+    exact ⟨Units.mk0 t hy0,
+      HeightOneSpectrum.adicCompletionIntegers.mem_units_iff_valued_eq_one.mpr hy, rfl⟩
+
+/-- A product over a larger index set whose extra factors are indicators is the product over
+the smaller set when every indicator is one, and zero otherwise. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_prod {S S' : Finset V} (hSS : S ⊆ S') (c : S' → ℂ) (d : S → ℂ) (q : S' → Prop)
+    (hd : ∀ w : S, c ⟨w.val, hSS w.property⟩ = d w)
+    (hq : ∀ w : S', w.val ∉ S → c w = if q w then 1 else 0) :
+    ∏ w, c w = if (∀ w : S', w.val ∉ S → q w) then ∏ w, d w else 0 := by
+  split_ifs with hc
+  · refine (Fintype.prod_of_injective (fun w : S ↦ (⟨w.val, hSS w.property⟩ : S'))
+      (fun w₁ w₂ h ↦ Subtype.ext (congrArg (fun x : S' ↦ x.val) h :)) d c (fun w hw ↦ ?_)
+      (fun w ↦ (hd w).symm)).symm
+    have hwS : w.val ∉ S := fun h ↦ hw ⟨⟨w.val, h⟩, rfl⟩
+    rw [hq w hwS, if_pos (hc w hwS)]
+  · push Not at hc
+    obtain ⟨w, hwS, hwO⟩ := hc
+    exact Finset.prod_eq_zero (Finset.mem_univ w) (by rw [hq w hwS, if_neg hwO])
+
+open scoped TensorProduct in
+/-- The transition of a pure tensor to a larger stage is the pure tensor with the integer
+indicator in the new factors. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_transition {S S' : Finset V} (hSS : S ⊆ S')
+    (a : SchwartzBruhat (Multiplicative (InfiniteAdeleRing F)))
+    (b : ∀ w : S, SchwartzBruhat (Multiplicative (w.val.adicCompletion F))) :
+    sAdeleSchwartzTransition F hSS ((sAdeleSchwartz_inductiveTensor_equiv F S).choose
+        (a ⊗ₜ[ℂ] (⨂ₜ[ℂ] w, b w))) =
+      (sAdeleSchwartz_inductiveTensor_equiv F S').choose (a ⊗ₜ[ℂ] (⨂ₜ[ℂ] w : S',
+        if h : w.val ∈ S then b ⟨w.val, h⟩ else finiteStandardGaussian w.val 1)) := by
+  refine Subtype.ext (funext fun z ↦ ?_)
+  have h1 := sAdeleSchwartzTransition_apply F hSS ((sAdeleSchwartz_inductiveTensor_equiv F S).choose
+    (a ⊗ₜ[ℂ] (⨂ₜ[ℂ] w, b w))) z.toAdd
+  have h2 := (sAdeleSchwartz_inductiveTensor_equiv F S').choose_spec a
+    (fun w : S' ↦ if h : w.val ∈ S then b ⟨w.val, h⟩ else finiteStandardGaussian w.val 1) z.toAdd
+  have h3 := (sAdeleSchwartz_inductiveTensor_equiv F S).choose_spec a b
+    (z.toAdd.1, fun w : S ↦ z.toAdd.2 ⟨w.val, hSS w.property⟩)
+  have key := sLocalCarvingLimit_eq_closedSpan_generator_mem_prod hSS
+    (fun w : S' ↦ (if h : w.val ∈ S then b ⟨w.val, h⟩ else finiteStandardGaussian w.val 1)
+      (Multiplicative.ofAdd (z.toAdd.2 w)))
+    (fun w : S ↦ b w (Multiplicative.ofAdd (z.toAdd.2 ⟨w.val, hSS w.property⟩)))
+    (fun w : S' ↦ z.toAdd.2 w ∈ w.val.adicCompletionIntegers F)
+    (fun w ↦ by rw [dif_pos w.property])
+    (fun w hw ↦ by rw [dif_neg hw]; exact sLocalCarvingLimit_eq_closedSpan_generator_mem_gauss w.val _)
+  refine h1.trans (Eq.trans ?_ h2.symm)
+  refine Eq.trans ?_ (congrArg (HMul.hMul (a (Multiplicative.ofAdd z.toAdd.1))) key).symm
+  split_ifs with hc
+  · exact h3
+  · exact (mul_zero _).symm
+
+open scoped TensorProduct in
+/-- Two linear functionals that agree on the pure tensors of an inductive tensor product agree
+everywhere. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_ind {A B : Type*}
+    [AddCommGroup A] [Module ℂ A] [TopologicalSpace A]
+    [AddCommGroup B] [Module ℂ B] [TopologicalSpace B] {ι : Type*} {D : ι → Type*}
+    [∀ i, AddCommGroup (D i)] [∀ i, Module ℂ (D i)]
+    (e : InductiveTensor A (FinestLocallyConvex (⨂[ℂ] i, D i)) ≃L[ℂ] B)
+    (Λ₁ Λ₂ : B →ₗ[ℂ] ℂ)
+    (h : ∀ (a : A) (g : ∀ i, D i), Λ₁ (e (a ⊗ₜ[ℂ] (⨂ₜ[ℂ] i, g i))) =
+      Λ₂ (e (a ⊗ₜ[ℂ] (⨂ₜ[ℂ] i, g i)))) (x : B) :
+    Λ₁ x = Λ₂ x := by
+  obtain ⟨t, rfl⟩ := e.surjective x
+  let W := FinestLocallyConvex (⨂[ℂ] i, D i)
+  let L₁ : A ⊗[ℂ] W →ₗ[ℂ] ℂ := Λ₁ ∘ₗ (e.toLinearMap : InductiveTensor A W →ₗ[ℂ] B)
+  let L₂ : A ⊗[ℂ] W →ₗ[ℂ] ℂ := Λ₂ ∘ₗ (e.toLinearMap : InductiveTensor A W →ₗ[ℂ] B)
+  have hL : L₁ = L₂ := by
+    refine TensorProduct.ext' fun a z ↦ ?_
+    refine PiTensorProduct.induction_on (motive := fun z : ⨂[ℂ] i, D i ↦
+      L₁ (a ⊗ₜ[ℂ] (z : W)) = L₂ (a ⊗ₜ[ℂ] (z : W))) z ?_ ?_
+    · intro r g
+      have ht : (a ⊗ₜ[ℂ] (((r • (⨂ₜ[ℂ] i, g i) : ⨂[ℂ] i, D i)) : W) : A ⊗[ℂ] W) =
+          r • (a ⊗ₜ[ℂ] (((⨂ₜ[ℂ] i, g i) : ⨂[ℂ] i, D i) : W)) :=
+        (TensorProduct.mk ℂ A W a).map_smul r (((⨂ₜ[ℂ] i, g i) : ⨂[ℂ] i, D i) : W)
+      have hp : L₁ (a ⊗ₜ[ℂ] (((⨂ₜ[ℂ] i, g i) : ⨂[ℂ] i, D i) : W)) =
+          L₂ (a ⊗ₜ[ℂ] (((⨂ₜ[ℂ] i, g i) : ⨂[ℂ] i, D i) : W)) := h a g
+      exact (congrArg L₁ ht).trans ((map_smul L₁ r _).trans ((congrArg (r • ·) hp).trans
+        ((map_smul L₂ r _).symm.trans (congrArg L₂ ht.symm))))
+    · intro z₁ z₂ h₁ h₂
+      have ht : (a ⊗ₜ[ℂ] (((z₁ + z₂ : ⨂[ℂ] i, D i)) : W) : A ⊗[ℂ] W) =
+          a ⊗ₜ[ℂ] (z₁ : W) + a ⊗ₜ[ℂ] (z₂ : W) :=
+        (TensorProduct.mk ℂ A W a).map_add (z₁ : W) (z₂ : W)
+      exact (congrArg L₁ ht).trans ((map_add L₁ _ _).trans ((congrArg₂ (· + ·) h₁ h₂).trans
+        ((map_add L₂ _ _).symm.trans (congrArg L₂ ht.symm))))
+  exact LinearMap.congr_fun hL t
+
+open scoped TensorProduct in
+/-- The S-local principal value of the transition of a test, at places outside the test,
+replaces the integer indicator by the unit indicator. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_sPV {S S' T : Finset V} (hSS : S ⊆ S') (hTS : T ⊆ S') (hdis : Disjoint S T)
+    (f : ℬₛ(S)) (y : SAdeleRing F S') :
+    sAdelePrincipalValue F hTS (sAdeleSchwartzTransition F hSS f) (Multiplicative.ofAdd y) =
+      (if ∀ w : S', w.val ∉ S → (if w.val ∈ T then Valued.v (y.2 w) = 1
+          else y.2 w ∈ w.val.adicCompletionIntegers F) then 1 else 0) *
+        f (Multiplicative.ofAdd (y.1, fun w : S ↦ y.2 ⟨w.val, hSS w.property⟩)) := by
+  let ev₁ : ℬₛ(S') →ₗ[ℂ] ℂ :=
+    { toFun := fun k ↦ k (Multiplicative.ofAdd y)
+      map_add' := fun _ _ ↦ rfl
+      map_smul' := fun _ _ ↦ rfl }
+  let ev₂ : ℬₛ(S) →ₗ[ℂ] ℂ :=
+    { toFun := fun k ↦ k (Multiplicative.ofAdd (y.1, fun w : S ↦ y.2 ⟨w.val, hSS w.property⟩))
+      map_add' := fun _ _ ↦ rfl
+      map_smul' := fun _ _ ↦ rfl }
+  let Q : Prop := ∀ w : S', w.val ∉ S → (if w.val ∈ T then Valued.v (y.2 w) = 1
+          else y.2 w ∈ w.val.adicCompletionIntegers F)
+  let Λ₁ : ℬₛ(S) →ₗ[ℂ] ℂ := ev₁ ∘ₗ (sAdelePrincipalValue F hTS) ∘ₗ (sAdeleSchwartzTransition F hSS)
+  let Λ₂ : ℬₛ(S) →ₗ[ℂ] ℂ := (if Q then (1 : ℂ) else 0) • ev₂
+  refine sLocalCarvingLimit_eq_closedSpan_generator_mem_ind (sAdeleSchwartz_inductiveTensor_equiv F S).choose Λ₁ Λ₂ (fun a b ↦ ?_) f
+  let b'' : ∀ w : S', SchwartzBruhat (Multiplicative (w.val.adicCompletion F)) := fun w ↦
+    if h : w.val ∈ S then b ⟨w.val, h⟩ else finiteStandardGaussian w.val 1
+  have ht := sLocalCarvingLimit_eq_closedSpan_generator_mem_transition hSS a b
+  have hp := sAdelePrincipalValue_tmul hTS a b''
+  have hs := (sAdeleSchwartz_inductiveTensor_equiv F S').choose_spec a
+    (fun w ↦ if w.val ∈ T then finitePlacePrincipalValue w.val (b'' w) else b'' w) y
+  have h3 := (sAdeleSchwartz_inductiveTensor_equiv F S).choose_spec a b
+    (y.1, fun w : S ↦ y.2 ⟨w.val, hSS w.property⟩)
+  have key := sLocalCarvingLimit_eq_closedSpan_generator_mem_prod hSS
+    (fun w : S' ↦ (if w.val ∈ T then finitePlacePrincipalValue w.val (b'' w) else b'' w)
+      (Multiplicative.ofAdd (y.2 w)))
+    (fun w : S ↦ b w (Multiplicative.ofAdd (y.2 ⟨w.val, hSS w.property⟩)))
+    (fun w : S' ↦ if w.val ∈ T then Valued.v (y.2 w) = 1
+          else y.2 w ∈ w.val.adicCompletionIntegers F)
+    (fun w ↦ by
+      change (if w.val ∈ T then finitePlacePrincipalValue w.val (b'' ⟨w.val, hSS w.property⟩)
+        else b'' ⟨w.val, hSS w.property⟩) _ = _
+      rw [if_neg (Finset.disjoint_left.mp hdis w.property)]
+      change (if h : w.val ∈ S then b ⟨w.val, h⟩ else finiteStandardGaussian w.val 1) _ = _
+      rw [dif_pos w.property])
+    (fun w hw ↦ by
+      change (if w.val ∈ T then finitePlacePrincipalValue w.val (b'' w) else b'' w) _ = _
+      by_cases hT : w.val ∈ T
+      · rw [if_pos hT, if_pos hT]
+        change finitePlacePrincipalValue w.val
+          (if h : w.val ∈ S then b ⟨w.val, h⟩ else finiteStandardGaussian w.val 1) _ = _
+        rw [dif_neg hw]
+        rw [sLocalCarvingLimit_eq_closedSpan_generator_mem_pvGauss]
+        split_ifs <;> rfl
+      · rw [if_neg hT, if_neg hT]
+        change (if h : w.val ∈ S then b ⟨w.val, h⟩ else finiteStandardGaussian w.val 1) _ = _
+        rw [dif_neg hw]
+        exact sLocalCarvingLimit_eq_closedSpan_generator_mem_gauss w.val _)
+  refine (congrArg (fun k ↦ sAdelePrincipalValue F hTS k (Multiplicative.ofAdd y)) ht).trans ?_
+  refine (congrArg (fun k : ℬₛ(S') ↦ k (Multiplicative.ofAdd y)) hp).trans ?_
+  refine hs.trans ?_
+  refine (congrArg (HMul.hMul (a (Multiplicative.ofAdd y.1))) key).trans ?_
+  change _ = (if Q then (1 : ℂ) else 0) * (sAdeleSchwartz_inductiveTensor_equiv F S).choose
+    (a ⊗ₜ[ℂ] (⨂ₜ[ℂ] w, b w)) (Multiplicative.ofAdd (y.1, fun w : S ↦ y.2 ⟨w.val, hSS w.property⟩))
+  rw [h3]
+  split_ifs <;> ring
+
+/-- The global principal value at places outside `S` of the global inclusion of an S-local
+test is the test times the indicator of units at those places and integers off `S`. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_pv (S T : Finset V)
+    (hdis : Disjoint S T) (f : ℬₛ(S)) (x : AdeleRing (𝓞 F) F) :
+    adelePrincipalValue F T (sAdeleSchwartzToGlobal F S f) (Multiplicative.ofAdd x) =
+      if (∀ v ∈ T, Valued.v (x.2 v) = 1) ∧ (∀ v ∉ S, x.2 v ∈ v.adicCompletionIntegers F) then
+        f (Multiplicative.ofAdd (adeleProjection F S x)) else 0 := by
+  obtain ⟨S₂, h₂, hh₂⟩ := sAdeleSchwartzToGlobal_exhaustive F
+    (adelicStandardGaussian (F := F) (1 : PontryaginDual C𝔽))
+  have hS : S ⊆ S ∪ T ∪ S₂ := Finset.subset_union_left.trans Finset.subset_union_left
+  have hT : T ⊆ S ∪ T ∪ S₂ := Finset.subset_union_right.trans Finset.subset_union_left
+  have hS₂ : S₂ ⊆ S ∪ T ∪ S₂ := Finset.subset_union_right
+  have hk₂ : sAdeleSchwartzTransition F hS₂ h₂ (Multiplicative.ofAdd 0) ≠ 0 := by
+    have h2' : sAdeleSchwartzToGlobal F _ (sAdeleSchwartzTransition F hS₂ h₂) =
+        sAdeleSchwartzToGlobal F S₂ h₂ :=
+      LinearMap.congr_fun (sAdeleSchwartzToGlobal_comp F hS₂) h₂
+    rw [← adelePrincipalValue_mem_polarSubspace_toGlobal_zero, h2', hh₂,
+      adelicStandardGaussian_trivial_zero]
+    exact pow_ne_zero _ (inv_ne_zero (mul_ne_zero two_ne_zero
+      (Complex.ofReal_ne_zero.mpr Real.pi_ne_zero)))
+  have hk₀ : ((sAdeleSchwartzTransition F hS₂ h₂ (Multiplicative.ofAdd 0))⁻¹ •
+      sAdeleSchwartzTransition F hS₂ h₂) (Multiplicative.ofAdd 0) = 1 :=
+    inv_mul_cancel₀ hk₂
+  have hk : sAdeleSchwartzToGlobal F _ (sAdeleSchwartzTransition F hS f) =
+      sAdeleSchwartzToGlobal F S f :=
+    LinearMap.congr_fun (sAdeleSchwartzToGlobal_comp F hS) f
+  rw [← hk, adelePrincipalValue_mem_polarSubspace_toGlobal_comm hT _ hk₀,
+    sAdeleSchwartzToGlobal_apply,
+    sLocalCarvingLimit_eq_closedSpan_generator_mem_sPV hS hT hdis f]
+  have hiff : ((∀ w : V, w ∉ S ∪ T ∪ S₂ → x.2 w ∈ w.adicCompletionIntegers F) ∧
+      (∀ w : ↥(S ∪ T ∪ S₂), w.val ∉ S → (if w.val ∈ T then
+        Valued.v ((adeleProjection F (S ∪ T ∪ S₂) x).2 w) = 1 else
+        (adeleProjection F (S ∪ T ∪ S₂) x).2 w ∈ w.val.adicCompletionIntegers F))) ↔
+      ((∀ v ∈ T, Valued.v (x.2 v) = 1) ∧ (∀ v ∉ S, x.2 v ∈ v.adicCompletionIntegers F)) := by
+    constructor
+    · rintro ⟨hA, hQ⟩
+      have hTv : ∀ v (hv : v ∈ T), Valued.v (x.2 v) = 1 := fun v hv ↦ by
+        have h := hQ ⟨v, hT hv⟩ (Finset.disjoint_right.mp hdis hv)
+        rw [if_pos hv] at h
+        exact h
+      refine ⟨hTv, fun v hvS ↦ ?_⟩
+      by_cases hv : v ∈ S ∪ T ∪ S₂
+      · by_cases hvT : v ∈ T
+        · exact (hTv v hvT).le
+        · have h := hQ ⟨v, hv⟩ hvS
+          rw [if_neg hvT] at h
+          exact h
+      · exact hA v hv
+    · rintro ⟨hB, hC⟩
+      refine ⟨fun w hw ↦ hC w fun h ↦ hw (hS h), fun w hwS ↦ ?_⟩
+      by_cases hwT : w.val ∈ T
+      · rw [if_pos hwT]
+        exact hB w.val hwT
+      · rw [if_neg hwT]
+        exact hC w.val hwS
+  by_cases hB : (∀ v ∈ T, Valued.v (x.2 v) = 1) ∧
+      (∀ v ∉ S, x.2 v ∈ v.adicCompletionIntegers F)
+  · rw [if_pos (hiff.mpr hB).1, if_pos (hiff.mpr hB).2, if_pos hB, one_mul]
+    rfl
+  · rw [if_neg hB]
+    by_cases hA : ∀ w : V, w ∉ S ∪ T ∪ S₂ → x.2 w ∈ w.adicCompletionIntegers F
+    · have hQ : ¬ ∀ w : ↥(S ∪ T ∪ S₂), w.val ∉ S → (if w.val ∈ T then
+          Valued.v ((adeleProjection F (S ∪ T ∪ S₂) x).2 w) = 1 else
+          (adeleProjection F (S ∪ T ∪ S₂) x).2 w ∈ w.val.adicCompletionIntegers F) :=
+        fun hQ ↦ hB (hiff.mp ⟨hA, hQ⟩)
+      rw [if_pos hA, if_neg hQ, zero_mul]
+    · rw [if_neg hA]
+
+/-- Dominated convergence for series along a sequence. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_tsum {β G : Type*} [NormedAddCommGroup G] [CompleteSpace G]
+    {f : ℕ → β → G} {g : β → G} {bound : β → ℝ} (h_sum : Summable bound)
+    (hab : ∀ b, Tendsto (f · b) atTop (𝓝 (g b))) (h_bound : ∀ n b, ‖f n b‖ ≤ bound b) :
+    Tendsto (fun n ↦ ∑' b, f n b) atTop (𝓝 (∑' b, g b)) := by
+  have hg : ∀ b, ‖g b‖ ≤ bound b := fun b ↦ le_of_tendsto' (hab b).norm (h_bound · b)
+  have hd : ∀ n b, ‖f n b - g b‖ ≤ 2 * bound b := fun n b ↦
+    (norm_sub_le _ _).trans (by linarith [h_bound n b, hg b])
+  have hfs : ∀ n, Summable (f n) := fun n ↦ h_sum.of_norm_bounded (h_bound n)
+  have hgs : Summable g := h_sum.of_norm_bounded hg
+  have h2 : Summable (fun b ↦ 2 * bound b) := h_sum.mul_left 2
+  rw [Metric.tendsto_atTop]
+  intro ε hε
+  obtain ⟨T, hT⟩ : ∃ T : Finset β, ∑' b : ↥((T : Set β)ᶜ), 2 * bound b < ε / 2 := by
+    have h := tendsto_tsum_compl_atTop_zero (fun b ↦ 2 * bound b)
+    exact (h.eventually (gt_mem_nhds (half_pos hε))).exists
+  have hfin : Tendsto (fun n ↦ ∑ b ∈ T, (f n b - g b)) atTop (𝓝 0) := by
+    have := tendsto_finsetSum T fun b _ ↦ (hab b).sub_const (g b)
+    simpa using this
+  obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp hfin (ε / 2) (half_pos hε)
+  refine ⟨N, fun n hn ↦ ?_⟩
+  have hds : Summable (fun b ↦ f n b - g b) := (hfs n).sub hgs
+  rw [dist_eq_norm, ← (hfs n).tsum_sub hgs, ← hds.sum_add_tsum_compl (s := T)]
+  have e1 := hN n hn
+  rw [dist_zero_right] at e1
+  have e2 : ‖∑' b : ↥((T : Set β)ᶜ), (f n b - g b)‖ ≤ ∑' b : ↥((T : Set β)ᶜ), 2 * bound b :=
+    tsum_of_norm_bounded (h2.subtype _).hasSum fun b ↦ hd n b
+  calc _ ≤ _ := norm_add_le _ _
+    _ < ε / 2 + ε / 2 := add_lt_add_of_lt_of_le e1 (e2.trans hT.le)
+    _ = ε := add_halves ε
+
+/-- An idele is a unit at all but finitely many finite places. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_finite (x : I𝔽) :
+    {v : V | Valued.v (x.val.2 v) ≠ 1}.Finite := by
+  refine Filter.eventually_cofinite.mp ?_
+  filter_upwards [x.val.2.2, x.inv.2.2] with v hv1 hv2
+  have h1 : x.val.2 v * x.inv.2 v = 1 :=
+    congrArg (fun y : AdeleRing (𝓞 F) F ↦ y.2 v) x.val_inv
+  have hm := congrArg Valued.v h1
+  rw [map_mul, map_one] at hm
+  have hv1' : Valued.v (x.val.2 v) ≤ 1 := hv1
+  have hv2' : Valued.v (x.inv.2 v) ≤ 1 := hv2
+  exact le_antisymm hv1' (calc
+    (1 : WithZero (Multiplicative ℤ)) = Valued.v (x.val.2 v) * Valued.v (x.inv.2 v) := hm.symm
+    _ ≤ Valued.v (x.val.2 v) * 1 := mul_le_mul_right hv2' _
+    _ = Valued.v (x.val.2 v) := mul_one _)
+
+/-- Along a cofinal sequence, the thetas of the principal values of the global inclusion of
+an S-local test converge pointwise to the raw S-local theta generator. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_theta {S : Finset V}
+    (f : ℬₛ(S)) (A : ℕ → SLocalCarvingIndex (F := F) S) (hA : IsSLocalCarvingCofinal A)
+    (x : I𝔽) :
+    Tendsto (fun k ↦ adelicTheta (adelePrincipalValue F (A k).val
+        (sAdeleSchwartzToGlobal F S f)) (classOf x))
+      atTop (𝓝 (sLocalCarvingTheta S f (classOf x))) := by
+  obtain ⟨hmono, hcof⟩ := (isSLocalCarvingCofinal_iff A).1 hA
+  rw [sLocalCarvingTheta_classOf]
+  unfold ideleThetaSum
+  have hsum : Summable (fun ξ : Fˣ ↦ ‖sAdeleSchwartzToGlobal F S f
+      (Multiplicative.ofAdd (algebraMap F (AdeleRing (𝓞 F) F) (ξ : F) * x.val))‖) := by
+    have h := (adelicAverage_summableUniformlyOn (F := F) (sAdeleSchwartzToGlobal F S f) {(x, 0)}
+      isCompact_singleton).summable (Set.mem_singleton (x, (0 : AdeleRing (𝓞 F) F)))
+    refine h.congr fun ξ ↦ ?_
+    change ‖sAdeleSchwartzToGlobal F S f (Multiplicative.ofAdd
+      (x.val * (algebraMap F (AdeleRing (𝓞 F) F) (ξ : F) + 0)))‖ = _
+    rw [add_zero, mul_comm]
+  have hfun : ∀ k, adelicTheta (adelePrincipalValue F (A k).val
+      (sAdeleSchwartzToGlobal F S f)) (classOf x) = ∑' ξ : Fˣ, adelePrincipalValue F (A k).val
+        (sAdeleSchwartzToGlobal F S f)
+        (Multiplicative.ofAdd (algebraMap F (AdeleRing (𝓞 F) F) (ξ : F) * x.val)) :=
+    fun k ↦ adelicTheta_mk _ x
+  simp_rw [hfun]
+  refine sLocalCarvingLimit_eq_closedSpan_generator_mem_tsum hsum (fun ξ ↦ ?_)
+    (fun k ξ ↦ ?_)
+  · let z : I𝔽 := IdeleGroup.unitEmbedding (𝓞 F) F ξ * x
+    have hz : z.val = algebraMap F (AdeleRing (𝓞 F) F) (ξ : F) * x.val := rfl
+    let B : Finset V := (sLocalCarvingLimit_eq_closedSpan_generator_mem_finite z).toFinset \ S
+    obtain ⟨k₀, hk₀⟩ := hcof ⟨B, Finset.disjoint_sdiff⟩
+    refine tendsto_const_nhds.congr' ?_
+    filter_upwards [eventually_ge_atTop k₀] with k hk
+    have hB : B ⊆ (A k).val := hk₀.trans (hmono hk)
+    rw [sLocalCarvingLimit_eq_closedSpan_generator_mem_pv S (A k).val (A k).2, ← hz]
+    unfold sLocalCarvingIdeleTest
+    by_cases hc : ∀ v ∉ S, Valued.v (z.val.2 v) = 1
+    · rw [Set.indicator_of_mem (show z ∈ {g : I𝔽 | ∀ v ∉ S, Valued.v (g.val.2 v) = 1} from hc),
+        if_pos ⟨fun v hv ↦ hc v (Finset.disjoint_right.mp (A k).2 hv),
+          fun v hv ↦ (hc v hv).le⟩]
+    · rw [Set.indicator_of_notMem (show z ∉ {g : I𝔽 | ∀ v ∉ S, Valued.v (g.val.2 v) = 1} from hc),
+        if_neg]
+      rintro ⟨h1, -⟩
+      refine hc fun v hvS ↦ ?_
+      by_contra hne
+      exact hne (h1 v (hB (Finset.mem_sdiff.mpr ⟨(Set.Finite.mem_toFinset _).mpr hne, hvS⟩)))
+  · rw [sLocalCarvingLimit_eq_closedSpan_generator_mem_pv S (A k).val (A k).2,
+      sAdeleSchwartzToGlobal_apply]
+    split_ifs with h1 h2
+    · exact le_rfl
+    · exact absurd h1.2 h2
+    · rw [norm_zero]
+      exact norm_nonneg _
+    · rw [norm_zero]
+
+open scoped ENNReal in
+/-- Dominated convergence in L² along a sequence, from pointwise convergence of representatives
+dominated by a fixed square-integrable function. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_dominated {X : Type*} [MeasurableSpace X] (ν : Measure X)
+    (u : ℕ → Lp ℂ 2 ν) (u₀ : Lp ℂ 2 ν) (a : ℕ → X → ℂ) (a₀ : X → ℂ) (Φ : X → ℝ)
+    (hΦ : MemLp Φ 2 ν) (hu : ∀ k, (u k : X → ℂ) =ᵐ[ν] a k) (hu₀ : (u₀ : X → ℂ) =ᵐ[ν] a₀)
+    (hb : ∀ k x, ‖a k x‖ ≤ Φ x)
+    (hlim : ∀ x, Tendsto (fun k ↦ a k x) atTop (𝓝 (a₀ x))) :
+    Tendsto u atTop (𝓝 u₀) := by
+  rw [Lp.tendsto_Lp_iff_tendsto_eLpNorm']
+  have hb₀ : ∀ x, ‖a₀ x‖ ≤ Φ x := fun x ↦
+    le_of_tendsto' (hlim x).norm fun k ↦ hb k x
+  have heq : ∀ k, eLpNorm (⇑(u k) - ⇑u₀) 2 ν = eLpNorm (a k - a₀) 2 ν := fun k ↦
+    eLpNorm_congr_ae ((hu k).sub hu₀)
+  simp_rw [heq]
+  have hmeas : ∀ k, AEStronglyMeasurable (a k - a₀) ν := fun k ↦
+    ((Lp.aestronglyMeasurable (u k)).congr (hu k)).sub
+      ((Lp.aestronglyMeasurable u₀).congr hu₀)
+  have h2 : (2 : ℝ≥0∞) ≠ 0 := two_ne_zero
+  have h2' : (2 : ℝ≥0∞) ≠ ∞ := ENNReal.ofNat_ne_top
+  have hrw : ∀ k, eLpNorm (a k - a₀) 2 ν =
+      (∫⁻ x, ‖(a k - a₀) x‖ₑ ^ (2 : ℝ≥0∞).toReal ∂ν) ^ (1 / (2 : ℝ≥0∞).toReal) := fun k ↦
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal h2 h2' (hmeas k)
+  simp_rw [hrw]
+  have hint : ∫⁻ x, (‖(2 : ℝ) * Φ x‖ₑ) ^ (2 : ℝ≥0∞).toReal ∂ν ≠ ∞ := by
+    have h := (hΦ.const_mul (2 : ℝ)).eLpNorm_lt_top
+    rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal h2 h2' (hΦ.aestronglyMeasurable.const_mul (2 : ℝ))] at h
+    have h' := ENNReal.rpow_lt_top_of_nonneg (by norm_num : (0 : ℝ) ≤ 2) h.ne
+    rw [← ENNReal.rpow_mul] at h'
+    simpa using h'.ne
+  have hlin : Tendsto (fun k ↦ ∫⁻ x, ‖(a k - a₀) x‖ₑ ^ (2 : ℝ≥0∞).toReal ∂ν) atTop (𝓝 0) := by
+    have := tendsto_lintegral_of_dominated_convergence'
+      (F := fun k x ↦ ‖(a k - a₀) x‖ₑ ^ (2 : ℝ≥0∞).toReal)
+      (f := fun _ ↦ 0) (fun x ↦ (‖(2 : ℝ) * Φ x‖ₑ) ^ (2 : ℝ≥0∞).toReal)
+      (fun k ↦ ((hmeas k).eNorm.pow_const _)) (fun k ↦ ae_of_all _ fun x ↦ ?_) hint
+      (ae_of_all _ fun x ↦ ?_)
+    · simpa using this
+    · refine ENNReal.rpow_le_rpow ?_ (by norm_num)
+      rw [Pi.sub_apply]
+      refine eNorm_le_iff_norm_le.mpr ((norm_sub_le _ _).trans ?_)
+      rw [Real.norm_eq_abs, abs_of_nonneg (by linarith [norm_nonneg (a k x), hb k x])]
+      linarith [hb k x, hb₀ x]
+    · have h := ((hlim x).sub_const (a₀ x)).eNorm
+      simp only [sub_self, eNorm_zero] at h
+      have h' := (ENNReal.continuous_rpow_const (y := (2 : ℝ≥0∞).toReal)).tendsto 0
+      simpa [ENNReal.zero_rpow_of_pos, Function.comp_def] using h'.comp h
+  have hr := (ENNReal.continuous_rpow_const (y := 1 / (2 : ℝ≥0∞).toReal)).tendsto 0
+  simpa [ENNReal.zero_rpow_of_pos, Function.comp_def] using hr.comp hlin
+
+/-- The principal values of the global inclusion are dominated by the global inclusion. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_le {S T : Finset V}
+    (hdis : Disjoint S T) (f : ℬₛ(S)) (y : AdeleRing (𝓞 F) F) :
+    ‖adelePrincipalValue F T (sAdeleSchwartzToGlobal F S f) (Multiplicative.ofAdd y)‖ ≤
+      ‖sAdeleSchwartzToGlobal F S f (Multiplicative.ofAdd y)‖ := by
+  rw [sLocalCarvingLimit_eq_closedSpan_generator_mem_pv S T hdis, sAdeleSchwartzToGlobal_apply]
+  split_ifs with h1 h2
+  · exact le_rfl
+  · exact absurd h1.2 h2
+  · rw [norm_zero]
+    exact norm_nonneg _
+  · rw [norm_zero]
+
+/-- The thetas of the principal values of the global inclusion of an S-local test are bounded
+uniformly in the principal-value places, by an inverse power of the norm above any positive
+norm. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_bound {S : Finset V}
+    (f : ℬₛ(S)) (a : ℝ) (ha : 0 < a) (N : ℕ) :
+    ∃ C D : ℝ, 0 ≤ C ∧ 0 ≤ D ∧ ∀ T : Finset V, Disjoint S T → ∀ c : C𝔽,
+      ‖adelicTheta (adelePrincipalValue F T (sAdeleSchwartzToGlobal F S f)) c‖ ≤
+        C * (((ideleClassNorm F c).val : ℝ) ^ N)⁻¹ + C * ((ideleClassNorm F c).val : ℝ)⁻¹ ∧
+      (a ≤ ((ideleClassNorm F c).val : ℝ) →
+        ‖adelicTheta (adelePrincipalValue F T (sAdeleSchwartzToGlobal F S f)) c‖ ≤
+          D * (((ideleClassNorm F c).val : ℝ) ^ N)⁻¹) := by
+  obtain ⟨K₁, hK₁, h₁⟩ := adelicTheta_normSum_decay_large (sAdeleSchwartzToGlobal F S f) N
+  obtain ⟨K₂, hK₂, h₂⟩ := adelicTheta_normSum_le_small (sAdeleSchwartzToGlobal F S f)
+  refine ⟨K₁ + K₂, K₁ + K₂ * a⁻¹, by positivity, by positivity, fun T hT c ↦ ?_⟩
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective (IdeleGroup.principalSubgroup (𝓞 F) F) c
+  have htx : ((ideleClassNorm F (classOf x)).val : ℝ) = ((ideleNorm F x : ℝ≥0) : ℝ) := rfl
+  rw [htx]
+  set t : ℝ := ((ideleNorm F x : ℝ≥0) : ℝ) with ht
+  have hpos : 0 < t := NNReal.coe_pos.mpr (Units.zero_lt _)
+  have hsum : Summable (fun ξ : Fˣ ↦ ‖sAdeleSchwartzToGlobal F S f
+      (Multiplicative.ofAdd (x.val * algebraMap F (AdeleRing (𝓞 F) F) (ξ : F)))‖) := by
+    have h := (adelicAverage_summableUniformlyOn (F := F) (sAdeleSchwartzToGlobal F S f) {(x, 0)}
+      isCompact_singleton).summable (Set.mem_singleton (x, (0 : AdeleRing (𝓞 F) F)))
+    refine h.congr fun ξ ↦ ?_
+    change ‖sAdeleSchwartzToGlobal F S f (Multiplicative.ofAdd
+      (x.val * (algebraMap F (AdeleRing (𝓞 F) F) (ξ : F) + 0)))‖ = _
+    rw [add_zero]
+  have hsig : ‖adelicTheta (adelePrincipalValue F T (sAdeleSchwartzToGlobal F S f)) (classOf x)‖ ≤
+      ∑' ξ : Fˣ, ‖sAdeleSchwartzToGlobal F S f
+        (Multiplicative.ofAdd (x.val * algebraMap F (AdeleRing (𝓞 F) F) (ξ : F)))‖ := by
+    refine (congrArg norm (adelicTheta_mk _ x)).trans_le ?_
+    refine tsum_of_norm_bounded hsum.hasSum fun ξ ↦ ?_
+    rw [mul_comm (algebraMap F (AdeleRing (𝓞 F) F) (ξ : F))]
+    exact sLocalCarvingLimit_eq_closedSpan_generator_mem_le hT f _
+  have hu : 0 ≤ (t ^ N)⁻¹ := inv_nonneg.mpr (pow_pos hpos N).le
+  have hw : 0 ≤ t⁻¹ := inv_nonneg.mpr hpos.le
+  have hai : 0 ≤ a⁻¹ := inv_nonneg.mpr ha.le
+  have e1 := mul_nonneg hK₂.le hu
+  have e2 := mul_nonneg hK₁.le hw
+  have e3 := mul_nonneg hK₂.le hw
+  have e4 := mul_nonneg (mul_nonneg hK₂.le hai) hu
+  have e5 := mul_nonneg hK₁.le hu
+  refine ⟨?_, fun hat ↦ ?_⟩
+  · rcases le_total 1 t with h | h
+    · have := hsig.trans (h₁ x h)
+      nlinarith
+    · have := hsig.trans (h₂ x h)
+      nlinarith
+  · rcases le_total 1 t with h | h
+    · have := hsig.trans (h₁ x h)
+      nlinarith
+    · have hb := hsig.trans (h₂ x h)
+      have hti : t⁻¹ ≤ a⁻¹ := inv_anti₀ ha hat
+      have hu1 : 1 ≤ (t ^ N)⁻¹ := (one_le_inv₀ (pow_pos hpos N)).mpr (pow_le_one₀ hpos.le h)
+      have f1 : K₂ * t⁻¹ ≤ K₂ * a⁻¹ := mul_le_mul_of_nonneg_left hti hK₂.le
+      have f2 : K₂ * a⁻¹ ≤ K₂ * a⁻¹ * (t ^ N)⁻¹ :=
+        le_mul_of_one_le_right (mul_nonneg hK₂.le hai) hu1
+      nlinarith
+
+/-- A cutoff norm-one average of a function decaying above the cutoff is bounded by a decaying
+exponential in the logarithm of the norm. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_pointwise (ω : PontryaginDual C₁)
+    (J : Set ℝ) (Θ : C𝔽 → ℂ) (a D : ℝ) (ha : 0 < a) (hD0 : 0 ≤ D) (k : ℕ)
+    (hJ : ∀ x ∈ J, a ≤ x)
+    (hD : ∀ g : C𝔽, a ≤ ((ideleClassNorm F g).val : ℝ) →
+      ‖Θ g‖ ≤ D * (((ideleClassNorm F g).val : ℝ) ^ k)⁻¹)
+    (g : C𝔽) :
+    ‖(norm𝔽 ⁻¹' J).indicator (fun g ↦ ∫ h : C₁, Θ (h.val * g) * (ω h : ℂ) ∂μ₁) g‖ ≤
+      (Ici (Real.log a)).indicator
+        (fun x ↦ (μ₁).real univ * D * Real.exp (-(k : ℝ) * x))
+        (Real.log ((ideleClassNorm F g).val : ℝ)) := by
+  have : CompactSpace C₁ := (ideleClassGroup_finiteness F).2.1
+  have : (μ₁).IsHaarMeasure :=
+    (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.1
+  by_cases hg : g ∈ (fun g : C𝔽 ↦ ((ideleClassNorm F g).val : ℝ)) ⁻¹' J
+  · have hag : a ≤ ((ideleClassNorm F g).val : ℝ) := hJ _ hg
+    have hpos : 0 < ((ideleClassNorm F g).val : ℝ) := NNReal.coe_pos.mpr (Units.zero_lt _)
+    have hlog : Real.log ((ideleClassNorm F g).val : ℝ) ∈ Ici (Real.log a) :=
+      Real.log_le_log ha hag
+    rw [Set.indicator_of_mem hg, Set.indicator_of_mem hlog]
+    have hexp : Real.exp (-(k : ℝ) * Real.log ((ideleClassNorm F g).val : ℝ)) =
+        (((ideleClassNorm F g).val : ℝ) ^ k)⁻¹ := by
+      rw [neg_mul, Real.exp_neg, ← Real.log_pow, Real.exp_log (pow_pos hpos k)]
+    rw [hexp]
+    have hb : ∀ h : C₁, ‖Θ (h.val * g) * (ω h : ℂ)‖ ≤
+        D * (((ideleClassNorm F g).val : ℝ) ^ k)⁻¹ := by
+      intro h
+      have hN : ideleClassNorm F (h.val * g) = ideleClassNorm F g := by
+        rw [map_mul, MonoidHom.mem_ker.mp h.property, one_mul]
+      rw [norm_mul, Circle.norm_coe, mul_one]
+      have h1 := hD (h.val * g) (by rw [hN]; exact hag)
+      rwa [hN] at h1
+    calc ‖∫ h : C₁, Θ (h.val * g) * (ω h : ℂ) ∂μ₁‖
+        ≤ D * (((ideleClassNorm F g).val : ℝ) ^ k)⁻¹ * (μ₁).real univ :=
+          norm_integral_le_of_norm_le_const (.of_forall hb)
+      _ = _ := by ring
+  · rw [Set.indicator_of_notMem hg, norm_zero]
+    exact Set.indicator_nonneg (fun x _ ↦
+      mul_nonneg (mul_nonneg measureReal_nonneg hD0) (Real.exp_pos _).le) _
+
+/-- A decaying exponential in the logarithm of the norm above a positive norm is square
+integrable for the zero-line weight once the decay rate beats the Sobolev degree. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_memLp (s : ℝ)
+    (hs : DegreeBound(s)) (Λ D : ℝ) :
+    MemLp (fun g : C𝔽 ↦ (Ici (Real.log Λ⁻¹)).indicator
+      (fun x ↦ (μ₁).real univ * D * Real.exp (-((⌈s⌉₊ + 1 : ℕ) : ℝ) * x))
+      (Real.log ((ideleClassNorm F g).val : ℝ))) 2 (ν(s)) := by
+  have hs0 : 0 ≤ s := (mul_nonneg zero_le_two (Nat.cast_nonneg _)).trans hs
+  have hks : s + 1 ≤ 2 * ((⌈s⌉₊ + 1 : ℕ) : ℝ) := by
+    have := Nat.le_ceil s
+    push_cast
+    linarith
+  let r : ℝ → ℝ := (Ici (Real.log Λ⁻¹)).indicator
+    (fun x ↦ (μ₁).real univ * D * Real.exp (-((⌈s⌉₊ + 1 : ℕ) : ℝ) * x))
+  have hL : Continuous (fun g : C𝔽 ↦ Real.log ((ideleClassNorm F g).val : ℝ)) :=
+    Real.continuousOn_log.comp_continuous
+      (NNReal.continuous_coe.comp (Units.continuous_val.comp (m𝔽).continuous))
+      fun _ ↦ (NNReal.coe_pos.mpr (Units.zero_lt _)).ne'
+  have hr : Measurable r := Measurable.indicator (by fun_prop) measurableSet_Ici
+  have hRmeas : AEStronglyMeasurable (fun g : C𝔽 ↦ r (Real.log ((ideleClassNorm F g).val : ℝ)))
+      (ν(s)) := (hr.comp hL.measurable).aestronglyMeasurable
+  have : CompactSpace C₁ := (ideleClassGroup_finiteness F).2.1
+  have : (μ₁).IsHaarMeasure :=
+    (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.1
+  change MemLp (fun g : C𝔽 ↦ r (Real.log ((ideleClassNorm F g).val : ℝ))) 2 (ν(s))
+  rw [memLp_two_iff_integrable_sq_norm hRmeas]
+  have hwc : Continuous (intervalSobolevDensity 0 0 s) := by
+    unfold intervalSobolevDensity
+    refine Continuous.mul (by fun_prop) (Continuous.rpow_const (by fun_prop) fun t ↦ Or.inl ?_)
+    positivity
+  refine (integrable_withDensity_iff_integrable_smul'
+    (f := fun g : C𝔽 ↦ ENNReal.ofReal
+      (intervalSobolevDensity 0 0 s (Real.log ((ideleClassNorm F g).val : ℝ))))
+    (ENNReal.measurable_ofReal.comp (hwc.comp hL).measurable)
+    (ae_of_all _ fun _ ↦ ENNReal.ofReal_lt_top)).mpr ?_
+  have hreal := memLp_sLocalCarvingGenerator_integrable_real s (Real.log Λ⁻¹)
+    ((μ₁).real univ * D) (⌈s⌉₊ + 1) hs0 hks
+  change Integrable ((fun x : ℝ ↦ (ENNReal.ofReal (intervalSobolevDensity 0 0 s x)).toReal •
+    ‖r x‖ ^ 2) ∘ (fun g : C𝔽 ↦ Real.log ((ideleClassNorm F g).val : ℝ))) μ𝔽
+  rw [ideleClassTamagawaMeasure_eq_smul_canonical]
+  refine Integrable.smul_measure ?_ (measure_ne_top _ _)
+  exact (memLp_sLocalCarvingGenerator_measurePreserving.integrable_comp
+    hreal.aestronglyMeasurable).mpr hreal
+
+/-- The global inclusion of an S-local test with both vanishing conditions has both
+vanishing conditions. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_polar (S : Finset V)
+    (f : ℬₛ(S)) (hf : f (Multiplicative.ofAdd 0) = 0)
+    (hFf : sAdeleSchwartzFourier f (Multiplicative.ofAdd 0) = 0) :
+    sAdeleSchwartzToGlobal F S f ∈ adelePolarSubspace F := by
+  obtain ⟨M, hM⟩ := adelePrincipalValue_mem_polarSubspace_toGlobal_integral (F := F) S
+  rw [mem_adelePolarSubspace]
+  refine ⟨(adelePrincipalValue_mem_polarSubspace_toGlobal_zero S f).trans hf, ?_⟩
+  rw [(adeleSchwartzFourier_apply_zero _).2, hM f, ← sAdeleSchwartzFourier_apply_zero, hFf,
+    mul_zero]
+
+/-- Paper: Proposition 11.1.1.2, p. 476, applied as in the proof of Theorem 11.1.2.1(3),
+pp. 482-483. Along a cofinal sequence, the cutoff homogeneous thetas of the principal values
+of the global inclusion of an S-local test converge to the projected S-local generator. -/
+private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem_tendsto {S : Finset V}
+    (χ : PontryaginDual C𝔽) (hχ : Unramified(χ, S)) (hPic : TrivialPic((S : Set V)))
+    (s : ℝ) (hs : DegreeBound(s)) (twoSided : Bool) (Λ : ℝ) (hΛ : 0 < Λ)
+    (f : ℬₛ(S)) (hf : f (Multiplicative.ofAdd 0) = 0)
+    (hFf : sAdeleSchwartzFourier f (Multiplicative.ofAdd 0) = 0)
+    (A : ℕ → SLocalCarvingIndex (F := F) S) (hA : IsSLocalCarvingCofinal A) (g : ℬ₀)
+    (hg : g.val = sAdeleSchwartzToGlobal F S f) :
+    Tendsto (fun k ↦ M(s, J(twoSided, Λ), hJ(twoSided, Λ)) (θ(s, ωOf(χ), P((A k).val, g))))
+      atTop (𝓝 ((memLp_sLocalCarvingGenerator χ hχ hPic s hs twoSided Λ hΛ f hf hFf).toLp
+        (sLocalCarvingGenerator S (ωOf(χ)) (J(twoSided, Λ)) f))) := by
+  obtain ⟨g₀, hg₀⟩ := g
+  change g₀ = _ at hg
+  subst hg
+  have ha : 0 < Λ⁻¹ := inv_pos.mpr hΛ
+  have hJ : ∀ x ∈ J(twoSided, Λ), Λ⁻¹ ≤ x := by
+    intro x hx
+    unfold sLocalCarvingBand at hx
+    split_ifs at hx
+    · exact hx.1
+    · exact hx
+  obtain ⟨C, D, hC, hD0, hb⟩ :=
+    sLocalCarvingLimit_eq_closedSpan_generator_mem_bound f Λ⁻¹ ha (⌈s⌉₊ + 1)
+  have : CompactSpace C₁ := (ideleClassGroup_finiteness F).2.1
+  have : (μ₁).IsHaarMeasure :=
+    (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.1
+  let Θ : ℕ → C𝔽 → ℂ := fun k ↦ adelicTheta (adelePrincipalValue F (A k).val
+    (sAdeleSchwartzToGlobal F S f))
+  let a : ℕ → C𝔽 → ℂ := fun k ↦ (norm𝔽 ⁻¹' J(twoSided, Λ)).indicator
+    (fun g ↦ ∫ h : C₁, Θ k (h.val * g) * ((ωOf(χ)) h : ℂ) ∂μ₁)
+  refine sLocalCarvingLimit_eq_closedSpan_generator_mem_dominated (ν(s)) _ _ a
+    (sLocalCarvingGenerator S (ωOf(χ)) (J(twoSided, Λ)) f) _
+    (sLocalCarvingLimit_eq_closedSpan_generator_mem_memLp s hs Λ D) (fun k ↦ ?_)
+    (MemLp.coeFn_toLp _) (fun k g ↦ ?_) (fun g ↦ ?_)
+  · refine (modulatedAbsoluteCutoffOperator_apply m𝔽 (ν(s)) _ _ _).trans ?_
+    have h2 := MemLp.coeFn_toLp (memLp_homogeneousTheta_zeroLine s (ωOf(χ))
+      P((A k).val, (⟨sAdeleSchwartzToGlobal F S f, hg₀⟩ : ℬ₀)))
+    filter_upwards [h2] with x hx2
+    rw [hx2]
+    unfold modulatedAbsoluteCutoff
+    simp only [a]
+    by_cases hx : x ∈ norm𝔽 ⁻¹' J(twoSided, Λ)
+    · rw [Set.indicator_of_mem (s := (fun x : C𝔽 ↦ ((m𝔽 x).val : ℝ)) ⁻¹' J(twoSided, Λ)) hx,
+        Set.indicator_of_mem (s := norm𝔽 ⁻¹' J(twoSided, Λ)) hx, Pi.one_apply,
+        Complex.ofReal_one, one_mul]
+      rfl
+    · rw [Set.indicator_of_notMem (s := (fun x : C𝔽 ↦ ((m𝔽 x).val : ℝ)) ⁻¹' J(twoSided, Λ)) hx,
+        Set.indicator_of_notMem (s := norm𝔽 ⁻¹' J(twoSided, Λ)) hx, Complex.ofReal_zero,
+        zero_mul]
+  · exact (sLocalCarvingLimit_eq_closedSpan_generator_mem_pointwise (ωOf(χ)) (J(twoSided, Λ))
+      (Θ k) Λ⁻¹ D ha hD0 (⌈s⌉₊ + 1) hJ (fun c hc ↦ ((hb (A k).val (A k).2 c).2 hc)) g)
+  · unfold sLocalCarvingGenerator
+    by_cases hx : g ∈ norm𝔽 ⁻¹' J(twoSided, Λ)
+    · simp only [a, Set.indicator_of_mem hx]
+      have hN : ∀ h : C₁, ideleClassNorm F (h.val * g) = ideleClassNorm F g := fun h ↦ by
+        rw [map_mul, MonoidHom.mem_ker.mp h.property, one_mul]
+      refine tendsto_integral_of_dominated_convergence
+        (fun _ ↦ C * (((ideleClassNorm F g).val : ℝ) ^ (⌈s⌉₊ + 1))⁻¹ +
+          C * ((ideleClassNorm F g).val : ℝ)⁻¹) (fun k ↦ ?_) (integrable_const _)
+        (fun k ↦ ae_of_all _ fun h ↦ ?_) (ae_of_all _ fun h ↦ ?_)
+      · exact (((adelicTheta (adelePrincipalValue F (A k).val
+          (sAdeleSchwartzToGlobal F S f))).continuous.comp (continuous_subtype_val.mul continuous_const)).mul
+          (by fun_prop)).aestronglyMeasurable
+      · rw [norm_mul, Circle.norm_coe, mul_one]
+        have h1 := (hb (A k).val (A k).2 (h.val * g)).1
+        rwa [hN] at h1
+      · have ht := sLocalCarvingLimit_eq_closedSpan_generator_mem_theta f A hA (h.val * g).out
+        have hq : classOf (h.val * g).out = h.val * g := QuotientGroup.out_eq' _
+        rw [hq] at ht
+        exact ht.mul_const _
+    · simp only [a, Set.indicator_of_notMem hx]
+      exact tendsto_const_nhds
+
 -- TODO(paper-gap): Page 483 uses R_{Λ,S} without defining it. Both spans in
 -- the quotient already have Fourier value zero. The argument still needs to
 -- approximate every vector of the intersection by projected local generators.
@@ -2381,7 +3038,20 @@ private theorem sLocalCarvingLimit_eq_closedSpan_generator_mem {S : Finset V}
     (memLp_sLocalCarvingGenerator χ hχ hPic s hs twoSided Λ hΛ f hf hFf).toLp
         (sLocalCarvingGenerator S (ωOf(χ)) (J(twoSided, Λ)) f) ∈
       sLocalCutoffCarving s (ωOf(χ)) i.val (J(twoSided, Λ)) (hJ(twoSided, Λ)) := by
-  sorry
+  obtain ⟨A, hA⟩ := exists_sLocalCarvingCofinal (F := F) S
+  obtain ⟨hmono, hcof⟩ := (isSLocalCarvingCofinal_iff A).1 hA
+  obtain ⟨k₀, hk₀⟩ := hcof i
+  let g : ℬ₀ := ⟨sAdeleSchwartzToGlobal F S f,
+    sLocalCarvingLimit_eq_closedSpan_generator_mem_polar S f hf hFf⟩
+  have ht := sLocalCarvingLimit_eq_closedSpan_generator_mem_tendsto χ hχ hPic s hs twoSided Λ hΛ
+    f hf hFf A hA g rfl
+  refine (Submodule.isClosed_topologicalClosure _).mem_of_tendsto ht ?_
+  filter_upwards [eventually_ge_atTop k₀] with k hk
+  have hmem : M(s, J(twoSided, Λ), hJ(twoSided, Λ)) (θ(s, ωOf(χ), P((A k).val, g))) ∈
+      sLocalCutoffCarving s (ωOf(χ)) (A k).val (J(twoSided, Λ)) (hJ(twoSided, Λ)) :=
+    Submodule.le_topologicalClosure _ (Submodule.subset_span ⟨g, rfl⟩)
+  exact sLocalCutoffCarving_antitone s (ωOf(χ)) (J(twoSided, Λ)) (hJ(twoSided, Λ))
+    (hk₀.trans (hmono hk)) hmem
 
 /-- Paper: Theorem 11.1.2.1(3), pp. 482-483. The closed span of the projected
 generators is contained in the cofinal limit, which is closed and contains each of
