@@ -116,6 +116,197 @@ def Printed.sLocalCechRadialReflection : Prop :=
       ∀ (t : ℝ≥0ˣ) (k : (sIdeleQuotientNorm F S).ker),
         j.val.val (τ t * k.val) = normℂ(t)⁻¹ * f.val.val (τ t⁻¹ * k.val)
 
+/-- Exponential decay with a smooth cutoff on the left is a Schwartz bound. -/
+private theorem sLocalCechRadialReflection_false_decay (δ : ℝ) (hδ : 0 < δ) (k n : ℕ) :
+    ∃ C, ∀ x : ℝ, ‖x‖ ^ k * ‖iteratedFDeriv ℝ n
+      (fun x : ℝ ↦ ((Real.exp (-δ * x) * Real.smoothTransition x : ℝ) : ℂ)) x‖ ≤ C := by
+  let h : ℝ → ℝ := fun x ↦ Real.exp (-δ * x) * Real.smoothTransition x
+  have hh : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) h :=
+    (Real.contDiff_exp.comp (contDiff_const.mul contDiff_id)).mul (Real.smoothTransition.contDiff (n := ⊤))
+  let g : ℝ → ℂ := Complex.ofRealLI ∘ h
+  have hg : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) g := Complex.ofRealLI.contDiff.comp hh
+  have key (x : ℝ) : ‖iteratedFDeriv ℝ n g x‖ = |iteratedDeriv n h x| := by
+    rw [LinearIsometry.norm_iteratedFDeriv_comp_left _ hh.contDiffAt (by exact_mod_cast le_top),
+      norm_iteratedFDeriv_eq_norm_iteratedDeriv, Real.norm_eq_abs]
+  obtain ⟨M, hM⟩ := (isCompact_Icc (a := (0 : ℝ)) (b := 1)).exists_bound_of_continuousOn
+    (f := fun x : ℝ ↦ ‖x‖ ^ k * ‖iteratedFDeriv ℝ n g x‖)
+    (((continuous_norm.pow k).mul (hg.continuous_iteratedFDeriv
+      (by exact_mod_cast le_top)).norm).continuousOn)
+  have hB : 0 ≤ δ ^ n * (k.factorial / δ ^ k) := by positivity
+  refine ⟨max M (δ ^ n * (k.factorial / δ ^ k)), fun x ↦ ?_⟩
+  change ‖x‖ ^ k * ‖iteratedFDeriv ℝ n g x‖ ≤ _
+  rcases lt_or_ge x 0 with hx | hx
+  · have he : h =ᶠ[nhds x] fun _ ↦ 0 := by
+      filter_upwards [Iio_mem_nhds hx] with y hy
+      simp [h, Real.smoothTransition.zero_of_nonpos (le_of_lt hy)]
+    rw [key, he.iteratedDeriv_eq]
+    have h0 : iteratedDeriv n (fun _ : ℝ ↦ (0 : ℝ)) x = 0 := by simp
+    rw [h0, abs_zero, mul_zero]
+    exact le_max_of_le_right hB
+  rcases le_or_gt x 1 with hx1 | hx1
+  · have := hM x ⟨hx, hx1⟩
+    rw [Real.norm_of_nonneg (by positivity)] at this
+    exact this.trans (le_max_left _ _)
+  · have he : h =ᶠ[nhds x] fun y ↦ Real.exp (-δ * y) := by
+      filter_upwards [Ioi_mem_nhds hx1] with y hy
+      simp [h, Real.smoothTransition.one_of_one_le (le_of_lt hy)]
+    rw [key, he.iteratedDeriv_eq, iteratedDeriv_exp_const_mul, Real.norm_of_nonneg hx]
+    refine le_trans ?_ (le_max_right _ _)
+    have hpow := Real.pow_div_factorial_le_exp (δ * x) (by positivity) k
+    have hf : (0 : ℝ) < k.factorial := by exact_mod_cast k.factorial_pos
+    rw [abs_mul, abs_of_pos (Real.exp_pos _), abs_pow, abs_neg, abs_of_pos hδ]
+    have hexp : Real.exp (-δ * x) * Real.exp (δ * x) = 1 := by
+      rw [← Real.exp_add]; simp
+    have : x ^ k * Real.exp (-δ * x) ≤ k.factorial / δ ^ k := by
+      rw [le_div_iff₀ (by positivity)]
+      rw [div_le_iff₀ hf, mul_pow] at hpow
+      nlinarith [Real.exp_pos (-δ * x), pow_pos hδ k, pow_nonneg hx k]
+    calc x ^ k * (δ ^ n * Real.exp (-δ * x)) = δ ^ n * (x ^ k * Real.exp (-δ * x)) := by ring
+      _ ≤ _ := mul_le_mul_of_nonneg_left this (by positivity)
+
+/-- The logarithmic profile of `t ↦ t⁻¹ ψ(log t)`, with `ψ` a smooth step from `0` to `1`,
+decays after every exponential twist with exponent below one. -/
+private theorem sLocalCechRadialReflection_false_profile :
+    (fun x : ℝ ↦ ((Real.exp (-x) * Real.smoothTransition x : ℝ) : ℂ)) ∈
+      logExponentialDecaySubmodule (Iio 1) := by
+  refine (Submodule.mem_iInf _).2 fun a ↦ Submodule.mem_comap.2 ?_
+  have hδ : 0 < 1 - (a : ℝ) := sub_pos.2 a.2
+  have hh : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun x : ℝ ↦ Real.exp (-(1 - (a : ℝ)) * x) * Real.smoothTransition x) :=
+    (Real.contDiff_exp.comp (contDiff_const.mul contDiff_id)).mul (Real.smoothTransition.contDiff (n := ⊤))
+  let s : SchwartzMap ℝ ℂ :=
+    ⟨fun x : ℝ ↦ ((Real.exp (-(1 - (a : ℝ)) * x) * Real.smoothTransition x : ℝ) : ℂ),
+      Complex.ofRealCLM.contDiff.comp hh, sLocalCechRadialReflection_false_decay _ hδ⟩
+  refine ⟨s, funext fun x ↦ ?_⟩
+  change ((Real.exp (-(1 - (a : ℝ)) * x) * Real.smoothTransition x : ℝ) : ℂ) =
+    (Real.exp ((a : ℝ) * x) : ℂ) * ((Real.exp (-x) * Real.smoothTransition x : ℝ) : ℂ)
+  rw [← Complex.ofReal_mul, ← mul_assoc, ← Real.exp_add]
+  congr 3
+  ring
+
+/-- Functions in the Schwartz–Bruhat submodule are bounded. -/
+private theorem sLocalCechRadialReflection_false_bounded {G : Type*} [CommGroup G]
+    [TopologicalSpace G] {f : G → ℂ} (hf : f ∈ schwartzBruhatSubmodule G) :
+    ∃ d : ℝ, ∀ x, ‖f x‖ ≤ d := by
+  let B : Submodule ℂ (G → ℂ) :=
+    { carrier := {f | ∃ d : ℝ, ∀ x, ‖f x‖ ≤ d}
+      add_mem' := by
+        rintro f g ⟨a, ha⟩ ⟨b, hb⟩
+        exact ⟨a + b, fun x ↦ (norm_add_le _ _).trans (add_le_add (ha x) (hb x))⟩
+      zero_mem' := ⟨0, fun x ↦ by simp⟩
+      smul_mem' := by
+        rintro c f ⟨a, ha⟩
+        refine ⟨‖c‖ * a, fun x ↦ ?_⟩
+        rw [Pi.smul_apply, smul_eq_mul, norm_mul]
+        exact mul_le_mul_of_nonneg_left (ha x) (norm_nonneg c) }
+  have hle : schwartzBruhatSubmodule G ≤ B := by
+    unfold schwartzBruhatSubmodule
+    refine iSup_le fun a ↦ iSup_le fun e ↦ ?_
+    rintro _ ⟨s, rfl⟩
+    refine ⟨elementarySchwartzSeminorm (0, 0, 0, 0) s, fun x ↦ ?_⟩
+    rw [schwartzBruhatStageRealization_apply]
+    split_ifs
+    · change (‖s _‖₊ : ENNReal).toReal ≤ (elementarySchwartzBound s.val (0, 0, 0, 0)).toReal
+      apply ENNReal.toReal_mono (s.property.2 _).ne
+      rw [elementarySchwartzBound_zero]
+      exact le_iSup (fun y ↦ (‖s y‖₊ : ENNReal)) _
+    · exact norm_zero.trans_le (apply_nonneg _ _)
+  exact hle hf
+
+/-- The constant function one is a Schwartz–Bruhat function on a compact group
+(as `compact_schwartzBruhat_one` in `AppD_SchwartzBruhat/Sec2b.lean`). -/
+private theorem sLocalCechRadialReflection_false_one {H : Type*} [CommGroup H]
+    [TopologicalSpace H] [IsTopologicalGroup H] [T2Space H] [LocallyCompactSpace H]
+    [CompactSpace H] : ∃ c : SchwartzBruhat H, ∀ k, c k = 1 := by
+  have hcompact : IsCompact ((⊤ : Subgroup H) : Set H) := isCompact_univ
+  have : CompactSpace (⊤ : Subgroup H) := isCompact_iff_compactSpace.mp hcompact
+  have : CompactSpace (lcaAnnihilator (⊤ : Subgroup H)) :=
+    isCompact_iff_compactSpace.mp (isCompact_lcaAnnihilator ⊤ isOpen_univ)
+  let a : BruhatStructuralPair H :=
+    ⟨(⊤, OrderDual.toDual ⊤), isOpen_univ,
+      isCompactlyGeneratedGroup_of_compact (G := (⊤ : Subgroup H)),
+      ⟨isClosed_univ, isOpen_lcaAnnihilator ⊤ hcompact,
+        isCompactlyGeneratedGroup_of_compact (G := lcaAnnihilator (⊤ : Subgroup H))⟩, le_rfl⟩
+  have : Subsingleton a.quotient := by
+    change Subsingleton ((⊤ : Subgroup H) ⧸ (⊤ : Subgroup (⊤ : Subgroup H)))
+    exact QuotientGroup.subsingleton_quotient_top
+  let A := Multiplicative (ElementaryLieGroup 0 0 0 PUnit)
+  have : Subsingleton A := by
+    change Subsingleton (ElementaryLieGroup 0 0 0 PUnit)
+    infer_instance
+  let f : a.quotient →* A := 1
+  let e₀ : a.quotient ≃* A := MulEquiv.ofBijective f
+    ⟨fun _ _ _ ↦ Subsingleton.elim _ _, fun y ↦ ⟨1, Subsingleton.elim _ y⟩⟩
+  let e : ElementaryLCAPresentation a.quotient :=
+    { realDim := 0
+      torusDim := 0
+      latticeRank := 0
+      finiteFactor := PUnit
+      equiv := { e₀ with
+        continuous_toFun := (continuous_const (y := (1 : A))).congr fun _ ↦ Subsingleton.elim _ _
+        continuous_invFun := (continuous_const (y := (1 : a.quotient))).congr
+          fun _ ↦ Subsingleton.elim _ _ } }
+  let s : SchwartzBruhatStage e := ⟨fun _ ↦ 1, by
+    refine ⟨fun _ _ ↦ contDiff_const, ?_⟩
+    intro idx
+    have hi : idx = (0, 0, 0, 0) := Subsingleton.elim _ _
+    subst idx
+    simp [elementarySchwartzBound_zero]⟩
+  refine ⟨schwartzBruhatStageInclusion a e s, fun k ↦ ?_⟩
+  rw [schwartzBruhatStageInclusion_apply, schwartzBruhatStageRealization_apply,
+    dite_eq_left (show k ∈ a.val.1 from Subgroup.mem_top k)]
+
+/-- A radial function with profile `t ↦ t⁻¹ ψ(log t)` lies in the decay space with
+exponents below one, by the tensor splitting of Theorem D.3.3.7(1). -/
+private theorem sLocalCechRadialReflection_false_radial {G : Type*} [CommGroup G]
+    [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] (m : G →ₜ* ℝ≥0ˣ) (hm : IsModulation m)
+    (τ : ℝ≥0ˣ →ₜ* G) (hτ : RightInverse τ m) :
+    ∃ f : ModulatedExponentialDecay m (Iio 1), ∀ g : G,
+      f.val g = ((Real.exp (-Real.log ((m g).val : ℝ)) *
+        Real.smoothTransition (Real.log ((m g).val : ℝ)) : ℝ) : ℂ) := by
+  have hK : IsCompact (m.toMonoidHom.ker : Set G) :=
+    hm.1.isCompact_preimage (isCompact_singleton (x := (1 : ℝ≥0ˣ)))
+  have : CompactSpace m.toMonoidHom.ker := isCompact_iff_compactSpace.mp hK
+  obtain ⟨c, hc⟩ := sLocalCechRadialReflection_false_one (H := m.toMonoidHom.ker)
+  obtain ⟨e, he⟩ := modulatedExponentialDecay_tensor_equiv m (Iio 1) hm ordConnected_Iio
+    ⟨0, by norm_num⟩ τ hτ
+  let p : PositiveRealExponentialDecay (Iio 1) := ⟨_, sLocalCechRadialReflection_false_profile⟩
+  refine ⟨e (UniformSpace.Completion.coe'
+    (α := InductiveTensor (SchwartzBruhat m.toMonoidHom.ker) (PositiveRealExponentialDecay (Iio 1)))
+    (c ⊗ₜ[ℂ] p)), fun g ↦ ?_⟩
+  have hu : g * (τ (m g))⁻¹ ∈ m.toMonoidHom.ker := by
+    rw [MonoidHom.mem_ker]
+    change m (g * (τ (m g))⁻¹) = 1
+    rw [map_mul, map_inv, hτ (m g), mul_inv_cancel]
+  have hg : ((⟨g * (τ (m g))⁻¹, hu⟩ : m.toMonoidHom.ker) : G) * τ (m g) = g := inv_mul_cancel_right _ _
+  have h1 := he c p ⟨g * (τ (m g))⁻¹, hu⟩ (m g)
+  rw [hg, hc, one_mul] at h1
+  exact h1
+
+/-- A function in the decay space with exponents below one cannot equal `ψ(−log t)`
+along a section: its twist by `t⁻¹` would be unbounded. -/
+private theorem sLocalCechRadialReflection_false_unbounded {G : Type*} [CommGroup G]
+    [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [LocallyCompactSpace G] (m : G →ₜ* ℝ≥0ˣ) (τ : ℝ≥0ˣ →ₜ* G) (hτ : RightInverse τ m)
+    (j : ModulatedExponentialDecay m (Iio 1))
+    (hj : ∀ t : ℝ≥0ˣ, j.val (τ t) = (Real.smoothTransition (-Real.log (t.val : ℝ)) : ℂ)) :
+    False := by
+  obtain ⟨d, hd⟩ := sLocalCechRadialReflection_false_bounded
+    (modulationWeight_mem_schwartzBruhat m (Iio 1) ⟨-1, by norm_num⟩ j)
+  let x₀ : ℝ := |d| + 1
+  let t : ℝ≥0ˣ := Units.mk0 ⟨Real.exp (-x₀), (Real.exp_pos _).le⟩
+    (ne_of_gt (show (0 : ℝ≥0) < ⟨Real.exp (-x₀), (Real.exp_pos _).le⟩ from Real.exp_pos _))
+  have ht : ((t.val : ℝ≥0) : ℝ) = Real.exp (-x₀) := rfl
+  have h1 := hd (τ t)
+  change ‖((((m (τ t)).val : ℝ) ^ ((-1 : ℝ)) : ℝ) : ℂ) * j.val (τ t)‖ ≤ d at h1
+  rw [hτ t, hj t, ht, Real.log_exp, neg_neg,
+    Real.smoothTransition.one_of_one_le (by simp [x₀, abs_nonneg] : (1 : ℝ) ≤ x₀),
+    Complex.ofReal_one, mul_one, Complex.norm_real, Real.norm_of_nonneg (by positivity),
+    Real.rpow_neg_one, ← Real.exp_neg, neg_neg] at h1
+  have h2 := Real.add_one_le_exp x₀
+  have h3 := le_abs_self d
+  simp only [x₀] at h1 h2
+  linarith
+
 /-- Paper: Theorem 5.4.2.2(2), p. 276.
 Take `F = ℚ`, `S` consisting of the real place, the positive-real section, and `χ = 1`.
 Use `f(t) = exp(−1/t) / t`. For every `a < 1`, the twist `t^a f(t)` is Schwartz in
@@ -124,7 +315,56 @@ The radial image is `exp(−t)`. Its weight-zero twist tends to `1` as `t` tends
 and hence is outside the target with weights `a < 1`.
 -/
 theorem Printed.sLocalCechRadialReflection_false : ¬ Printed.sLocalCechRadialReflection := by
-  sorry
+  intro h
+  let S : Finset (HeightOneSpectrum (𝓞 ℚ)) := ∅
+  obtain ⟨τ, hτ⟩ := sIdeleQuotientNorm_exists_section ℚ S
+  have : LocallyCompactSpace (SAdeleRing ℚ S)ˣ := (sIdeleGroup_description ℚ S).2.2.1
+  have : T2Space (SIdeleQuotient ℚ S) :=
+    have := isClosed_sProjectedDiagonal (F := ℚ) (S := S)
+    inferInstance
+  have : ∀ w : InfinitePlace ℚ, SecondCountableTopology w.Completion := fun w ↦
+    (InfinitePlace.Completion.isometry_extensionEmbedding w).isEmbedding.secondCountableTopology
+  have : ∀ v : S, SecondCountableTopology (v.val.adicCompletion ℚ) := fun v ↦
+    (Finset.notMem_empty _ v.2).elim
+  have : SecondCountableTopology (SAdeleRing ℚ S) :=
+    inferInstanceAs (SecondCountableTopology
+      (((w : InfinitePlace ℚ) → w.Completion) × ((v : S) → v.val.adicCompletion ℚ)))
+  have : SecondCountableTopology (SAdeleRing ℚ S)ˣ :=
+    (sIdeleGroup_description ℚ S).1.secondCountableTopology
+  have : SecondCountableTopology (SIdeleQuotient ℚ S) := inferInstance
+  let m : SIdeleQuotient ℚ S →ₜ* ℝ≥0ˣ :=
+    ⟨sIdeleQuotientNorm ℚ S, (isProperMap_sIdeleQuotientNorm ℚ S).continuous⟩
+  have hτm : RightInverse τ m := fun t ↦ hτ t
+  have hm : IsModulation m := by
+    refine ⟨isProperMap_sIdeleQuotientNorm ℚ S, τ (Units.mk0 2 (by norm_num)), ?_⟩
+    change sIdeleQuotientNorm ℚ S (τ _) ≠ 1
+    rw [hτ]
+    intro h2
+    have := congrArg (fun t : ℝ≥0ˣ ↦ (t.val : ℝ)) h2
+    norm_num at this
+  obtain ⟨f₀, hf₀⟩ := sLocalCechRadialReflection_false_radial m hm τ hτm
+  obtain ⟨j, hj⟩ := h ℚ S 1 τ hτ ⟨f₀, by
+    refine (mem_sLocalDecayIsotype (F := ℚ) (S := S) (Iio 1) _ f₀).mpr ?_
+    intro u g
+    have hmu : m (u.val⁻¹ * g) = m g := by
+      change sIdeleQuotientNorm ℚ S (u.val⁻¹ * g) = sIdeleQuotientNorm ℚ S g
+      rw [map_mul, map_inv, MonoidHom.mem_ker.mp u.property, inv_one, one_mul]
+    rw [hf₀, hf₀, hmu]
+    symm
+    convert one_mul _ using 2
+    rw [inv_one]
+    exact Circle.coe_one⟩
+  refine sLocalCechRadialReflection_false_unbounded m τ hτm j.val fun t ↦ ?_
+  have h1 := hj t 1
+  have ht : ((t.val : ℝ≥0) : ℝ) ≠ 0 := (NNReal.coe_pos.mpr (Units.zero_lt t)).ne'
+  change j.val.val (τ t * 1) = _ * f₀.val (τ t⁻¹ * 1) at h1
+  rw [mul_one, mul_one, hf₀] at h1
+  change j.val.val (τ t) = _ * (((Real.exp (-Real.log ((m (τ t⁻¹)).val : ℝ)) *
+    Real.smoothTransition (Real.log ((m (τ t⁻¹)).val : ℝ)) : ℝ) : ℂ)) at h1
+  rw [hτm t⁻¹, Units.val_inv_eq_inv_val, NNReal.coe_inv, Real.log_inv, neg_neg,
+    Real.exp_log (NNReal.coe_pos.mpr (Units.zero_lt t))] at h1
+  change j.val.val (τ t) = _
+  rw [h1, Complex.ofReal_mul, ← mul_assoc, inv_mul_cancel₀ (Complex.ofReal_ne_zero.mpr ht), one_mul]
 
 /-- Paper: Theorem 5.4.2.2(3), p. 276.
 As printed: reflection followed by multiplication by the local correcting factor gives
