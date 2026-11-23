@@ -35,13 +35,13 @@ consultant to `agents.txt` (the nagger's roster).
 | fixer: `general-purpose`, model sonnet, effort medium | – | `Fix <failing check or review comment> on PR #<p> in worktree <wt>, following S/HUNTER.md "Checks and pull request". Model tag <M>.` |
 
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
-   last check (last seen: AGENTS ed9dbb7, ERRATA d77f273), re-read the change, update the briefs
+   last check (last seen: AGENTS ed9dbb7, ERRATA 92c9ed9), re-read the change, update the briefs
    (HUNTER.md first), and update "last seen" here.
 1. Run `status.sh --mark` (advances the new-comments window) and `cleanup.sh` under timeout,
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
    A Verdict `error` with "main itself does not build" is not ours: once main builds again
-   (Main state check green), push an empty commit to the PR branch to retrigger (pending: #5579, #5547, leads.txt).
+   (Main state check green), push an empty commit to the PR branch to retrigger (pending: leads.txt).
 3. Release orphan or STALE claims only via `release.sh`. `QUEUED #<n> RELEASE` (queued over 2 h,
    no agent took it): `release.sh <n> "queued for <level> escalation, no agent free within 2 h; notes
    below"` (it marks the queue row RELEASED; `resumable.sh` offers it again in 8b). `QUEUED #<n>
@@ -65,16 +65,35 @@ consultant to `agents.txt` (the nagger's roster).
    it repeats.
 6. READY or HINT lines in `== sieve`: launch ONE siever unless one runs. No blind hunters.
 7. Staffing (user, 2026-11-22: "when two sonnets are idle, spawn an opus instead. keep at minimum
-   two opuses and at maximum six sonnets"; 20:20Z: "bump the budget to twelve"). Budget 12 units (table above). Count the running
+   two opuses and at maximum six sonnets"; 20:20Z: "bump the budget to twelve"; 23:10Z, CPU pegged:
+   "let's drop to 10 slots for now"). **Max budget 10 units.** Scale it down by token usage (user,
+   2026-11-23 ~01:05Z: "dynamically scale down from the max budget if the remaining token budget
+   gets low … Once the reset has hit, it's free to scale up again"). Take the `== claude usage`
+   line of `status.sh` (or run `usage.sh`) and use the lowest budget any row gives:
+
+   | Usage (5h window, and 7d likewise) | Budget this tick |
+   |---|---|
+   | under 70% | 10 (max) |
+   | 70–85%, or 5h ≥ 50% with more than 3 h to its reset | 6 |
+   | 85–95% | 2 |
+   | 95% or more | 0: launch nothing |
+
+   No new Fable agent (consultant or findings evaluator) while `fable-7d` ≥ 85%. The scaled
+   budget overrides the 2-Opus minimum. If `usage.sh` fails, keep last tick's budget, never raise
+   it. After a reset the percentage drops (or reads "window already reset (stale)"): take the row
+   for the new value, up to the max again. While running agents exceed the budget, launch nothing.
+   At 95% or more with over 30 min to the reset, also wind down the agents beyond the budget,
+   newest first, via notes, as on 2026-11-23 ~00:25Z (user: agents done and only waiting for
+   builds/checks finish their hand-in). Name the usage, budget and reset time in the report. Count the running
    agents (`agents.txt`), then hand out free units in this order, never stopping a running agent
-   to rebalance:
+   to rebalance (the 95% wind-down aside):
    1. Opus (step 8) until 2 run.
    2. Fable consultants (step 8b, 2 units each, at most 2 at once), while QUEUED `fable` rows wait.
       Consultations come before new work (user, 2026-11-22): while such a row waits, hold freed
       units for it instead of starting Sonnet hunters or Opus beyond the two above.
    3. Sonnet hunters while quick-win rows (7a) exist, up to 6 Sonnets.
    4. What is left, two units at a time, to Opus (step 8). One unit left over waits.
-7a. New issues first: proof issues newer than the last shortlisted (last: #5615, triage12) get
+7a. New issues first: proof issues newer than the last shortlisted (last: #5707, triage13) get
    `shortlist.py` on their files and a triage agent into a new `triage<k>.tsv`; update "last"
    here. Hunters take rows rated 1–2 (then 3) with unclaimed issues not labelled `stuck`, listed in
    the prompt by file (run `trap5398.py` on them and append `(RISK-5398)` to flagged issues):
