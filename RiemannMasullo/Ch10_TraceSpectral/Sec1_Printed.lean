@@ -5,6 +5,11 @@ public import RiemannMasullo.Ch10_TraceSpectral.Sec1
 import all RiemannMasullo.AppA_AlgebraicNT.Sec3
 import all RiemannMasullo.Ch06_LocalGlobal.Sec2
 import RiemannMasullo.ForMathlib.Analysis.Distribution.SchwartzSpace.Gaussian
+import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
+import Mathlib.MeasureTheory.Function.L2Space
+import Mathlib.NumberTheory.NumberField.Cyclotomic.Basic
+import Mathlib.NumberTheory.NumberField.Cyclotomic.Embeddings
+import Mathlib.NumberTheory.NumberField.Cyclotomic.PID
 
 /-! # §10.1 assertions that are false as printed -/
 
@@ -349,14 +354,343 @@ def Printed.globalThetaSobolev_rawIsotypeDecomposition : Prop :=
       (fun f ↦ modulationWeight m a (adelicTheta f))
       (fun ω f ↦ modulationWeight m a (homogeneousAdelicTheta ω f))
 
-/-- Paper: Proposition 10.1.1.5(2), p. 437. Take ℚ(i), a = s = 0 and I = {0}.
-Use the finite integer indicators and a radial smooth archimedean bump equal to 1
-at radius 1 and supported in (0.9, 1.1). Subtract a radial bump supported in (0.4, 0.6)
-scaled to cancel the integral. Both zero terms vanish and theta at the identity is 4.
-This theta lies in the trivial isotype. The norm-one mass π/4 scales its only
-nonzero coordinate and prevents an isometry. -/
+open scoped ENNReal ComplexConjugate InnerProductSpace in
+private theorem Printed.rawIsotype_orth {K : Type*} [CommGroup K] [TopologicalSpace K]
+    [IsTopologicalGroup K] [CompactSpace K] [MeasurableSpace K] [BorelSpace K] (ν : Measure K) [ν.IsHaarMeasure]
+    (ω₁ ω₂ : PontryaginDual K) (h : ω₁ ≠ ω₂) :
+    ∫ x, (ω₁ x : ℂ) * conj (ω₂ x : ℂ) ∂ν = 0 := by
+  obtain ⟨c, hc⟩ := DFunLike.ne_iff.mp h
+  set I := ∫ x, (ω₁ x : ℂ) * conj (ω₂ x : ℂ) ∂ν
+  have hinv : ∫ x, (ω₁ (c * x) : ℂ) * conj (ω₂ (c * x) : ℂ) ∂ν = I :=
+    integral_mul_left_eq_self (fun x ↦ (ω₁ x : ℂ) * conj (ω₂ x : ℂ)) c
+  have hsplit : ∫ x, (ω₁ (c * x) : ℂ) * conj (ω₂ (c * x) : ℂ) ∂ν =
+      ((ω₁ c : ℂ) * conj (ω₂ c : ℂ)) * I := by
+    rw [← integral_const_mul]
+    congr 1; funext x
+    simp only [map_mul, Circle.coe_mul, map_mul]; ring
+  have hl : (ω₁ c : ℂ) * conj (ω₂ c : ℂ) ≠ 1 := by
+    intro h1
+    apply hc
+    have h2 : (ω₂ c : ℂ) * conj (ω₂ c : ℂ) = 1 := by
+      rw [Complex.mul_conj, Circle.normSq_coe, Complex.ofReal_one]
+    have : (ω₁ c : ℂ) = (ω₂ c : ℂ) := by
+      have hne : conj (ω₂ c : ℂ) ≠ 0 := by
+        intro h0; rw [h0, mul_zero] at h2; exact zero_ne_one h2
+      exact mul_right_cancel₀ hne (h1.trans h2.symm)
+    exact Subtype.ext this
+  have : ((ω₁ c : ℂ) * conj (ω₂ c : ℂ) - 1) * I = 0 := by
+    rw [sub_mul, one_mul, ← hsplit, hinv, sub_self]
+  exact (mul_eq_zero.mp this).resolve_left (sub_ne_zero.mpr hl)
+
+open scoped ENNReal ComplexConjugate InnerProductSpace in
+private theorem Printed.rawIsotype_bessel {K : Type*} [CommGroup K] [TopologicalSpace K]
+    [IsTopologicalGroup K] [CompactSpace K] [MeasurableSpace K] [BorelSpace K] (ν : Measure K) [ν.IsHaarMeasure]
+    (φ : C(K, ℂ)) (s : Finset (PontryaginDual K)) :
+    ∑ ω ∈ s, ‖∫ x, φ x * (ω x : ℂ) ∂ν‖ ^ 2 ≤
+      (ν univ).toReal * ‖ContinuousMap.toLp (E := ℂ) 2 ν ℂ φ‖ ^ 2 := by
+  set V := (ν univ).toReal with hVdef
+  have hV : 0 < V := ENNReal.toReal_pos (NeZero.ne _) (measure_ne_top _ _)
+  let χ : PontryaginDual K → C(K, ℂ) := fun ω ↦
+    ⟨fun x ↦ conj (ω x : ℂ), Complex.continuous_conj.comp (continuous_subtype_val.comp ω.continuous)⟩
+  let c : ℝ := (Real.sqrt V)⁻¹
+  let v : PontryaginDual K → Lp ℂ 2 ν := fun ω ↦ (c : ℂ) • ContinuousMap.toLp (E := ℂ) 2 ν ℂ (χ ω)
+  have hc2 : c * c * V = 1 := by
+    simp only [c]
+    rw [← mul_inv, Real.mul_self_sqrt hV.le, inv_mul_cancel₀ hV.ne']
+  have hv : Orthonormal ℂ v := by
+    classical
+    rw [orthonormal_iff_ite]
+    intro i j
+    simp only [v, inner_smul_left, inner_smul_right, ContinuousMap.inner_toLp, Complex.conj_ofReal]
+    change (c : ℂ) * ((c : ℂ) * ∫ x, conj (j x : ℂ) * conj (conj (i x : ℂ)) ∂ν) = _
+    simp only [Complex.conj_conj]
+    split_ifs with hij
+    · subst hij
+      have h1 : ∀ x, conj (i x : ℂ) * (i x : ℂ) = 1 := fun x ↦ by
+        rw [mul_comm, Complex.mul_conj, Circle.normSq_coe, Complex.ofReal_one]
+      simp only [h1, integral_const]
+      rw [← mul_assoc, ← Complex.ofReal_mul]
+      simp only [Measure.real, Complex.real_smul, mul_one]
+      exact_mod_cast hc2
+    · have h0 := Printed.rawIsotype_orth ν i j hij
+      have : ∫ x, conj (j x : ℂ) * (i x : ℂ) ∂ν = 0 := by
+        rw [← h0]; congr 1; funext x; ring
+      rw [this, mul_zero, mul_zero]
+  have key := hv.sum_inner_products_le (x := ContinuousMap.toLp (E := ℂ) 2 ν ℂ φ) (s := s)
+  have hin : ∀ ω, ⟪v ω, ContinuousMap.toLp (E := ℂ) 2 ν ℂ φ⟫_ℂ =
+      (c : ℂ) * ∫ x, φ x * (ω x : ℂ) ∂ν := by
+    intro ω
+    simp only [v, inner_smul_left, ContinuousMap.inner_toLp, Complex.conj_ofReal]
+    change (c : ℂ) * ∫ x, φ x * conj (conj (ω x : ℂ)) ∂ν = _
+    simp only [Complex.conj_conj]
+  simp only [hin, norm_mul, Complex.norm_real, mul_pow] at key
+  rw [← Finset.mul_sum] at key
+  have hcn : ‖c‖ ^ 2 * V = 1 := by
+    rw [Real.norm_eq_abs, sq_abs, sq]; exact hc2
+  calc ∑ ω ∈ s, ‖∫ x, φ x * (ω x : ℂ) ∂ν‖ ^ 2
+      = V * (‖c‖ ^ 2 * ∑ ω ∈ s, ‖∫ x, φ x * (ω x : ℂ) ∂ν‖ ^ 2) := by
+        rw [← mul_assoc, mul_comm V, hcn, one_mul]
+    _ ≤ V * ‖ContinuousMap.toLp (E := ℂ) 2 ν ℂ φ‖ ^ 2 := by gcongr
+
+open scoped ENNReal ComplexConjugate InnerProductSpace in
+private theorem Printed.rawIsotype_besselENN {K : Type*} [CommGroup K] [TopologicalSpace K]
+    [IsTopologicalGroup K] [CompactSpace K] [MeasurableSpace K] [BorelSpace K] (ν : Measure K) [ν.IsHaarMeasure]
+    (φ : C(K, ℂ)) :
+    ∑' ω : PontryaginDual K, ‖∫ x, φ x * (ω x : ℂ) ∂ν‖ₑ ^ 2 ≤ ν univ * ∫⁻ x, ‖φ x‖ₑ ^ 2 ∂ν := by
+  have hL : ENNReal.ofReal (‖ContinuousMap.toLp (E := ℂ) 2 ν ℂ φ‖ ^ 2) =
+      ∫⁻ x, ‖φ x‖ₑ ^ 2 ∂ν := by
+    rw [Lp.norm_def, ENNReal.ofReal_pow ENNReal.toReal_nonneg,
+      ENNReal.ofReal_toReal (Lp.eLpNorm_ne_top _),
+      eLpNorm_congr_ae (φ.coeFn_toLp (p := 2) (𝕜 := ℂ) ν)]
+    have := eLpNorm_nnreal_pow_eq_lintegral (μ := ν) (f := ⇑φ) (p := 2) two_ne_zero
+      φ.continuous.aestronglyMeasurable
+    simpa using this
+  rw [ENNReal.tsum_eq_iSup_sum]
+  refine iSup_le fun s ↦ ?_
+  have hb := Printed.rawIsotype_bessel ν φ s
+  calc ∑ ω ∈ s, ‖∫ x, φ x * (ω x : ℂ) ∂ν‖ₑ ^ 2
+      = ENNReal.ofReal (∑ ω ∈ s, ‖∫ x, φ x * (ω x : ℂ) ∂ν‖ ^ 2) := by
+        rw [ENNReal.ofReal_sum_of_nonneg (fun _ _ ↦ by positivity)]
+        refine Finset.sum_congr rfl fun ω _ ↦ ?_
+        rw [← ofReal_norm_eq_enorm, ENNReal.ofReal_pow (norm_nonneg _)]
+    _ ≤ ENNReal.ofReal ((ν univ).toReal * ‖ContinuousMap.toLp (E := ℂ) 2 ν ℂ φ‖ ^ 2) :=
+        ENNReal.ofReal_le_ofReal hb
+    _ = ν univ * ∫⁻ x, ‖φ x‖ₑ ^ 2 ∂ν := by
+        rw [ENNReal.ofReal_mul ENNReal.toReal_nonneg, ENNReal.ofReal_toReal (measure_ne_top _ _), hL]
+
+open scoped ENNReal ComplexConjugate InnerProductSpace in
+private theorem Printed.rawIsotype_integrated {C : Type*} [CommGroup C] [TopologicalSpace C]
+    [IsTopologicalGroup C] [MeasurableSpace C] [BorelSpace C] [SecondCountableTopology C]
+    (K : Subgroup C) [CompactSpace K] (ν : Measure K) [ν.IsHaarMeasure]
+    (μ : Measure C) [μ.IsMulLeftInvariant] [SFinite μ]
+    (θ : C → ℂ) (hθ : Continuous θ) (Θ : PontryaginDual K → C → ℂ)
+    (hΘc : ∀ ω, Continuous (Θ ω))
+    (hΘ : ∀ ω g, Θ ω g = ∫ h, θ (h.val * g) * (ω h : ℂ) ∂ν) :
+    ∑' ω, ∫⁻ g, ‖Θ ω g‖ₑ ^ 2 ∂μ ≤ ν univ ^ 2 * ∫⁻ g, ‖θ g‖ₑ ^ 2 ∂μ := by
+  have hpt : ∀ g, ∑' ω, ‖Θ ω g‖ₑ ^ 2 ≤ ν univ * ∫⁻ h, ‖θ (h.val * g)‖ₑ ^ 2 ∂ν := by
+    intro g
+    simp only [hΘ]
+    exact Printed.rawIsotype_besselENN ν ⟨fun h : K ↦ θ (h.val * g),
+      hθ.comp (continuous_subtype_val.mul continuous_const)⟩
+  have hmain : ∫⁻ g, ∑' ω, ‖Θ ω g‖ₑ ^ 2 ∂μ ≤ ν univ ^ 2 * ∫⁻ g, ‖θ g‖ₑ ^ 2 ∂μ := calc
+    ∫⁻ g, ∑' ω, ‖Θ ω g‖ₑ ^ 2 ∂μ
+      ≤ ∫⁻ g, ν univ * ∫⁻ h, ‖θ (h.val * g)‖ₑ ^ 2 ∂ν ∂μ := lintegral_mono hpt
+    _ = ν univ * ∫⁻ g, ∫⁻ h, ‖θ (h.val * g)‖ₑ ^ 2 ∂ν ∂μ :=
+        lintegral_const_mul' _ _ (measure_ne_top _ _)
+    _ = ν univ * ∫⁻ h, ∫⁻ g, ‖θ (h.val * g)‖ₑ ^ 2 ∂μ ∂ν := by
+        rw [lintegral_lintegral_swap]
+        exact ((hθ.comp ((continuous_subtype_val.comp continuous_snd).mul
+          continuous_fst)).measurable.enorm.pow_const 2).aemeasurable
+    _ = ν univ * ∫⁻ h, ∫⁻ g, ‖θ g‖ₑ ^ 2 ∂μ ∂ν := by
+        congr 1
+        refine lintegral_congr fun h ↦ ?_
+        exact lintegral_mul_left_eq_self (fun g ↦ ‖θ g‖ₑ ^ 2) h.val
+    _ = ν univ ^ 2 * ∫⁻ g, ‖θ g‖ₑ ^ 2 ∂μ := by rw [lintegral_const, sq, mul_assoc, mul_comm (∫⁻ _, _ ∂μ)]
+  rw [ENNReal.tsum_eq_iSup_sum]
+  refine iSup_le fun s ↦ le_trans ?_ hmain
+  rw [← lintegral_finsetSum' s (fun ω _ ↦ ((hΘc ω).measurable.enorm.pow_const 2).aemeasurable)]
+  exact lintegral_mono fun g ↦ ENNReal.sum_le_tsum s
+
+/-- Squared L² seminorm of a continuous function as a lower integral. -/
+private theorem Printed.rawIsotype_eLpNorm_sq {C : Type*} [TopologicalSpace C]
+    [MeasurableSpace C] [OpensMeasurableSpace C] [SecondCountableTopology C]
+    (μ : Measure C) (φ : C → ℂ) (hφ : Continuous φ) :
+    eLpNorm φ 2 μ ^ 2 = ∫⁻ x, ‖φ x‖ₑ ^ 2 ∂μ := by
+  have := eLpNorm_nnreal_pow_eq_lintegral (μ := μ) (f := φ) (p := 2) two_ne_zero
+    hφ.aestronglyMeasurable
+  simpa using this
+
+/-- A Hilbert-sum factorization of quotient maps equates the squared norm of
+each total function with the sum of the squared norms of its components. -/
+private theorem Printed.rawIsotype_factorization_norm {G B X Ω : Type*} {Y : Ω → Type*}
+    [MeasurableSpace G] [AddCommGroup X] [Module ℂ X] [TopologicalSpace X]
+    [∀ i, AddCommGroup (Y i)] [∀ i, Module ℂ (Y i)] [∀ i, TopologicalSpace (Y i)]
+    {μ μ' : Measure G} {q : B → X} {qω : ∀ i, B → Y i}
+    {θ : B → G → ℂ} {θω : Ω → B → G → ℂ}
+    (h : Printed.HasHomogeneousSobolevFactorization (W := Lp ℂ 2 μ') μ (fun u ↦ ⇑u)
+      q qω θ θω) (hμ : μ' = μ) (f : B) :
+    eLpNorm (θ f) 2 μ < ⊤ ∧ ∑' i, eLpNorm (θω i f) 2 μ ^ 2 = eLpNorm (θ f) 2 μ ^ 2 := by
+  subst hμ
+  obtain ⟨H, K, j, k, Q, T, hj, hk, -, hQ, hT⟩ := h
+  have e0 : eLpNorm (θ f) 2 μ' = eLpNorm (((j (q f) : H) : Lp ℂ 2 μ')) 2 μ' :=
+    eLpNorm_congr_ae (hj.2.2.2 f).symm
+  have ei : ∀ i, eLpNorm (θω i f) 2 μ' =
+      eLpNorm (((T (j (q f)) i : K i) : Lp ℂ 2 μ')) 2 μ' := by
+    intro i
+    rw [← hT, hQ f i]
+    exact eLpNorm_congr_ae ((hk i).2.2.2 f).symm
+  have hs := lp.hasSum_norm (p := 2) (by norm_num) (T (j (q f)))
+  rw [T.norm_map] at hs
+  have hs' : HasSum (fun i ↦ (eLpNorm (((T (j (q f)) i : K i) : Lp ℂ 2 μ')) 2 μ').toReal ^ 2)
+      ((eLpNorm (((j (q f) : H) : Lp ℂ 2 μ')) 2 μ').toReal ^ 2) := by
+    simp only [ENNReal.toReal_ofNat, Real.rpow_two] at hs
+    exact hs
+  refine ⟨e0 ▸ Lp.eLpNorm_lt_top _, ?_⟩
+  have hsq : ∀ w : Lp ℂ 2 μ', eLpNorm w 2 μ' ^ 2 = ENNReal.ofReal ((eLpNorm w 2 μ').toReal ^ 2) :=
+    fun w ↦ by
+      rw [ENNReal.ofReal_pow ENNReal.toReal_nonneg, ENNReal.ofReal_toReal (Lp.eLpNorm_ne_top _)]
+  simp only [ei, e0, hsq]
+  rw [← ENNReal.ofReal_tsum_of_nonneg (fun _ ↦ by positivity) hs'.summable, hs'.tsum_eq]
+
+/-- If the Hilbert-sum norm identity holds for one nonzero continuous theta function,
+the norm-one group has mass at least one: Bessel bounds the components by the mass squared. -/
+private theorem Printed.rawIsotype_contra {C : Type*} [CommGroup C] [TopologicalSpace C]
+    [IsTopologicalGroup C] [MeasurableSpace C] [BorelSpace C] [SecondCountableTopology C]
+    (K : Subgroup C) [CompactSpace K] (ν : Measure K) [ν.IsHaarMeasure]
+    (μ : Measure C) [μ.IsMulLeftInvariant] [SFinite μ] [μ.IsOpenPosMeasure]
+    (θ : C → ℂ) (hθ : Continuous θ) (Θ : PontryaginDual K → C → ℂ)
+    (hΘc : ∀ ω, Continuous (Θ ω))
+    (hΘ : ∀ ω g, Θ ω g = ∫ h, θ (h.val * g) * (ω h : ℂ) ∂ν)
+    (hvol : ν univ < 1) (g0 : C) (hg0 : θ g0 ≠ 0)
+    (hfin : eLpNorm θ 2 μ < ⊤) (heq : ∑' ω, eLpNorm (Θ ω) 2 μ ^ 2 = eLpNorm θ 2 μ ^ 2) :
+    False := by
+  have hb := Printed.rawIsotype_integrated K ν μ θ hθ Θ hΘc hΘ
+  have hω : ∀ ω, ∫⁻ g, ‖Θ ω g‖ₑ ^ 2 ∂μ = eLpNorm (Θ ω) 2 μ ^ 2 :=
+    fun ω ↦ (Printed.rawIsotype_eLpNorm_sq μ _ (hΘc ω)).symm
+  simp only [hω] at hb
+  rw [heq, ← Printed.rawIsotype_eLpNorm_sq μ θ hθ] at hb
+  have he : eLpNorm θ 2 μ ^ 2 = 0 := by
+    by_contra hne
+    have hfin2 : eLpNorm θ 2 μ ^ 2 ≠ ⊤ := ENNReal.pow_ne_top hfin.ne
+    have h1 : 1 ≤ ν univ ^ 2 := by
+      exact (ENNReal.mul_le_mul_iff_left (a := 1) (b := ν univ ^ 2) hne hfin2).mp
+        (by rwa [one_mul])
+    exact absurd h1 (not_le.mpr (pow_lt_one₀ bot_le hvol two_ne_zero))
+  have h0 : θ =ᵐ[μ] 0 :=
+    (eLpNorm_eq_zero_iff two_ne_zero).mp (pow_eq_zero_iff two_ne_zero |>.mp he)
+  exact hg0 (congrFun ((hθ.ae_eq_iff_eq μ continuous_const).mp h0) g0)
+
+open scoped Classical in
+/-- Over every number field some adelic theta function is nonzero: take a nonnegative
+archimedean bump equal to one at the unit, times the indicator of the finite integers. -/
+private theorem Printed.rawIsotype_exists_theta_ne_zero (F : Type) [Field F] [NumberField F] :
+    ∃ (f : SchwartzBruhat (Multiplicative (AdeleRing (𝓞 F) F)))
+      (g : IdeleClassGroup (𝓞 F) F), adelicTheta f g ≠ 0 := by
+  let b : ContDiffBump (1 : mixedEmbedding.mixedSpace F) := ⟨1, 2, one_pos, one_lt_two⟩
+  let bs : SchwartzMap (mixedEmbedding.mixedSpace F) ℂ :=
+    HasCompactSupport.toSchwartzMap (f := fun x ↦ ((b x : ℝ) : ℂ))
+      (b.hasCompactSupport.comp_left Complex.ofReal_zero)
+      (Complex.ofRealCLM.contDiff.comp b.contDiff)
+  let arch : SchwartzBruhat (Multiplicative (InfiniteAdeleRing F)) :=
+    ⟨fun x ↦ bs (InfiniteAdeleRing.ringEquiv_mixedSpace F x.toAdd),
+      (mem_archimedeanSchwartzBruhat_iff _).mpr ⟨bs, fun _ ↦ rfl⟩⟩
+  obtain ⟨e, he⟩ := sAdeleSchwartz_inductiveTensor_equiv F (∅ : Finset (HeightOneSpectrum (𝓞 F)))
+  let gg : ∀ w : (∅ : Finset (HeightOneSpectrum (𝓞 F))),
+      SchwartzBruhat (Multiplicative (w.val.adicCompletion F)) :=
+    fun w ↦ absurd w.2 (Finset.notMem_empty _)
+  let f := sAdeleSchwartzToGlobal F ∅ (e (arch ⊗ₜ[ℂ] (⨂ₜ[ℂ] w, gg w)))
+  have hf : ∀ x : AdeleRing (𝓞 F) F, f (Multiplicative.ofAdd x) =
+      if ∀ v : HeightOneSpectrum (𝓞 F), x.2 v ∈ v.adicCompletionIntegers F then
+        ((b (InfiniteAdeleRing.ringEquiv_mixedSpace F x.1) : ℝ) : ℂ) else 0 := by
+    intro x
+    rw [sAdeleSchwartzToGlobal_apply, he]
+    simp only [Finset.univ_eq_empty, Finset.prod_empty, mul_one, Finset.notMem_empty,
+      not_false_eq_true, forall_const]
+    split_ifs <;> rfl
+  let T : Fˣ → ℂ := fun ξ ↦ f (Multiplicative.ofAdd
+    (algebraMap F (AdeleRing (𝓞 F) F) (ξ : F) * (1 : IdeleGroup (𝓞 F) F).val))
+  have hT : ∀ ξ, T ξ = ((‖T ξ‖ : ℝ) : ℂ) := by
+    intro ξ
+    change f _ = ((‖f _‖ : ℝ) : ℂ)
+    rw [hf]
+    split_ifs
+    · rw [Complex.norm_real, Real.norm_of_nonneg b.nonneg]
+    · simp
+  have hT1 : ‖T 1‖ = 1 := by
+    change ‖f _‖ = 1
+    rw [Units.val_one, map_one, Units.val_one, mul_one, hf, if_pos (fun v ↦ by
+      change (1 : v.adicCompletion F) ∈ v.adicCompletionIntegers F
+      exact one_mem _), Prod.fst_one, map_one, b.one_of_mem_closedBall (Metric.mem_closedBall_self b.rIn_pos.le),
+      Complex.ofReal_one, norm_one]
+  have hs : Summable fun ξ ↦ ‖T ξ‖ := by
+    have := (adelicAverage_summableUniformlyOn f _
+      (isCompact_singleton (x := ((1 : IdeleGroup (𝓞 F) F), (0 : AdeleRing (𝓞 F) F))))).summable
+      (Set.mem_singleton _)
+    simpa only [T, add_zero, mul_comm] using this
+  refine ⟨f, QuotientGroup.mk (s := IdeleGroup.principalSubgroup (𝓞 F) F) 1, ?_⟩
+  rw [adelicTheta_mk]
+  change ∑' ξ, T ξ ≠ 0
+  rw [tsum_congr hT, ← Complex.ofReal_tsum]
+  have hpos : 0 < ∑' ξ, ‖T ξ‖ :=
+    lt_of_lt_of_le (by rw [hT1]; exact one_pos) (hs.le_tsum 1 (fun _ _ ↦ norm_nonneg _))
+  exact_mod_cast hpos.ne'
+
+/-- The norm-one idele classes of ℚ(ζ₃) have Tamagawa mass π/(3√3) < 1. -/
+private theorem Printed.rawIsotype_volume_lt_one :
+    normOneIdeleClassTamagawaMeasure (CyclotomicField 3 ℚ) univ < 1 := by
+  rw [normOneIdeleClassTamagawaMeasure_volume, ENNReal.ofReal_lt_one]
+  have : IsCyclotomicExtension {(3:ℕ)} ℚ (CyclotomicField 3 ℚ) :=
+    CyclotomicField.isCyclotomicExtension 3 ℚ
+  have hh : NumberField.classNumber (CyclotomicField 3 ℚ) = 1 :=
+    classNumber_eq_one_iff.mpr (IsCyclotomicExtension.Rat.three_pid _)
+  have ht : Units.torsionOrder (CyclotomicField 3 ℚ) = 6 := by
+    rw [IsCyclotomicExtension.Rat.torsionOrder_eq (n := 3)]; decide
+  have hd : NumberField.discr (CyclotomicField 3 ℚ) = -3 := by
+    rw [IsCyclotomicExtension.Rat.discr_prime 3 (CyclotomicField 3 ℚ)]
+    norm_num
+  have h1 : InfinitePlace.nrRealPlaces (CyclotomicField 3 ℚ) = 0 :=
+    IsCyclotomicExtension.Rat.nrRealPlaces_eq_zero (n := 3) _ (by norm_num)
+  have h2 : InfinitePlace.nrComplexPlaces (CyclotomicField 3 ℚ) = 1 := by
+    rw [IsCyclotomicExtension.Rat.nrComplexPlaces_eq_totient_div_two 3]; decide
+  have hR : Units.regulator (CyclotomicField 3 ℚ) = 1 := by
+    have hc : Fintype.card (InfinitePlace (CyclotomicField 3 ℚ)) = 1 := by
+      rw [InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces, h1, h2]
+    have hall : ∀ a b : InfinitePlace (CyclotomicField 3 ℚ), a = b :=
+      Fintype.card_le_one_iff.mp hc.le
+    classical
+    rw [Units.regulator_eq_det', Matrix.det_eq_one_of_card_eq_zero
+      (Fintype.card_eq_zero_iff.mpr ⟨fun w ↦ w.2 (hall _ _)⟩), abs_one]
+  rw [hh, ht, hd, h1, h2, hR]
+  have hs : (1.7 : ℝ) < Real.sqrt 3 := by
+    rw [Real.lt_sqrt (by norm_num)]; norm_num
+  have hpi := Real.pi_lt_d2
+  rw [div_lt_one (by positivity)]
+  norm_num
+  nlinarith
+
+/-- The global statement fails over ℚ(ζ₃) with a = α = β = s = 0. -/
+private theorem Printed.rawIsotype_global_aux (F : Type) [Field F] [NumberField F]
+    (hvol : normOneIdeleClassTamagawaMeasure F univ < 1)
+    (h : Printed.HasHomogeneousSobolevFactorization (X := GlobalAdelicThetaSpace F)
+      (Y := GlobalHomogeneousThetaSpace F) (ideleClassTamagawaMeasure F)
+      (fun u : CompactIntervalSobolev (ideleClassTamagawaMeasure F)
+          (fun g ↦ Real.log ((ideleClassNorm F g).val : ℝ)) 0 0 0 ↦ ⇑u)
+      Submodule.Quotient.mk (fun _ ↦ Submodule.Quotient.mk)
+      (fun f ↦ modulationWeight (⟨ideleClassNorm F, (isProperMap_ideleClassNorm F).continuous⟩ :
+          IdeleClassGroup (𝓞 F) F →ₜ* ℝ≥0ˣ) 0 (adelicTheta f))
+      (fun ω f ↦ modulationWeight (⟨ideleClassNorm F, (isProperMap_ideleClassNorm F).continuous⟩ :
+          IdeleClassGroup (𝓞 F) F →ₜ* ℝ≥0ˣ) 0 (homogeneousAdelicTheta ω f))) : False := by
+  obtain ⟨f, g0, hg0⟩ := Printed.rawIsotype_exists_theta_ne_zero F
+  have hF := Printed.rawIsotype_factorization_norm h
+    (by simp [intervalSobolevDensity]) f
+  simp only [modulationWeight_zero] at hF
+  let : BorelSpace (IdeleClassGroup (𝓞 F) F) := ⟨rfl⟩
+  let : T2Space (IdeleClassGroup (𝓞 F) F) := (ideleGroup_quotient.{_, 0} F).2.2.2.2.2.1
+  let : LocallyCompactSpace (IdeleClassGroup (𝓞 F) F) :=
+    (ideleGroup_quotient.{_, 0} F).2.2.2.2.2.2.1
+  let : SecondCountableTopology (IdeleClassGroup (𝓞 F) F) := by
+    let := idele_secondCountable F
+    exact inferInstanceAs (SecondCountableTopology
+      (IdeleGroup (𝓞 F) F ⧸ IdeleGroup.principalSubgroup (𝓞 F) F))
+  let : CompactSpace (ideleClassNorm F).ker := (ideleClassGroup_finiteness F).2.1
+  let : (ideleClassTamagawaMeasure F).IsHaarMeasure := (ideleClassTamagawaMeasure_isWeil F).1
+  let : (normOneIdeleClassTamagawaMeasure F).IsHaarMeasure :=
+    (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.1
+  exact Printed.rawIsotype_contra (ideleClassNorm F).ker (normOneIdeleClassTamagawaMeasure F)
+    (ideleClassTamagawaMeasure F) (adelicTheta f) (adelicTheta f).continuous
+    (fun ω ↦ homogeneousAdelicTheta ω f) (fun ω ↦ (homogeneousAdelicTheta ω f).continuous)
+    (fun _ _ ↦ rfl) hvol g0 hg0 hF.1 hF.2
+
+/-- Paper: Proposition 10.1.1.5(2), p. 437. Take ℚ(ζ₃), a = s = 0 and I = {0}, so the
+weight is one. The isometry gives ‖θ‖² = Σ_ω ‖θ_ω‖² for every test function. By Bessel's
+inequality for the characters of the norm-one classes, the right side is at most
+vol(C¹)²‖θ‖², and vol(C¹) = π/(3√3) < 1. So every theta function would vanish, but a
+nonnegative archimedean bump times the indicator of the finite integers has nonzero theta.
+(The printed counterexample over ℚ(i), with norm-one mass π/4, works the same way.) -/
 theorem Printed.globalThetaSobolev_rawIsotypeDecomposition_false :
-    ¬ Printed.globalThetaSobolev_rawIsotypeDecomposition := by sorry
+    ¬ Printed.globalThetaSobolev_rawIsotypeDecomposition := fun h ↦
+  Printed.rawIsotype_global_aux (CyclotomicField 3 ℚ) Printed.rawIsotype_volume_lt_one
+    (h (CyclotomicField 3 ℚ) 0 0 0 0 le_rfl le_rfl)
 
 /-- Paper: Proposition 10.1.1.5(2), p. 437, (10.1.1.15). The product of the
 S-local homogeneous quotient maps factors isometrically through the Hilbert sum.
