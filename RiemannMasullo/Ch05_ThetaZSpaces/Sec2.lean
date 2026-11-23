@@ -5,7 +5,7 @@ import all RiemannMasullo.Ch05_ThetaZSpaces.Sec1
 import all RiemannMasullo.Ch04_PeriodicSchauderBases.Sec3b
 public import RiemannMasullo.AppD_SchwartzBruhat.Sec1d
 import all RiemannMasullo.AppA_AlgebraicNT.Sec1
-import all RiemannMasullo.AppA_AlgebraicNT.Sec3
+import RiemannMasullo.AppA_AlgebraicNT.Sec3
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec2b
 import all RiemannMasullo.Ch02_AdelicTheta.Sec1
 import all RiemannMasullo.Ch02_AdelicTheta.Sec2b

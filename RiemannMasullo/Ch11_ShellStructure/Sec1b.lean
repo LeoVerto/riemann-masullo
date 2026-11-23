@@ -3,7 +3,7 @@ module
 public import RiemannMasullo.Ch10_TraceSpectral.Sec1
 public import RiemannMasullo.Ch11_ShellStructure.Sec1a
 
-import all RiemannMasullo.AppA_AlgebraicNT.Sec3
+import RiemannMasullo.AppA_AlgebraicNT.Sec3
 import Mathlib.MeasureTheory.Integral.ExpDecay
 
 /-!

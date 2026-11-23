@@ -716,7 +716,7 @@ section
 omit [NumberField F] in
 /-- The archimedean factors are additive Haar measures by transport from the real and
 complex lines. -/
-private theorem infiniteLocalAdditiveTamagawaMeasure_haar (v : InfinitePlace F) :
+theorem infiniteLocalAdditiveTamagawaMeasure_haar (v : InfinitePlace F) :
     (infiniteLocalAdditiveTamagawaMeasure F v).IsAddHaarMeasure := by
   let : BorelSpace v.Completion := ⟨rfl⟩
   by_cases h : v.IsReal
@@ -844,7 +844,7 @@ private theorem infiniteAdeleFundamentalDomain_tamagawaMass :
 
 /-- The product of the local integer masses is the reciprocal square root of the
 absolute discriminant. -/
-private theorem finiteLocalTamagawaMass_finprod :
+theorem finiteLocalTamagawaMass_finprod :
     (∏ᶠ v : Primes(F), differentMass(F, v)) =
       (ENNReal.ofReal (Real.sqrt (↑(discr F).natAbs : ℝ)))⁻¹ := by
   let J := differentIdeal ℤ (𝓞 F)
@@ -2506,7 +2506,7 @@ theorem padicTamagawaFourier_integerUnits :
 open Filter Topology in
 /-- A nontrivial continuous additive character on a proper normed field identifies
 the additive group with its Pontryagin dual via multiplication. -/
-private theorem exists_pontryaginDualEquiv_of_normedField
+theorem exists_pontryaginDualEquiv_of_normedField
     {K : Type*} [NormedField K] [ProperSpace K] (ψ : Multiplicative K →ₜ* Circle)
     (hψ : ∃ z, ψ (Multiplicative.ofAdd z) ≠ 1) :
     ∃ e : Multiplicative K ≃ₜ* PontryaginDual (Multiplicative K),
@@ -3007,7 +3007,7 @@ private theorem ratLocalCharacter_eq_one (v : Primes(ℚ)) (x : v.adicCompletion
   exact e.injective he ▸ hz
 
 /-- Membership in the integral subring amounts to integrality in each finite coordinate. -/
-private theorem mem_ratIntegralAdeles (a : 𝔸[ℚ]) :
+theorem mem_ratIntegralAdeles (a : 𝔸[ℚ]) :
     a ∈ ratIntegralAdeles ↔ ∀ v : Primes(ℚ), a.2 v ∈ v.adicCompletionIntegers ℚ := by
   change a ∈ integralAdelesOutside ℚ ∅ ↔ _
   simp only [integralAdelesOutside, Subring.mem_iInf, Finset.notMem_empty, not_false_eq_true,
@@ -3015,7 +3015,7 @@ private theorem mem_ratIntegralAdeles (a : 𝔸[ℚ]) :
   rfl
 
 /-- On integral finite components the global character is its real factor. -/
-private theorem ratAdeleStandardCharacter_of_integral (a : 𝔸[ℚ]) (ha : a ∈ ratIntegralAdeles) :
+theorem ratAdeleStandardCharacter_of_integral (a : 𝔸[ℚ]) (ha : a ∈ ratIntegralAdeles) :
     ratAdeleStandardCharacter a = Circle.exp (2 * Real.pi * ratRealPart a) := by
   change Circle.exp (2 * Real.pi * ratRealPart a) *
     (∏ᶠ v : Primes(ℚ), ratLocalCharacter v (a.2 v)) = _
@@ -3534,7 +3534,7 @@ local instance : BorelSpace (Multiplicative 𝔸[F]) := ⟨rfl⟩
 open scoped IsDedekindDomain.FiniteAdeleRing RestrictedProduct in
 /-- The rational adeles are second countable by the countable open cover obtained by
 allowing a finite set of primes to have nonintegral components. -/
-private theorem ratAdele_secondCountable : SecondCountableTopology (Multiplicative 𝔸[ℚ]) := by
+theorem ratAdele_secondCountable : SecondCountableTopology (Multiplicative 𝔸[ℚ]) := by
   let I := Primes(ℚ)
   let K (v : I) := v.adicCompletion ℚ
   let O (v : I) : Set (K v) := v.adicCompletionIntegers ℚ
@@ -3576,7 +3576,7 @@ attribute [local instance] ratAdele_secondCountable
 open scoped RestrictedProduct in
 /-- The product of the infinite adeles and the locally compact restricted product of
 the finite completions is locally compact. -/
-private theorem adele_locallyCompact : LocallyCompactSpace (Multiplicative 𝔸[F]) := by
+theorem adele_locallyCompact : LocallyCompactSpace (Multiplicative 𝔸[F]) := by
   let (v : Primes(F)) : CompactSpace (v.adicCompletionIntegers F) :=
     compactSpace_adicCompletionIntegers v
   let : Fact (∀ v : Primes(F), IsOpen (v.adicCompletionIntegers F : Set (v.adicCompletion F))) :=
@@ -3595,7 +3595,7 @@ local instance : T2Space (Multiplicative 𝔸[F]) := by
 
 /-- The covolume-one measure is Haar on the multiplicative synonym of the
 additive group of adeles. -/
-private theorem additiveTamagawaMeasure_isHaar :
+theorem additiveTamagawaMeasure_isHaar :
     (show Measure (Multiplicative 𝔸[F]) from additiveTamagawaMeasure F).IsHaarMeasure := by
   have h := (additiveTamagawaMeasure_existsUnique F).exists.choose_spec.1
   exact { toIsFiniteMeasureOnCompacts := h.toIsFiniteMeasureOnCompacts
@@ -4269,7 +4269,7 @@ private theorem isLCAPlancherelMeasure_of_compactOpenSubgroup
 end
 
 /-- The local trace character is continuous, additive, and nontrivial. -/
-private theorem finiteLocalStandardCharacter_exists_continuousMonoidHom (v : Primes(F)) :
+theorem finiteLocalStandardCharacter_exists_continuousMonoidHom (v : Primes(F)) :
     ∃ ψ : Multiplicative (v.adicCompletion F) →ₜ* Circle,
       (∀ x : v.adicCompletion F, ψ (Multiplicative.ofAdd x) = finiteLocalStandardCharacter F v x) ∧
       ∃ x : v.adicCompletion F, ψ (Multiplicative.ofAdd x) ≠ 1 := by
@@ -4314,7 +4314,7 @@ private theorem finiteLocalStandardCharacter_exists_continuousMonoidHom (v : Pri
   exact padicStandardCharacter_inv_prime_ne_one p.val
 
 /-- The local Tamagawa measure is regular because its Haar scalar is finite. -/
-private theorem finiteLocalAdditiveTamagawaMeasure_regular (v : Primes(F)) :
+theorem finiteLocalAdditiveTamagawaMeasure_regular (v : Primes(F)) :
     (finiteLocalAdditiveTamagawaMeasure F v).Regular := by
   let μ := Measure.addHaar (G := v.adicCompletion F)
   let O := (v.adicCompletionIntegers F : Set (v.adicCompletion F))
@@ -5313,7 +5313,7 @@ theorem sAdeleStandardCharacter_single_finite (v : S) (x : v.val.adicCompletion 
 
 /-- Bundle the global character as a continuous homomorphism by evaluating the
 adelic duality pairing at the multiplicative identity of the adele ring. -/
-private theorem exists_adeleCharacterHom :
+theorem exists_adeleCharacterHom :
     ∃ ψ : Multiplicative 𝔸[F] →ₜ* Circle, ∀ a : 𝔸[F],
       ψ (Multiplicative.ofAdd a) = adeleStandardCharacter F a := by
   obtain ⟨e, he, -⟩ := additiveTamagawaMeasure_selfDual F
@@ -5732,7 +5732,7 @@ local notation "classVolume(" F ")" =>
       Nat.cast (Units.torsionOrder F)))
 
 /-- The exponential pushforward of Lebesgue measure is Haar measure on the positive reals. -/
-private theorem positiveRealHaar_isHaarMeasure : positiveRealHaar.IsHaarMeasure := by
+theorem positiveRealHaar_isHaarMeasure : positiveRealHaar.IsHaarMeasure := by
   let : BorelSpace ℝ≥0ˣ := borelSpace_units_of_continuousInv₀ ℝ≥0
   let μ : Measure (Multiplicative ℝ) := (volume : Measure ℝ)
   let : μ.IsHaarMeasure := by
@@ -6222,14 +6222,14 @@ local notation "finiteUnitAt" => fun v : Primes(F) ↦
     (RingHom.snd (InfiniteAdeleRing F) (FiniteAdeleRing (𝓞 F) F))))
 
 /-- The product of local unit groups at infinity and at the selected finite places. -/
-private abbrev IdeleCoordinates :=
+abbrev IdeleCoordinates :=
   ((w : InfinitePlace F) → w.Completionˣ) × ((v : S) → (v.val.adicCompletion F)ˣ)
 
 open Topology in
 open scoped RestrictedProduct in
 /-- Restricting idelic Haar measure to the subgroup of units outside S and projecting
 away its compact tail gives a Haar measure on the selected local coordinates. -/
-private theorem multiplicativeTamagawaMeasure_projected_haar :
+theorem multiplicativeTamagawaMeasure_projected_haar :
     ∃ ν : Measure (IdeleCoordinates F S), ν.IsHaarMeasure ∧
       ∀ W : Set (IdeleCoordinates F S), MeasurableSet W →
         ν W = multiplicativeTamagawaMeasure F
@@ -6328,7 +6328,7 @@ private theorem multiplicativeTamagawaMeasure_projected_haar :
     exact hg
 
 /-- The finite-place normalization rescales Haar measure by a positive finite constant. -/
-private theorem finiteLocalMultiplicativeTamagawaMeasure_haar (v : Primes(F)) :
+theorem finiteLocalMultiplicativeTamagawaMeasure_haar (v : Primes(F)) :
     (finiteLocalMultiplicativeTamagawaMeasure F v).IsHaarMeasure := by
   let μ := Measure.haar (G := (v.adicCompletion F)ˣ)
   let O := (v.adicCompletionIntegers F).units
@@ -6347,7 +6347,8 @@ private theorem finiteLocalMultiplicativeTamagawaMeasure_haar (v : Primes(F)) :
     (ENNReal.div_ne_top (ENNReal.inv_ne_top.mpr (ENNReal.ofReal_pos.mpr hsqrt).ne') hmass.ne')
 
 omit [NumberField F] in
-private theorem infiniteLocalMultiplicative_isHaar (w : InfinitePlace F) :
+/-- The infinite-place multiplicative Tamagawa measure is a Haar measure. -/
+theorem infiniteLocalMultiplicative_isHaar (w : InfinitePlace F) :
     (infiniteLocalMultiplicativeTamagawaMeasure F w).IsHaarMeasure := by
   let : BorelSpace w.Completion := ⟨rfl⟩
   let := infiniteLocalAdditiveTamagawaMeasure_haar F w
@@ -7464,7 +7465,8 @@ ideles by the global multiplicative Tamagawa measure and `dt/t`. -/
 def normOneIdeleTamagawaMeasure : Measure N[F] :=
   (normOneIdeleTamagawaMeasure_existsUnique F).exists.choose
 
-private theorem idele_secondCountable : SecondCountableTopology 𝕀[F] := by
+/-- The idele group of a number field is second countable. -/
+theorem idele_secondCountable : SecondCountableTopology 𝕀[F] := by
   let := ratAdele_secondCountable
   obtain ⟨u, _, _⟩ := exists_adeleTrace_dualCoordinates F
   let : SecondCountableTopology 𝔸[F] := u.symm.toHomeomorph.isEmbedding.secondCountableTopology
@@ -7473,7 +7475,7 @@ private theorem idele_secondCountable : SecondCountableTopology 𝕀[F] := by
 
 /-- In a split norm sequence the conditional measure at t is the translate of the
 kernel measure by s(t). Integrating these translates gives the product formula. -/
-private theorem normProduct_of_isWeil {G : Type*} [CommGroup G] [TopologicalSpace G]
+theorem normProduct_of_isWeil {G : Type*} [CommGroup G] [TopologicalSpace G]
     [IsTopologicalGroup G] [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G]
     [MeasurableSpace G] [BorelSpace G] (n : G →* ℝ≥0ˣ) (hn : Continuous n)
     (s : ℝ≥0ˣ → G) (hs : Continuous s) (hr : RightInverse s n)
@@ -7527,7 +7529,8 @@ theorem multiplicativeTamagawaMeasure_normProduct (s : ℝ≥0ˣ →* 𝕀[F]) (
   let : (normOneIdeleTamagawaMeasure F).Regular := hνreg
   exact normProduct_of_isWeil _ hnorm s hs hn _ hreg _ hνreg hw
 
-private theorem measurableSet_ideleFundamentalDomain
+/-- The fundamental domain of the idele class group is measurable. -/
+theorem measurableSet_ideleFundamentalDomain
     (v₀ : InfinitePlace F) (σ : ℂ ≃ₐ[ℝ] ℂ)
     (b : Module.Basis (Fin (Units.rank F)) ℤ (Additive ((𝓞 F)ˣ ⧸ Units.torsion F)))
     (r : CommRing.Pic (𝓞 F) → N[F]) : MeasurableSet (ideleFundamentalDomain F b v₀ σ r) := by
@@ -7705,7 +7708,8 @@ def sMultiplicativeTamagawaMeasure : Measure 𝕀ₛ :=
       (Measure.pi (fun v : S ↦ finiteLocalMultiplicativeTamagawaMeasure F v.val))).map
     (fun x ↦ e.symm (eArch.symm x.1, eS.symm x.2))
 
-private theorem finiteLocalMultiplicative_isHaar (v : Primes(F)) :
+/-- The finite-place multiplicative Tamagawa measure is a Haar measure. -/
+theorem finiteLocalMultiplicative_isHaar (v : Primes(F)) :
     (finiteLocalMultiplicativeTamagawaMeasure F v).IsHaarMeasure := by
   let μ := Measure.haar (G := (v.adicCompletion F)ˣ)
   let U : Set (v.adicCompletion F)ˣ := (v.adicCompletionIntegers F).units
@@ -7721,7 +7725,8 @@ private theorem finiteLocalMultiplicative_isHaar (v : Primes(F)) :
     (ENNReal.div_ne_top (ENNReal.inv_ne_top.mpr (ENNReal.ofReal_pos.mpr
       (Real.sqrt_pos_of_pos (pow_pos hq _))).ne') hpos.ne')
 
-private def sIdeleUnitsEquiv :
+/-- The units of the infinite and selected finite local factors form the S-idele group. -/
+def sIdeleUnitsEquiv :
     (((w : InfinitePlace F) → w.Completionˣ) × ((v : S) → (v.val.adicCompletion F)ˣ)) ≃ₜ* 𝕀ₛ :=
   let e := ContinuousMulEquiv.prodUnits (InfiniteAdeleRing F) ((v : S) → v.val.adicCompletion F)
   let a := ContinuousMulEquiv.piUnits (M := fun w : InfinitePlace F ↦ w.Completion)
@@ -7729,7 +7734,8 @@ private def sIdeleUnitsEquiv :
   (ContinuousMulEquiv.mk' (a.symm.toHomeomorph.prodCongr b.symm.toHomeomorph)
     (fun x y ↦ Prod.ext (map_mul a.symm x.1 y.1) (map_mul b.symm x.2 y.2))).trans e.symm
 
-private theorem sIdele_borelSpace
+/-- The S-idele group is Borel when its local factors are second countable. -/
+theorem sIdele_borelSpace
     [∀ w : InfinitePlace F, SecondCountableTopology w.Completion]
     [∀ v : S, SecondCountableTopology (v.val.adicCompletion F)] : BorelSpace 𝕀ₛ := by
   let (w : InfinitePlace F) : BorelSpace w.Completion := ⟨rfl⟩
@@ -7938,11 +7944,11 @@ private theorem sAdeleProjection_restrict (T : Finset (Primes(F))) (hST : Disjoi
   ac_rfl
 
 /-- Frequencies whose outside coordinates annihilate the omitted local integer rings. -/
-private def sAdeleTailDual : Set 𝔸[F] :=
+def sAdeleTailDual : Set 𝔸[F] :=
   {y | ∀ v : Primes(F), v ∉ S → ‖y.2 v‖ ≤ (v.asIdeal.absNorm : ℝ) ^ differentExp(F, v)}
 
 /-- The integer tail and its annihilator project with reciprocal masses. -/
-private theorem sAdeleProjection_dual_masses :
+theorem sAdeleProjection_dual_masses :
     ∃ c : ℝ≥0, c ≠ 0 ∧ MeasurableSet (sAdeleTailDual F S) ∧
       MeasurePreserving (adeleProjection F S)
         ((additiveTamagawaMeasure F).restrict (integralAdelesOutside F S)) (c • sAdditiveTamagawaMeasure F S) ∧
@@ -8024,7 +8030,7 @@ private theorem sAdeleProjection_dual_masses :
 
 /-- Extending a function by the integer-tail indicator restricts its Fourier
 transform to the dual tail and multiplies it by the omitted integer mass. -/
-private theorem tamagawaFourier_sAdeleLift (c : ℝ≥0)
+theorem tamagawaFourier_sAdeleLift (c : ℝ≥0)
     (hm : MeasurePreserving (adeleProjection F S)
       ((additiveTamagawaMeasure F).restrict (integralAdelesOutside F S)) (c • sAdditiveTamagawaMeasure F S))
     (f : SAdeleRing F S → ℂ) (hf : Integrable f (sAdditiveTamagawaMeasure F S)) :
@@ -8210,7 +8216,7 @@ theorem sAdditiveTamagawaMeasure_selfDual :
 
 /-- The scalar between the S-local product and covolume-one measures is the
 reciprocal of the mass of the omitted integer rings. -/
-private theorem sAdditiveTamagawaMeasure_scale :
+theorem sAdditiveTamagawaMeasure_scale :
     ∃ c : ℝ≥0, c ≠ 0 ∧ sAdditiveTamagawaMeasure F S = c • sAdditiveCovolumeOneMeasure F S ∧
       (c : ℝ≥0∞) = ∏ᶠ v : {v : Primes(F) // v ∉ S}, (differentMass(F, v.val))⁻¹ := by
   let μ := sAdditiveTamagawaMeasure F S

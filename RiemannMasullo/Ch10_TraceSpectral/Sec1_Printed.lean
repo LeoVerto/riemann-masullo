@@ -2,7 +2,7 @@ module
 
 public import RiemannMasullo.Ch10_TraceSpectral.Sec1
 
-import all RiemannMasullo.AppA_AlgebraicNT.Sec3
+import RiemannMasullo.AppA_AlgebraicNT.Sec3
 import all RiemannMasullo.Ch06_LocalGlobal.Sec2
 import RiemannMasullo.ForMathlib.Analysis.Distribution.SchwartzSpace.Gaussian
 import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension

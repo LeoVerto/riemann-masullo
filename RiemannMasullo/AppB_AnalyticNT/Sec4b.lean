@@ -1,6 +1,6 @@
 module
 
-import all RiemannMasullo.AppA_AlgebraicNT.Sec3
+import RiemannMasullo.AppA_AlgebraicNT.Sec3
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec2a
 import RiemannMasullo.ForMathlib.Analysis.Normed.Field.ProperSpace
 public import RiemannMasullo.AppB_AnalyticNT.Sec3

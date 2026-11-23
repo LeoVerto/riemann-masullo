@@ -3,7 +3,7 @@ module
 public import RiemannMasullo.Ch02_AdelicTheta.Sec4
 public import RiemannMasullo.Ch03_IdelicZeta.Sec2
 
-import all RiemannMasullo.AppA_AlgebraicNT.Sec3
+import RiemannMasullo.AppA_AlgebraicNT.Sec3
 import all RiemannMasullo.Ch02_AdelicTheta.Sec2a
 import RiemannMasullo.ForMathlib.MeasureTheory.Measure.Count
 import RiemannMasullo.ForMathlib.MeasureTheory.Measure.Haar.Unique
