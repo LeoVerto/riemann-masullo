@@ -35,28 +35,31 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
 | fixer: `general-purpose`, model sonnet, effort medium | – | `Fix <failing check or review comment> on PR #<p> in worktree <wt>, following S/HUNTER.md "Checks and pull request". Model tag <M>.` |
 
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
-   last check (last seen: AGENTS ed9dbb7, ERRATA 0d2e5b1), re-read the change, update the briefs
+   last check (last seen: AGENTS 9d44796, ERRATA ecf567d), re-read the change, update the briefs
    (HUNTER.md first), and update "last seen" here.
 0a. **#5889 MERGED** (2026-11-23 ~03:45Z, merge 0b7a2349). Claimed and queued (opus): #3878 (AppB Sec6,
    crowded: elmismisimoxhunca holds #3879), #5673 (Ch01 Sec4; #6012 merged 03:58Z, so no longer crowded; launch once warm has fb3acbf0), #4973
-   (Ch10 Sec2, RISK-5398). #3878 LAUNCHED 04:00Z (esc-appbsec6b); #4973 LAUNCHED 04:1xZ (esc-ch10sec2). Launch the rest (step 8a, one escalator each) only once
+   (Ch10 Sec2, RISK-5398). #3878 LAUNCHED 04:00Z (esc-appbsec6b); #4973 LAUNCHED 04:1xZ (esc-ch10sec2, PR #6063); #3878 PR #6071; #5673 LAUNCHED 05:0xZ (esc-ch01sec4). Step done. Launch the rest (step 8a, one escalator each) only once
    `git merge-base --is-ancestor 0b7a2349 <warm base>` holds (warm.log `ready` line); prompts name the
    vendored `RiemannMasullo/External/Grh/` lemmas the PR body assigns (horizontal estimates: finite zero
    factors, disk lower bound, log averaging; #4973: real-line L2, tail and pairing) and say "crowded file"
    where noted. Held ones (#3879 #3869 #3875 #3884 #3889 elmismisimoxhunca, #4982 factory-davidgu):
    no hints (user 04:0xZ: the integrator already commented on them). Then mark this step done.
 0b. (Done 2026-11-23 ~03:15Z: #4078/#4079 re-claimed by us after the user noted the last claims were ~5 h old; escalator esc-ch07sec1b4.)
-0c. **Watch PR #6043** (Tau Ceti Runge vendoring, rebased onto main; replaces closed #5972, whose base
-   #5887 was split into #6011 and #6012; asked by the user's vendoring helper session):
-   `gh pr view 6043 --json state -q .state`. Once #6043 is MERGED and the warm base contains it: tell the user; check
-   `claims.py 4666`; if FREE, claim it and run `escalate.sh 4666 "unblocked by #6043 (vendored
-   Runge)" --prior`, then launch one Opus escalator (it is a large refutation, not Sonnet work). Its prompt says:
-   use `IsCompact.isConnected_compl_iff_forall_differentiableOn_exists_polynomial_norm_sub_lt`
-   (import `RiemannMasullo.External.TauCeti.Analysis.Complex.Runge.Approximation`); what is left
-   is the inductive entire-function construction of ERRATA F22 plus connected complements of each
-   stage's square ∪ discs ∪ points; vendored Tau Ceti names live in `RiemannMasullo.External.TauCeti`
-   except `_root_` ones (`IsCompact.…`, `IsOpen.…`, `Differentiable.exists_polynomial_norm_sub_lt`).
-   Weaker leads after the merge (leads.txt): #4072, #4079, #4078. Never queue #4666 before the merge.
+0c. **#6043 MERGED** (~04:45Z). #4666 claimed and queued (opus). Launch its escalator when 2 units are
+   free and the warm base contains #6043 (`gh pr view 6043 --json mergeCommit`), AFTER the 0d fixes. Its prompt
+   says: use `IsCompact.isConnected_compl_iff_forall_differentiableOn_exists_polynomial_norm_sub_lt`
+   (import `RiemannMasullo.External.TauCeti.Analysis.Complex.Runge.Approximation`); what is left is the
+   inductive entire-function construction of ERRATA F22 plus connected complements of each stage's
+   square ∪ discs ∪ points; vendored Tau Ceti names live in `RiemannMasullo.External.TauCeti` except
+   `_root_` ones. Weaker leads (leads.txt): #4072, #4079, #4078. Tell the user it merged (done 04:5xZ).
+0d. **`import all` fixes** (AGENTS.md 9d44796 bans new `import all`): our open PRs #6071 (adds `import all
+   RiemannMasullo.External.Grh.Lemmas.LogLossGoodHeight`; fix: copy the private `logLoss_translate` as a
+   private helper with credit, drop the import) and #6072 (adds `import all` of Ch06 Sec2 and Ch03 Sec3;
+   fix: make the private lemmas it uses public in place per AGENTS.md, plain imports). One Sonnet fixer
+   (general-purpose, model sonnet, 1 unit) per PR, first free units; each re-checks the PR is OPEN, edits
+   its worktree, rebuilds, lint, signatures compare (expect only the made-public names), axioms unchanged,
+   pushes, one-line PR comment. Mark done here.
 1. Run `status.sh --mark` (advances the new-comments window) and `cleanup.sh` under timeout,
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
