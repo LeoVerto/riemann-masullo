@@ -148,6 +148,7 @@ a little thought. Skip anything deep.
   range (`scripts/paper.sh <p> <q>`, `--png <p>` for formulas).
 
 ## Elaboration traps and fixes that worked
+- **Untimed hang matching applied coercions with defeq-but-different instances** (#4896, PR #6661): `exact`/`convert`/`rfl` on `p u ω = …` against a helper's equation hung >10 min in `getFunInfo`/`collectDeps` on S-idele types, no heartbeat error. Fix: restate the helper privately over the statement's exact objects (subgroup/submodule of the same space) so instance paths match syntactically; for a mixed `MeasurableSpace` instance end with `revert key; delta <inst1> <inst2>; exact fun h ↦ h`. Diagnose with the scratch tactic in `S/notes/tools/DiffTac.txt` (lists instance mismatches between goal and hypothesis; scratch only, never in a PR).
 **The fix that keeps working:** run no tactic on the heavy objects themselves. State each step as
 a private lemma over abstract types (`{E} [AddCommGroup E] [Module ℂ E] …`, `{M Q Bm : Type*}`,
 `Submodule B`), with every binder written out (nothing from the section's `variable`s); bind it
