@@ -3,11 +3,12 @@ module
 public import Mathlib.NumberTheory.PrimeCounting
 public import RiemannMasullo.Ch11_ShellStructure.Sec2b
 
-import all RiemannMasullo.AppA_AlgebraicNT.Sec2
+import RiemannMasullo.AppA_AlgebraicNT.Sec2
 import RiemannMasullo.Ch10_TraceSpectral.Sec1
 import RiemannMasullo.Ch11_ShellStructure.Sec1a
 
 import all RiemannMasullo.Ch07_SchauderBasesZeta.Sec5
+import Mathlib.Analysis.Fourier.PoissonSummation
 
 /-!
 # Orbital kernels and orbital traces
@@ -759,6 +760,10 @@ theorem hasSum_divisorialKernelDifference (S : Finset V)
 
 section OrbitalTraces
 
+open scoped ContDiff FourierTransform SchwartzMap
+
+attribute [local instance] instIdeleClassSecondCountableSec1
+
 local notation "𝒟" => BruhatCompactSupport C𝔽
 local notation "πclass(" v ", " π ")" => IdeleClassGroup.ofAdicCompletion (𝓞 F) F v π
 local notation "q(" v ")" => (v).asIdeal.absNorm
@@ -782,6 +787,438 @@ theorem orbitalPlacePoissonTerm_trivial_zero (φ : 𝒟) (v : V) (π : (v.adicCo
         ∂normOneIdeleClassTamagawaMeasure F := by
   simp [orbitalPlacePoissonTerm]
 
+private def orbitalEulerZero (v : V) (t : ℝ) (n : ℤ) : ℂ :=
+  ((n : ℂ) * (2 * (Real.pi : ℂ)) / (Real.log (q(v) : ℝ) : ℂ) - (t : ℂ)) *
+    Complex.I
+
+private def orbitalEulerZeroEquiv (χ : PontryaginDual C𝔽) (v : V)
+    (hχ : (ideleClassNormTwist χ 0).IsUnramifiedAt v) (t : ℝ)
+    (ht : (ideleClassNormTwist χ 0).localValue v =
+      (q(v) : ℂ) ^ (-(t : ℂ) * Complex.I)) :
+    ℤ ≃ {z : ℂ // (finiteHeckeEulerFactor χ v z)⁻¹ = 0} := by
+  let L : ℂ := (Real.log (q(v) : ℝ) : ℂ)
+  have hq1 : (1 : ℝ) < q(v) := by exact_mod_cast HeightOneSpectrum.one_lt_absNorm v
+  have hq0 : (q(v) : ℂ) ≠ 0 := by exact_mod_cast (zero_lt_one.trans hq1).ne'
+  have hL : L ≠ 0 := Complex.ofReal_ne_zero.mpr (Real.log_pos hq1).ne'
+  have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_pos.ne'
+  have hz (z : ℂ) : (finiteHeckeEulerFactor χ v z)⁻¹ = 0 ↔
+      ∃ k : ℤ, (-z - (t : ℂ) * Complex.I) * L = k * (2 * (Real.pi : ℂ) * Complex.I) := by
+    rw [finiteHeckeEulerFactor_inv_eq_phase χ v hχ t ht, sub_eq_zero, eq_comm,
+      Complex.cpow_def_of_ne_zero hq0, ← Complex.natCast_log, Complex.exp_eq_one_iff]
+    simp only [L, mul_comm (Real.log (q(v) : ℝ) : ℂ)]
+  refine Equiv.ofBijective (fun n ↦ ⟨orbitalEulerZero v t n, (hz _).2 ⟨-n, ?_⟩⟩) ?_
+  · unfold orbitalEulerZero
+    change (-(((n : ℂ) * (2 * (Real.pi : ℂ)) / L - (t : ℂ)) * Complex.I) -
+      (t : ℂ) * Complex.I) * L = ((-n : ℤ) : ℂ) * _
+    push_cast
+    field_simp
+    ring
+  constructor
+  · intro m n h
+    apply Int.cast_injective (α := ℂ)
+    have h' := congrArg Subtype.val h
+    change (((m : ℂ) * (2 * (Real.pi : ℂ)) / L - (t : ℂ)) * Complex.I) =
+      (((n : ℂ) * (2 * (Real.pi : ℂ)) / L - (t : ℂ)) * Complex.I) at h'
+    apply (mul_left_inj' (show (2 : ℂ) * (Real.pi : ℂ) ≠ 0 from mul_ne_zero (by norm_num) hpi)).mp
+    apply (div_left_inj₀ hL).mp
+    apply (sub_left_inj).mp
+    exact (mul_left_inj' Complex.I_ne_zero).mp h'
+  · intro z
+    obtain ⟨k, hk⟩ := (hz z).mp z.property
+    refine ⟨-k, Subtype.ext ?_⟩
+    change ((((-k : ℤ) : ℂ) * (2 * (Real.pi : ℂ)) / L - (t : ℂ)) *
+      Complex.I) = z.val
+    push_cast
+    apply (mul_left_inj' hL).mp
+    field_simp
+    linear_combination hk
+
+private theorem orbitalSchwartz_hasSum (f : 𝓢(ℝ, ℂ)) :
+    HasSum (fun n : ℤ ↦ 𝓕 f (n : ℝ)) (∑' n : ℤ, f (n : ℝ)) := by
+  have hs : Summable (fun n : ℤ ↦ 𝓕 f (n : ℝ)) :=
+    summable_of_isBigO (Real.summable_abs_int_rpow one_lt_two)
+      (((𝓕 f).isBigO_cocompact_rpow (-2)).comp_tendsto Int.tendsto_coe_cofinite)
+  have he := f.tsum_eq_tsum_fourier 0
+  simp at he
+  exact he.symm ▸ hs.hasSum
+
+
+private def orbitalNormSection (r : ℝ) : C𝔽 :=
+  QuotientGroup.mk (canonicalIdeleNormSection F (Units.mk0 (Real.exp r).toNNReal (by positivity)))
+
+private theorem orbitalNormSection_norm (r : ℝ) :
+    ideleClassNorm F (orbitalNormSection (F := F) r) =
+      Units.mk0 (Real.exp r).toNNReal (by positivity) :=
+  canonicalIdeleNormSection_rightInverse F _
+
+private def orbitalLogProfile (χ : PontryaginDual C𝔽) (φ : 𝒟) (L t : ℝ) (x : ℝ) : ℂ :=
+  (L : ℂ) * ∫ h : C₁, φ.val (orbitalNormSection (-L * x) * h.val) *
+    ideleClassNormTwist χ (-(1 : ℂ) / 2 - (t : ℂ) * Complex.I)
+      (orbitalNormSection (-L * x) * h.val) ∂normOneIdeleClassTamagawaMeasure F
+
+private theorem orbitalLogProfile_at_int (χ : PontryaginDual C𝔽) (φ : 𝒟) (v : V)
+    (π : (v.adicCompletion F)ˣ) (hπ : Valued.v.IsUniformizer π.val) (t : ℝ)
+    (ht : ∀ (s : ℂ) (x : (v.adicCompletion F)ˣ),
+      finitePlaceRestriction F v (ideleClassNormTwist χ s) x =
+        ((‖x.val‖ : ℝ) : ℂ) ^ (s + (t : ℂ) * Complex.I)) (n : ℤ) :
+    orbitalLogProfile χ φ (Real.log (q(v) : ℝ)) t (n : ℝ) =
+      orbitalPlacePoissonTerm χ φ v π n := by
+  let L := Real.log (q(v) : ℝ)
+  let g := πclass(v, π) ^ n
+  let σ := orbitalNormSection (F := F) (-L * n)
+  let ψ := ideleClassNormTwist χ (-(1 : ℂ) / 2 - (t : ℂ) * Complex.I)
+  have hq : (0 : ℝ) < q(v) := by exact_mod_cast (zero_lt_one.trans (HeightOneSpectrum.one_lt_absNorm v))
+  have hgpow : πclass(v, π ^ n) = g :=
+    map_zpow (IdeleClassGroup.ofAdicCompletion (𝓞 F) F v) π n
+  have hnorm : ‖(π ^ n).val‖ = (q(v) : ℝ) ^ (-n) := by
+    rw [Units.val_zpow_eq_zpow_val, norm_zpow, norm_uniformizer_adicCompletion v _ hπ,
+      inv_zpow', zpow_neg]
+  have hgn : (((ideleClassNorm F g).val : ℝ≥0) : ℝ) = (q(v) : ℝ) ^ (-n) := by
+    rw [← hgpow, ideleClassNorm_ofAdicCompletion, Units.coe_map]
+    exact hnorm
+  have hσ : ideleClassNorm F σ = ideleClassNorm F g := by
+    apply Units.ext
+    apply NNReal.eq
+    rw [show ideleClassNorm F σ = _ from orbitalNormSection_norm _, hgn]
+    rw [Units.val_mk0, Real.coe_toNNReal _ (Real.exp_pos _).le, ← Real.rpow_intCast, Real.rpow_def_of_pos hq]
+    congr 1
+    push_cast
+    unfold L
+    ring
+  have hk : ideleClassNorm F (g⁻¹ * σ) = 1 := by rw [map_mul, map_inv, hσ, inv_mul_cancel]
+  let k : C₁ := ⟨g⁻¹ * σ, hk⟩
+  let A (h : C₁) := φ.val (g * h.val) * ψ (g * h.val)
+  let : (normOneIdeleClassTamagawaMeasure F).IsHaarMeasure :=
+    (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.1
+  have htranslate :
+      ∫ h : C₁, φ.val (σ * h.val) * ψ (σ * h.val) ∂normOneIdeleClassTamagawaMeasure F =
+        ∫ h, A h ∂normOneIdeleClassTamagawaMeasure F := by
+    rw [← integral_mul_left_eq_self A k]
+    apply integral_congr_ae
+    filter_upwards with h
+    have he : g * (k * h).val = σ * h.val := by
+      change g * ((g⁻¹ * σ) * h.val) = _
+      rw [mul_assoc g⁻¹ σ, mul_inv_cancel_left]
+    simp only [A, he]
+  have hψ : ψ g = (q(v) : ℂ) ^ ((n : ℂ) / 2) := by
+    have hlocal := ht (-(1 : ℂ) / 2 - (t : ℂ) * Complex.I) (π ^ n)
+    change ψ (πclass(v, π ^ n)) = _ at hlocal
+    rw [hgpow, hnorm, sub_add_cancel] at hlocal
+    rw [hlocal, Complex.cpow_def_of_ne_zero (by exact_mod_cast (zpow_pos hq (-n)).ne'),
+      Complex.cpow_def_of_ne_zero (by exact_mod_cast hq.ne')]
+    rw [← Complex.ofReal_log (zpow_pos hq (-n)).le, Real.log_zpow, ← Complex.natCast_log]
+    congr 1
+    push_cast
+    ring
+  have hfactor (h : C₁) : A h = (q(v) : ℂ) ^ ((n : ℂ) / 2) *
+      (φ.val (g * h.val) * (χ h.val : ℂ)) := by
+    have hc : ψ h.val = (χ h.val : ℂ) := by
+      change (χ h.val : ℂ) * (((ideleClassNorm F h.val).val : ℝ) : ℂ) ^
+        (-(1 : ℂ) / 2 - (t : ℂ) * Complex.I) = (χ h.val : ℂ)
+      rw [show ideleClassNorm F h.val = 1 from h.property]
+      simp
+    unfold A
+    rw [map_mul, hc, hψ]
+    ring
+  change (L : ℂ) * (∫ h : C₁, φ.val (σ * h.val) * ψ (σ * h.val)
+      ∂normOneIdeleClassTamagawaMeasure F) = _
+  rw [htranslate]
+  simp_rw [hfactor, integral_const_mul]
+  exact (mul_assoc _ _ _).symm
+
+private theorem orbitalNormSection_mul_norm (r : ℝ) (h : C₁) :
+    (((ideleClassNorm F (orbitalNormSection r * h.val)).val : ℝ≥0) : ℝ) = Real.exp r := by
+  rw [map_mul, show ideleClassNorm F h.val = 1 from h.property, mul_one, orbitalNormSection_norm,
+    Units.val_mk0, Real.coe_toNNReal _ (Real.exp_pos r).le]
+
+private theorem orbitalCompactSupport_mem_schwartz (φ : 𝒟) :
+    φ.val ∈ schwartzBruhatSubmodule C𝔽 := by
+  obtain ⟨m, _, hm, hms⟩ := exists_ideleClassModulation F
+  have hf := bruhatCompactSupport_le_modulatedExponentialDecay m {0} hm hms φ.property
+  rwa [modulatedExponentialDecaySubmodule_singleton_zero] at hf
+
+/-- The character-weighted coset integral is smooth on the logarithmic norm line. -/
+private theorem orbitalCharacterAverage_contDiff (χ : PontryaginDual C𝔽) (φ : 𝒟) :
+    ContDiff ℝ (∞) (fun x : ℝ ↦ ∫ h : C₁,
+      (χ (orbitalNormSection x * h.val) : ℂ) * φ.val (orbitalNormSection x * h.val)
+        ∂normOneIdeleClassTamagawaMeasure F) := by
+  let c : ℝ≥0ˣ → C𝔽 := fun u ↦ QuotientGroup.mk (canonicalIdeleNormSection F u)
+  have hc : Continuous c :=
+    QuotientGroup.continuous_mk.comp (canonicalIdeleNormSection_continuous F)
+  have hcr : RightInverse c (ideleClassNorm F) := canonicalIdeleNormSection_rightInverse F
+  let eQ := normQuotientEquiv (ideleClassNorm F) (isProperMap_ideleClassNorm F).continuous
+    c hc hcr
+  let e : (C𝔽 ⧸ C₁) ≃ₜ* Multiplicative ℝ := eQ.trans positiveRealLogEquiv
+  have he (x : ℝ) : (e (QuotientGroup.mk (orbitalNormSection x))).toAdd = x := by
+    change (positiveRealLogEquiv (ideleClassNorm F (orbitalNormSection x))).toAdd = _
+    rw [positiveRealLogEquiv_apply, orbitalNormSection_norm, Units.val_mk0,
+      Real.coe_toNNReal _ (Real.exp_pos x).le, Real.log_exp]
+  let f₀ : SchwartzBruhat C𝔽 := ⟨φ.val, orbitalCompactSupport_mem_schwartz φ⟩
+  obtain ⟨P, hP⟩ := exists_schwartzBruhat_characterEquiv (G := C𝔽) χ
+  have hK : IsCompact (C₁ : Set C𝔽) :=
+    (isProperMap_ideleClassNorm F).isCompact_preimage isCompact_singleton
+  let : LocallyCompactSpace C₁ := hK.isClosed.locallyCompactSpace
+  let : (normOneIdeleClassTamagawaMeasure F).IsHaarMeasure :=
+    (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.1
+  let : (normOneIdeleClassTamagawaMeasure F).Regular :=
+    (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.2.1
+  let f₁ := schwartzBruhatCosetIntegral C₁ (normOneIdeleClassTamagawaMeasure F) hK.isClosed (P f₀)
+  let : CommGroup (C𝔽 ⧸ C₁) := QuotientGroup.Quotient.commGroup C₁
+  let : T2Space (C𝔽 ⧸ C₁) := e.toHomeomorph.isEmbedding.t2Space
+  let : LocallyCompactSpace (C𝔽 ⧸ C₁) := e.toHomeomorph.isClosedEmbedding.locallyCompactSpace
+  obtain ⟨T, hT⟩ := schwartzBruhat_realCoordinate_equiv (G := C𝔽 ⧸ C₁) e
+  let b : 𝓢(ℝ, ℂ) := T.symm f₁
+  have hB : T b = f₁ := T.apply_symm_apply f₁
+  have hb (x : ℝ) : b x = ∫ h : C₁, (χ (orbitalNormSection x * h.val) : ℂ) *
+      φ.val (orbitalNormSection x * h.val) ∂normOneIdeleClassTamagawaMeasure F := by
+    let q : C𝔽 ⧸ C₁ := QuotientGroup.mk (orbitalNormSection x)
+    have hx : (e q).toAdd = x := he x
+    calc
+      b x = T b q := (congrArg b hx).symm.trans (hT b q).symm
+      _ = f₁ q := congrArg (fun g : SchwartzBruhat (C𝔽 ⧸ C₁) ↦ g q) hB
+      _ = ∫ h : C₁, (P f₀) (orbitalNormSection x * h.val) ∂normOneIdeleClassTamagawaMeasure F :=
+        schwartzBruhatCosetIntegral_mk C₁ (normOneIdeleClassTamagawaMeasure F) hK.isClosed (P f₀) _
+      _ = _ := by
+        apply integral_congr_ae
+        filter_upwards with h
+        exact hP f₀ (orbitalNormSection x * h.val)
+  have hb' : (b : ℝ → ℂ) = _ := funext hb
+  exact hb' ▸ b.smooth'
+
+/-- The real rescaling and the norm twist preserve smoothness of the coset integral. -/
+private theorem orbitalLogProfile_contDiff (χ : PontryaginDual C𝔽) (φ : 𝒟)
+    (L t : ℝ) : ContDiff ℝ (∞) (orbitalLogProfile χ φ L t) := by
+  let ψ := -(1 : ℂ) / 2 - (t : ℂ) * Complex.I
+  let A (x : ℝ) := ∫ h : C₁, (χ (orbitalNormSection x * h.val) : ℂ) *
+    φ.val (orbitalNormSection x * h.val) ∂normOneIdeleClassTamagawaMeasure F
+  have hprofile : orbitalLogProfile χ φ L t =
+      fun x ↦ (L : ℂ) * (A (-L * x) * Complex.exp (ψ * ((-L * x : ℝ) : ℂ))) := by
+    funext x
+    unfold orbitalLogProfile A
+    rw [← integral_mul_const]
+    congr 1
+    apply integral_congr_ae
+    filter_upwards with h
+    change φ.val _ * ((χ _ : ℂ) * (((ideleClassNorm F _).val : ℝ) : ℂ) ^ ψ) = _
+    rw [orbitalNormSection_mul_norm,
+      Complex.cpow_def_of_ne_zero (Complex.ofReal_ne_zero.mpr (Real.exp_pos (-L * x)).ne'),
+      ← Complex.ofReal_log (Real.exp_pos (-L * x)).le, Real.log_exp]
+    rw [mul_comm ((-L * x : ℝ) : ℂ) ψ, ← mul_assoc, mul_comm (φ.val _) (χ _ : ℂ)]
+  rw [hprofile]
+  have hcomp : ContDiff ℝ (∞) (fun x : ℝ ↦ -L * x) := contDiff_const.mul contDiff_id
+  exact contDiff_const.mul (((orbitalCharacterAverage_contDiff χ φ).comp hcomp).mul
+    ((contDiff_const.mul (Complex.ofRealCLM.contDiff.comp hcomp)).cexp))
+
+/-- The rescaled log norm of the Bruhat support contains the support of the average. -/
+private theorem orbitalLogProfile_hasCompactSupport (χ : PontryaginDual C𝔽) (φ : 𝒟)
+    {L : ℝ} (hL : 0 < L) (t : ℝ) :
+    HasCompactSupport (orbitalLogProfile χ φ L t) := by
+  let r (g : C𝔽) : ℝ := -(Real.log (((ideleClassNorm F g).val : ℝ≥0) : ℝ)) / L
+  have hr : Continuous r := by
+    have hn : Continuous (fun g : C𝔽 ↦ ((ideleClassNorm F g).val : ℝ)) :=
+      NNReal.continuous_coe.comp (Units.continuous_val.comp (isProperMap_ideleClassNorm F).continuous)
+    change Continuous (fun g : C𝔽 ↦ -Real.log ((ideleClassNorm F g).val : ℝ) / L)
+    exact (hn.log (fun g ↦ (NNReal.coe_pos.mpr (Units.zero_lt (ideleClassNorm F g))).ne')).neg.div_const L
+  refine HasCompactSupport.intro ((show HasCompactSupport φ.val from φ.property.2).image hr) ?_
+  intro x hx
+  unfold orbitalLogProfile
+  refine mul_eq_zero_of_right _ ?_
+  apply integral_eq_zero_of_ae
+  filter_upwards with h
+  have hφ : φ.val (orbitalNormSection (-L * x) * h.val) = 0 := by
+    apply image_eq_zero_of_notMem_tsupport
+    intro hmem
+    apply hx
+    refine ⟨_, hmem, ?_⟩
+    unfold r
+    rw [orbitalNormSection_mul_norm, Real.log_exp]
+    field_simp
+  simp only [hφ, zero_mul, Pi.zero_apply]
+
+private theorem orbitalLogProfile_schwartz (χ : PontryaginDual C𝔽) (φ : 𝒟)
+    {L : ℝ} (hL : 0 < L) (t : ℝ) :
+    ∃ f : 𝓢(ℝ, ℂ), ⇑f = orbitalLogProfile χ φ L t :=
+  ⟨(orbitalLogProfile_hasCompactSupport χ φ hL t).toSchwartzMap
+    (orbitalLogProfile_contDiff χ φ L t), rfl⟩
+
+/-- Weil integration of a test in the real norm coordinate. -/
+private theorem orbitalEulerSum_logNorm_integral (σ : ℝ≥0ˣ → C𝔽) (hσ : Continuous σ)
+    (hσnorm : RightInverse σ (ideleClassNorm F)) (f : C𝔽 → ℂ)
+    (hf : Integrable f (ideleClassTamagawaMeasure F)) :
+    (∫ g, f g ∂ideleClassTamagawaMeasure F) = ∫ y : ℝ,
+      ∫ h : C₁, f (σ (Units.mk0 (Real.exp y).toNNReal (by positivity)) * h.val)
+        ∂normOneIdeleClassTamagawaMeasure F := by
+  let : BorelSpace ℝ≥0ˣ := borelSpace_units_of_continuousInv₀ _
+  let : SecondCountableTopology ℝ≥0ˣ := Units.isEmbedding_val₀.secondCountableTopology
+  let : SFinite positiveRealHaar := by unfold positiveRealHaar; infer_instance
+  let : CompactSpace C₁ := (ideleClassGroup_finiteness F).2.1
+  let : (normOneIdeleClassTamagawaMeasure F).IsHaarMeasure :=
+    (multiplicativeTamagawaMeasures_existsUnique F).exists.choose_spec.2.2.2.1
+  let j (p : ℝ≥0ˣ × C₁) := σ p.1 * p.2.val
+  have hj : Measurable j :=
+    ((hσ.comp continuous_fst).mul (continuous_subtype_val.comp continuous_snd)).measurable
+  let p := positiveRealHaar.prod (normOneIdeleClassTamagawaMeasure F)
+  have hmap : p.map j = ideleClassTamagawaMeasure F := classTamagawa_normProduct σ hσ hσnorm
+  have hm : AEStronglyMeasurable f (p.map j) := hmap ▸ hf.aestronglyMeasurable
+  have hi : Integrable (f ∘ j) p :=
+    (integrable_map_measure hm hj.aemeasurable).mp (hmap ▸ hf)
+  let e : ℝ ≃ₜ ℝ≥0ˣ := Real.expOrderIso.toHomeomorph.trans (Nonneg.unitsHomeomorphPos ℝ).symm
+  have he (y : ℝ) : e y = Units.mk0 (Real.exp y).toNNReal (by positivity) :=
+    Units.ext (NNReal.eq (Real.coe_toNNReal _ (Real.exp_pos y).le).symm)
+  have hE : positiveRealHaar = volume.map e := by
+    unfold positiveRealHaar
+    congr 1
+    exact funext fun y ↦ (he y).symm
+  rw [← hmap, integral_map hj.aemeasurable hm]
+  change (∫ z, (f ∘ j) z ∂positiveRealHaar.prod (normOneIdeleClassTamagawaMeasure F)) = _
+  rw [integral_prod (f ∘ j) hi, hE]
+  calc
+    _ = ∫ y : ℝ, ∫ h : C₁, f (σ (e y) * h.val) ∂normOneIdeleClassTamagawaMeasure F :=
+      integral_map_equiv e.toMeasurableEquiv _
+    _ = _ := by simp only [he]
+
+
+/-- Change of scale for the real Fourier integral. -/
+private theorem orbitalEulerSum_fourier_scale (A : ℝ → ℂ) {L : ℝ} (hL : 0 < L) (n : ℤ) :
+    𝓕 (fun x : ℝ ↦ (L : ℂ) * A (-L * x)) (n : ℝ) =
+      ∫ y : ℝ, Complex.exp ((y : ℂ) * ((2 * (Real.pi : ℂ) * (n : ℂ) / L) * Complex.I)) * A y := by
+  let g (y : ℝ) := Complex.exp ((y : ℂ) * ((2 * (Real.pi : ℂ) * (n : ℂ) / L) * Complex.I)) * A y
+  rw [Real.fourier_real_eq_integral_exp_smul]
+  have h (x : ℝ) : Complex.exp (↑(-2 * Real.pi * x * (n : ℝ)) * Complex.I) •
+      ((L : ℂ) * A (-L * x)) = (L : ℂ) * g (-L * x) := by
+    rw [smul_eq_mul, mul_left_comm]
+    dsimp only [g]
+    congr 3
+    push_cast
+    field_simp [show (L : ℂ) ≠ 0 from Complex.ofReal_ne_zero.mpr hL.ne']
+  simp_rw [h, integral_const_mul]
+  rw [Measure.integral_comp_mul_left]
+  simp only [inv_neg, abs_neg, abs_of_pos (inv_pos.mpr hL), Complex.real_smul, Complex.ofReal_inv]
+  rw [← mul_assoc, mul_inv_cancel₀ (Complex.ofReal_ne_zero.mpr hL.ne'), one_mul]
+
+
+/-- The Fourier samples of the scaled norm-one average are shifted Mellin values. -/
+private theorem orbitalEulerSum_profile_fourier (χ : PontryaginDual C𝔽)
+    (φ : 𝒟) {L : ℝ} (hL : 0 < L) (t : ℝ) (n : ℤ) :
+    𝓕 (orbitalLogProfile χ φ L t) (n : ℝ) = nuclearityTestMellin χ φ
+      (-(1 : ℂ) / 2 - (t : ℂ) * Complex.I + (2 * (Real.pi : ℂ) * (n : ℂ) / L) * Complex.I) := by
+  let σ : ℝ≥0ˣ → C𝔽 := fun u ↦ QuotientGroup.mk (canonicalIdeleNormSection F u)
+  have hσ : Continuous σ :=
+    QuotientGroup.continuous_mk.comp (canonicalIdeleNormSection_continuous F)
+  have hσnorm : RightInverse σ (ideleClassNorm F) := canonicalIdeleNormSection_rightInverse F
+  let b : ℂ := -(1 : ℂ) / 2 - (t : ℂ) * Complex.I
+  let d : ℂ := (2 * (Real.pi : ℂ) * (n : ℂ) / L) * Complex.I
+  let f (w : ℂ) (g : C𝔽) := φ.val g * ideleClassNormTwist χ w g
+  let e (x : ℝ) : ℝ≥0ˣ := Units.mk0 (Real.exp x).toNNReal (by positivity)
+  let A (y : ℝ) := ∫ h : C₁, f b (σ (e y) * h.val) ∂normOneIdeleClassTamagawaMeasure F
+  change 𝓕 (fun x : ℝ ↦ (L : ℂ) * A (-L * x)) (n : ℝ) =
+    ∫ g, f (b + d) g ∂ideleClassTamagawaMeasure F
+  rw [orbitalEulerSum_fourier_scale A hL n, orbitalEulerSum_logNorm_integral σ hσ hσnorm
+    (f (b + d))
+    ((nuclearityTestMellin_integrable χ φ).1 (b + d))]
+  apply integral_congr_ae
+  filter_upwards with y
+  change Complex.exp ((y : ℂ) * d) * (∫ h : C₁, f b (σ (e y) * h.val)
+    ∂normOneIdeleClassTamagawaMeasure F) = ∫ h : C₁, f (b + d) (σ (e y) * h.val)
+      ∂normOneIdeleClassTamagawaMeasure F
+  rw [← integral_const_mul]
+  apply integral_congr_ae
+  filter_upwards with h
+  have hN : ideleClassNorm F (σ (e y) * h.val) = e y := by
+    rw [map_mul, hσnorm, MonoidHom.mem_ker.mp h.property, mul_one]
+  dsimp only [f]
+  change Complex.exp ((y : ℂ) * d) * (φ.val _ * ((χ _ : ℂ) *
+    (((ideleClassNorm F (σ (e y) * h.val)).val : ℝ) : ℂ) ^ b)) =
+    φ.val _ * ((χ _ : ℂ) * (((ideleClassNorm F (σ (e y) * h.val)).val : ℝ) : ℂ) ^ (b + d))
+  rw [hN, show ((e y).val : ℝ) = Real.exp y from Real.coe_toNNReal _ (Real.exp_pos y).le]
+  have hn : (Real.exp y : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr (Real.exp_pos y).ne'
+  rw [Complex.cpow_add _ _ hn, Complex.cpow_def_of_ne_zero hn d,
+    ← Complex.ofReal_log (Real.exp_pos y).le, Real.log_exp]
+  ring
+
+
+/-- Paper: §11.3.1.1(2), p. 494, and (11.3.2.5), p. 496.
+For one unramified place, the half-shifted Mellin values at the zeros of its
+reciprocal Euler factor sum to its norm-one coset contributions.
+Deviation: Uses the angular integral and half-shift weight of the repaired formula.
+This is the analytic part of the split: decompose the Mellin integral along the
+norm fibres and apply Poisson summation in the logarithmic norm coordinate. -/
+private theorem orbitalEulerSum_eq_poisson_local (F : Type*) [Field F] [NumberField F]
+    (χ : PontryaginDual (IdeleClassGroup (𝓞 F) F))
+    (φ : BruhatCompactSupport (IdeleClassGroup (𝓞 F) F))
+    (v : HeightOneSpectrum (𝓞 F))
+    (hχ : (ideleClassNormTwist χ 0).IsUnramifiedAt v)
+    (π : (v.adicCompletion F)ˣ)
+    (hπ : Valued.v.IsUniformizer (π : v.adicCompletion F)) :
+    HasSum (fun z : {z : ℂ // (finiteHeckeEulerFactor χ v z)⁻¹ = 0} ↦
+      nuclearityTestMellin χ φ (z.val - 1 / 2))
+      (∑' n : ℤ, orbitalPlacePoissonTerm χ φ v π n) := by
+  obtain ⟨t, ⟨_, ht, hphase⟩, _⟩ := unramifiedHeckeCharacter_existsUnique_phase χ v hχ π hπ
+  have ht' : (ideleClassNormTwist χ 0).localValue v =
+      (q(v) : ℂ) ^ (-(t : ℂ) * Complex.I) := by
+    rw [hχ.localValue_eq π hπ, HeckeCharacter.restrict, MulChar.ofUnitHom_coe]
+    exact ht
+  let e := orbitalEulerZeroEquiv χ v hχ t ht'
+  let L := Real.log (q(v) : ℝ)
+  have hL : 0 < L := Real.log_pos (by exact_mod_cast HeightOneSpectrum.one_lt_absNorm v)
+  obtain ⟨f, hf⟩ := orbitalLogProfile_schwartz χ φ hL t
+  have hvalues (n : ℤ) : f (n : ℝ) = orbitalPlacePoissonTerm χ φ v π n := by
+    rw [show f (n : ℝ) = orbitalLogProfile χ φ L t n from congrFun hf n]
+    exact orbitalLogProfile_at_int χ φ v π hπ t hphase n
+  have hfourier (n : ℤ) : 𝓕 f (n : ℝ) = nuclearityTestMellin χ φ ((e n).val - 1 / 2) := by
+    change 𝓕 (f : ℝ → ℂ) (n : ℝ) = _
+    rw [hf, orbitalEulerSum_profile_fourier χ φ hL t n]
+    congr 1
+    change -(1 : ℂ) / 2 - (t : ℂ) * Complex.I +
+      (2 * (Real.pi : ℂ) * (n : ℂ) / (L : ℂ)) * Complex.I = orbitalEulerZero v t n - 1 / 2
+    unfold orbitalEulerZero L
+    ring
+  apply e.hasSum_iff.mp
+  have hs := orbitalSchwartz_hasSum f
+  simp_rw [hvalues] at hs
+  exact hs.congr_fun (fun n ↦ (hfourier n).symm)
+
+/-- Paper: §11.3.1.1(2), p. 494.
+Adding the local zero sums counts a shared zero once for each vanishing factor,
+which is exactly its multiplicity in the reciprocal Euler product. -/
+private theorem orbitalEulerSum_eq_poisson_assemble (F : Type*) [Field F] [NumberField F]
+    (χ : PontryaginDual (IdeleClassGroup (𝓞 F) F))
+    (φ : BruhatCompactSupport (IdeleClassGroup (𝓞 F) F))
+    (S : Finset (HeightOneSpectrum (𝓞 F)))
+    (a : HeightOneSpectrum (𝓞 F) → ℂ)
+    (hs : ∀ v ∈ S, HasSum
+      (fun z : {z : ℂ // (finiteHeckeEulerFactor χ v z)⁻¹ = 0} ↦
+        nuclearityTestMellin χ φ (z.val - 1 / 2)) (a v)) :
+    HasSum (fun z : {z : ℂ // reciprocalPartialHeckeEulerProduct χ S z = 0} ↦
+      (orbitalEulerMultiplicity χ S z.val : ℂ) *
+        nuclearityTestMellin χ φ (z.val - 1 / 2)) (∑ v ∈ S, a v) := by
+  classical
+  let f : ℂ → ℂ := fun z ↦ nuclearityTestMellin χ φ (z - 1 / 2)
+  have hv (v) (hv : v ∈ S) :
+      HasSum ({z : ℂ | (finiteHeckeEulerFactor χ v z)⁻¹ = 0}.indicator f) (a v) :=
+    hasSum_subtype_iff_indicator.mp (hs v hv)
+  have h := hasSum_sum hv
+  have he (z : ℂ) :
+      (∑ v ∈ S, {z : ℂ | (finiteHeckeEulerFactor χ v z)⁻¹ = 0}.indicator f z) =
+        (orbitalEulerMultiplicity χ S z : ℂ) * f z := by
+    rw [orbitalEulerMultiplicity_eq_card]
+    simp only [Set.indicator_apply, Set.mem_ofPred_eq]
+    rw [← Finset.sum_filter]
+    simp
+  have hglobal : HasSum (fun z : ℂ ↦ (orbitalEulerMultiplicity χ S z : ℂ) * f z)
+      (∑ v ∈ S, a v) := h.congr_fun (fun z ↦ (he z).symm)
+  apply (hasSum_subtype_iff_of_support_subset (s :=
+    {z : ℂ | reciprocalPartialHeckeEulerProduct χ S z = 0}) ?_).mpr hglobal
+  intro z hz
+  by_contra hn
+  have hnone : ∀ v ∈ S, (finiteHeckeEulerFactor χ v z)⁻¹ ≠ 0 := by
+    intro v hv hzv
+    exact hn (Finset.prod_eq_zero hv hzv)
+  have hzero : orbitalEulerMultiplicity χ S z = 0 := by
+    rw [orbitalEulerMultiplicity_eq_card, Finset.filter_eq_empty_iff.mpr hnone]
+    rfl
+  exact hz (by simp [hzero])
+
 /-- Paper: §11.3.1.1(2), p. 494, and (11.3.2.5), p. 496.
 The half-shifted Mellin values at the zeros of the reciprocal Euler product sum,
 with multiplicity, to the Poisson contributions of the places over the prime.
@@ -794,7 +1231,10 @@ theorem orbitalEulerSum_eq_poisson (χ : PontryaginDual C𝔽) (φ : 𝒟) (p : 
     let zeros := {z : ℂ // reciprocalPartialHeckeEulerProduct χ above(p) z = 0}
     HasSum (fun z : zeros ↦ (orbitalEulerMultiplicity χ above(p) z.val : ℂ) *
       nuclearityTestMellin χ φ (z.val - 1 / 2))
-      (∑ v ∈ above(p), ∑' n : ℤ, orbitalPlacePoissonTerm χ φ v (π v) n) := by sorry
+      (∑ v ∈ above(p), ∑' n : ℤ, orbitalPlacePoissonTerm χ φ v (π v) n) := by
+  exact orbitalEulerSum_eq_poisson_assemble F χ φ above(p)
+    (fun v ↦ ∑' n : ℤ, orbitalPlacePoissonTerm χ φ v (π v) n)
+    (fun v hv ↦ orbitalEulerSum_eq_poisson_local F χ φ v (_hχ v hv) (π v) (_hπ v hv))
 
 /-- Paper: §11.3.1.1(2), pp. 494–495. If the test is supported at norms
 strictly between one and the residue size, every summand at that place vanishes. -/
@@ -869,13 +1309,188 @@ def orbitalSectionWeight (E : Set N𝔽) (τ : ℝ≥0ˣ →* I𝔽) (xy : I𝔽
       (Set.range τ).indicator (fun _ ↦ (1 : ℝ)) (principal ξ * g.val * xy.2)
       ∂normOneIdeleTamagawaMeasure F
 
+private theorem local_principalUnits {L : Type*} [NontriviallyNormedField L] [IsUltrametricDist L] :
+    ∃ u : ℕ → Lˣ, Filter.Tendsto u Filter.atTop (nhds 1) ∧ (∀ n, ‖(u n : L)‖ = 1) ∧ ∀ n, u n ≠ 1 := by
+  obtain ⟨π, hpos, hlt⟩ := NormedField.exists_norm_lt_one L
+  let a (n : ℕ) := π ^ (n + 1)
+  have ha (n : ℕ) : ‖a n‖ < 1 := by
+    change ‖π ^ (n + 1)‖ < 1
+    rw [norm_pow]
+    exact pow_lt_one₀ hpos.le hlt n.succ_ne_zero
+  have hne (n : ℕ) : 1 + a n ≠ 0 := by
+    intro he
+    have h := ha n
+    rw [show a n = -1 by linear_combination he, norm_neg, norm_one] at h
+    exact lt_irrefl _ h
+  let u (n : ℕ) := Units.mk0 (1 + a n) (hne n)
+  refine ⟨u, ?_, ?_, ?_⟩
+  · rw [Units.isEmbedding_val₀.isInducing.tendsto_nhds_iff]
+    have hlim : Filter.Tendsto a Filter.atTop (nhds (0 : L)) :=
+      (tendsto_pow_atTop_nhds_zero_of_norm_lt_one hlt).comp (Filter.tendsto_add_atTop_nat 1)
+    have h1 : Filter.Tendsto (fun n : ℕ ↦ (1 : L) + a n) Filter.atTop (nhds (1 + 0)) := tendsto_const_nhds.add hlim
+    rw [add_zero] at h1
+    simpa only [Function.comp_def, u, Units.val_mk0, Units.val_one] using h1
+  · intro n
+    change ‖1 + a n‖ = 1
+    have hlow : (1 : ℝ) ≤ max ‖1 + a n‖ ‖a n‖ := by
+      have h := IsUltrametricDist.norm_add_le_max (1 + a n) (-(a n))
+      simpa using h
+    have hge : (1 : ℝ) ≤ ‖1 + a n‖ := by
+      by_contra h
+      rw [not_le] at h
+      exact absurd (max_lt h (ha n)) (not_lt.mpr hlow)
+    have hle : ‖1 + a n‖ ≤ 1 :=
+      (IsUltrametricDist.norm_add_le_max (1 : L) (a n)).trans (max_le norm_one.le (ha n).le)
+    linarith
+  · intro n h
+    exact pow_ne_zero _ (norm_pos_iff.mp hpos) (add_eq_left.mp (congrArg Units.val h))
+
+
+/-- The idele with a unit of norm one at one finite place and 1 elsewhere has idele norm one. -/
+private theorem ideleNorm_ofAdicCompletion_of_norm_one (v : V) (u : (v.adicCompletion F)ˣ)
+    (hu : ‖(u : v.adicCompletion F)‖ = 1) :
+    ideleNorm F (IdeleGroup.ofAdicCompletion (𝓞 F) F v u) = 1 := by
+  classical
+  let g := IdeleGroup.ofAdicCompletion (𝓞 F) F v u
+  apply Units.ext
+  apply NNReal.coe_injective
+  change ((ideleNorm F g : ℝ≥0) : ℝ) = 1
+  rw [((ideleNorm_spec F).1 g).2]
+  change (∏ w : InfinitePlace F, ‖(1 : w.Completion)‖ ^ w.mult) *
+    ∏ᶠ w, ‖RestrictedProduct.mulSingle (fun w : V ↦ w.adicCompletionIntegers F) v u.val w‖ =
+    ((1 : ℝ≥0ˣ) : ℝ)
+  simp only [norm_one, one_pow, Finset.prod_const_one, one_mul, Units.val_one, NNReal.coe_one]
+  rw [finprod_eq_single _ v]
+  · rw [RestrictedProduct.mulSingle_eq_same]
+    exact hu
+  · intro w hw
+    rw [RestrictedProduct.mulSingle_eq_of_ne _ _ hw, norm_one]
+
+/-- Inserting a finite completion into the idele group is continuous. -/
+private theorem continuous_ideleGroup_ofAdicCompletion (v : V) :
+    Continuous (IdeleGroup.ofAdicCompletion (𝓞 F) F v) := by
+  classical
+  apply Continuous.units_map
+  apply continuous_const.prodMk
+  apply continuous_restrictedProduct_of_uniform
+  · intro w
+    exact (continuous_apply w).comp (continuous_mulSingle (A := fun u : V ↦ u.adicCompletion F) v)
+  · filter_upwards [Filter.eventually_cofinite_ne v] with w hw x
+    change Pi.mulSingle v x w ∈ w.adicCompletionIntegers F
+    rw [Pi.mulSingle_eq_of_ne hw]
+    exact (w.adicCompletionIntegers F).one_mem
+
+/-- The single-place insertion is injective. -/
+private theorem ofAdicCompletion_injective (v : V) {x : (v.adicCompletion F)ˣ}
+    (hx : IdeleGroup.ofAdicCompletion (𝓞 F) F v x = 1) : x = 1 := by
+  have hv := congrArg (fun d : I𝔽 ↦ d.val.2 v) hx
+  have hcoord : (IdeleGroup.ofAdicCompletion (𝓞 F) F v x).val.2 v = x.val := by
+    change RestrictedProduct.mulSingle (fun w : V ↦ w.adicCompletionIntegers F) v x.val v = x.val
+    exact RestrictedProduct.mulSingle_eq_same ..
+  rw [hcoord] at hv
+  simp at hv
+  exact Units.val_eq_one.mp hv
+
+
+open scoped Valued in
+/-- The norm-one ideles have no isolated point: a sequence of principal units at one
+finite place gives ideles of norm one tending to one but never equal to it. -/
+private theorem nhdsNE_neBot_normOne (v : V) : Filter.NeBot (nhdsWithin (1 : N𝔽) {1}ᶜ) := by
+  classical
+  obtain ⟨u, hu_tend, hu_norm, hu_ne⟩ := local_principalUnits (L := v.adicCompletion F)
+  have hcont : Continuous (IdeleGroup.ofAdicCompletion (𝓞 F) F v) :=
+    continuous_ideleGroup_ofAdicCompletion v
+  let φ (n : ℕ) : N𝔽 :=
+    ⟨IdeleGroup.ofAdicCompletion (𝓞 F) F v (u n), by
+      rw [MonoidHom.mem_ker]
+      exact ideleNorm_ofAdicCompletion_of_norm_one v (u n) (hu_norm n)⟩
+  rw [← mem_closure_iff_nhdsWithin_neBot, mem_closure_iff_frequently, Filter.frequently_iff]
+  intro U hU
+  rw [show nhds (1 : N𝔽) = (nhds (1 : I𝔽)).comap (Subtype.val : N𝔽 → I𝔽) from nhds_induced _ _] at hU
+  obtain ⟨W, hW, hWU⟩ := Filter.mem_comap.mp hU
+  have hpre : (IdeleGroup.ofAdicCompletion (𝓞 F) F v) ⁻¹' W ∈ nhds (1 : (v.adicCompletion F)ˣ) :=
+    hcont.continuousAt.preimage_mem_nhds (by rw [map_one]; exact hW)
+  obtain ⟨n, hn⟩ := (hu_tend.eventually hpre).exists
+  refine ⟨φ n, hWU hn, ?_⟩
+  intro hEq
+  have h1 : u n = 1 := by
+    apply ofAdicCompletion_injective v
+    exact congrArg Subtype.val hEq
+  exact hu_ne n h1
+
+
+/-- The norm-one Tamagawa measure gives measure zero to singletons. -/
+private theorem normOneIdeleTamagawaMeasure_nullSingleton (v : V) :
+    NullSingletonClass (normOneIdeleTamagawaMeasure F) := by
+  have htop : IsTopologicalGroup I𝔽 := (ideleGroup_topology F).2.2.1
+  have hcl : IsClosed ((ideleNorm F).ker : Set I𝔽) := (ideleGroup_topology F).2.2.2.2.2
+  let : IsTopologicalGroup I𝔽 := htop
+  let : LocallyCompactSpace I𝔽 := (ideleGroup_topology F).2.1
+  let : T2Space I𝔽 := (ideleGroup_topology F).1
+  let : LocallyCompactSpace N𝔽 := hcl.locallyCompactSpace
+  let : BorelSpace I𝔽 := ⟨rfl⟩
+  let : BorelSpace N𝔽 := ⟨by rw [borel_comap]; rfl⟩
+  let : (normOneIdeleTamagawaMeasure F).IsHaarMeasure :=
+    (normOneIdeleTamagawaMeasure_existsUnique F).exists.choose_spec.1
+  have hbot : Filter.NeBot (nhdsWithin (1 : N𝔽) {1}ᶜ) := nhdsNE_neBot_normOne v
+  exact MeasureTheory.Measure.IsHaarMeasure.nullSingletonClass _
+
+
+/-- A number field has a finite place. -/
+private theorem finitePlace_nonempty (F : Type*) [Field F] [NumberField F] :
+    Nonempty (HeightOneSpectrum (𝓞 F)) := by
+  obtain ⟨m, hm⟩ := Ideal.exists_maximal (𝓞 F)
+  exact ⟨⟨m, hm.isPrime, NeZero.ne m⟩⟩
+
 /-- Paper: (11.3.2.2), p. 495. The displayed weight vanishes everywhere.
 For each principal multiplier, the first translated section condition forces
 the integration variable into a single Haar-null point.
 Deviation: The printed weight cannot implement a normalized indentation. -/
 theorem orbitalSectionWeight_eq_zero (E : Set N𝔽) (τ : ℝ≥0ˣ →* I𝔽)
     (_hτ : RightInverse τ (ideleNorm F)) (xy : I𝔽 × I𝔽) :
-    orbitalSectionWeight E τ xy = 0 := by sorry
+    orbitalSectionWeight E τ xy = 0 := by
+  classical
+  have hτ : RightInverse τ (ideleNorm F) := _hτ
+  obtain ⟨v⟩ := finitePlace_nonempty F
+  haveI hns : NullSingletonClass (normOneIdeleTamagawaMeasure F) :=
+    normOneIdeleTamagawaMeasure_nullSingleton v
+  have hprincipal (ξ : Fˣ) : ideleNorm F (principal ξ) = 1 := by
+    have h : principal ξ ∈ (ideleNorm F).ker := (ideleNorm_spec F).2 ⟨ξ, rfl⟩
+    simpa using h
+  have hterm : ∀ ξ : Fˣ, ∫ g in E,
+      (Set.range τ).indicator (fun _ ↦ (1 : ℝ)) (principal ξ * g.val * xy.1) *
+        (Set.range τ).indicator (fun _ ↦ (1 : ℝ)) (principal ξ * g.val * xy.2)
+        ∂normOneIdeleTamagawaMeasure F = 0 := by
+    intro ξ
+    let g₀ : N𝔽 := ⟨(principal ξ)⁻¹ * τ (ideleNorm F xy.1) * (xy.1)⁻¹, by
+      rw [MonoidHom.mem_ker]
+      have hτ' : ∀ t : ℝ≥0ˣ, ideleNorm F (τ t) = t := hτ
+      simp only [map_mul, map_inv, hprincipal, hτ', inv_one, one_mul]
+      simp⟩
+    have hsupp : ∀ᵐ g ∂(normOneIdeleTamagawaMeasure F |>.restrict E),
+        (Set.range τ).indicator (fun _ ↦ (1 : ℝ)) (principal ξ * g.val * xy.1) *
+          (Set.range τ).indicator (fun _ ↦ (1 : ℝ)) (principal ξ * g.val * xy.2) = 0 := by
+      filter_upwards [Measure.ae_ne (normOneIdeleTamagawaMeasure F |>.restrict E) g₀]
+        with g hg
+      by_cases h1 : principal ξ * g.val * xy.1 ∈ Set.range τ
+      · exfalso
+        apply hg
+        obtain ⟨t, ht⟩ := h1
+        have hg1 : ideleNorm F (g : I𝔽) = 1 := MonoidHom.mem_ker.mp g.property
+        have hnorm : t = ideleNorm F xy.1 := by
+          have h := congrArg (ideleNorm F) ht
+          rw [hτ] at h
+          simp only [map_mul, hprincipal, hg1, one_mul] at h
+          exact h
+        have hg' : g.val = (principal ξ)⁻¹ * τ t * (xy.1)⁻¹ := by
+          rw [ht]
+          group
+        apply Subtype.ext
+        rw [hg', hnorm]
+      · rw [Set.indicator_of_notMem h1, zero_mul]
+    rw [integral_eq_zero_of_ae hsupp]
+  unfold orbitalSectionWeight
+  simp [hterm]
 
 /-- Paper: (11.3.2.1) and (11.3.2.3)–(11.3.2.4), pp. 495–496.
 The printed weight gives a zero skew-diagonal integral for any kernel,
