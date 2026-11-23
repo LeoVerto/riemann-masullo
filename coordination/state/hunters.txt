@@ -71,3 +71,33 @@ w28 2026-11-22T20:14Z PR #5551 (5 of 6 Ch11 Sec3), released #5514 (Haar-null sin
 w27 2026-11-22T20:19Z PR #5553 (7 Ch11 Sec2b); follow-up #5478
 w27 2026-11-22T20:20Z released #5478 (needs PV/convolution commutation, sorried equivariance)
 esc-ch10sec3 2026-11-22T20:29Z proved #5204 #5207 #5208 PR #5579
+w30 2026-11-22T20:58Z PR #5594 (4 of 5 Ch12 Sec4), released #5557 (needs public continuity lemmas)
+esc-ch07sec3a 2026-11-22T21:16Z proved #4603 PR #5616
+esc-ch12sec4 2026-11-22T21:34Z proved #5557 PR #5628 (stacked on #5594)
+w29 2026-11-22T21:37Z PR #5629 (5 of 6 Ch11 Sec3; signatures not run, timed out); #5502 escalated (needs adelePrincipalValue F ∅ = id)
+esc-ch11sec1b 2026-11-22T21:48Z PR #5633 (#5175 #5184); #5181 escalated fable; #5177 released
+w31 2026-11-22T21:59Z PR #5685 (#5607 #5608; untraced sorryAx claim in body, 2 import all AppD)
+fable5181 2026-11-22T22:19Z ROUTE #5181 (abstract lemma + with_reducible exact; probe passes)
+esc-ch11sec3 2026-11-22T22:25Z proved #5502 PR #5697 (stacked on #5629)
+esc-ch05sec3a2 2026-11-22T22:27Z PR #5698 (5 of 8 Ch05 Sec3a, clean axioms); #4135 #4136 #4184 to fable
+esc-ch07sec4 2026-11-22T22:29Z no PR; #5078 #5079 #5108 to fable (#5398 elaboration; maths routes in notes)
+esc-ch11sec1b2 2026-11-22T22:37Z proved #5181 PR #5715
+fable4135 2026-11-22T22:50Z ROUTE #4135 #4136 (finest-LC topology on main), back to opus rows
+esc-ch07sec1b 2026-11-22T22:51Z PR #5724 (#4070 #4073, clean axioms); #4078 #4079 to fable; finding: generator ≡ 0
+esc-ch05sec2b 2026-11-22T23:02Z PR #5740 (#4114 #4115 clean); #4091 to fable; 7 released with plans
+fable5078 2026-11-22T23:04Z ROUTE #5078 (+#5079); #5108 not covered
+fable4184 2026-11-22T23:08Z ROUTE #4184 (true; skeleton with 2 sorried helpers), back to opus
+fable4091 2026-11-22T23:42Z ROUTE #4091 (let-bound vars cause the hang; term-mode close), back to opus
+esc-ch06sec3 2026-11-22T23:42Z no PR: #4454 proved locally (wt esc-ch06sec3-1 1e749c6) but closed upstream by #5635 (later claimer); #4457 #4458 released (paper gap p.308)
+esc-ch07sec4b 2026-11-22T23:55Z PR #5806 (#5078 #5079, inherited sorryAx; Sec4 module 772 s at load 30)
+esc-ch05sec3a3 2026-11-23T00:04Z PR #5813 (#4135 #4136 clean axioms, Sec3a 57 s); #4184 left QUEUED
+fable4078 2026-11-23T00:07Z ROUTE #4078 (division+Taylor; one typeclass timeout left), back to opus; #4079 not settled
+esc-ch05sec2b2 2026-11-23T00:07Z PR #5821 (#4091, inherited sorryAx)
+fable4079 2026-11-23T00:14Z ROUTE #4079 (true; strip bound in AppB Sec1 private), offered to esc-ch07sec1b2
+esc-ch05sec3a4 2026-11-23T00:29Z PAUSED for quota: #4184 helper (4) proved in wt/.agent/A4.lean; helper (3) to write; row QUEUED
+esc-ch05sec2b3 2026-11-23T00:29Z PAUSED for quota: #4125 proved + #4126 written (uncommitted, wt esc-ch05sec2b3-1; rebuild+checks then one PR); 5 others not started
+fable5108 2026-11-23T00:30Z ROUTE #5108 (FG instead of FiniteDimensional; one instance missing), back to opus; 2.5 h, ~30 probes; installed gdb
+esc-ch07sec1b2 2026-11-23T00:31Z PAUSED for quota: #4078 helpers A D L1 C + generator_ne_zero compile (notes/4078-work), J/B 3 small errors, theorem E not started; row QUEUED
+handin-2b3 2026-11-23T00:36Z PR #5835 (#4125 #4126, inherited sorryAx)
+esc-ch07sec5 2026-11-23T00:48Z PR #5850 (#5135, inherited sorryAx)
+esc-appbsec6 2026-11-23T00:56Z PR #5859 (#3877 from #3878, moved #3878 decl above it); #3860 #3878 released with routes

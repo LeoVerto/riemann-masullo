@@ -48,3 +48,5 @@ crit  2026-11-22T11:24Z  crit/1526 finished: PR #5045 PROVED
 crit  2026-11-22T11:24Z  crit/2526 started (opus)
 2026-11-22T19:53Z w27 Ch11 Sec2b 7 issues; w28 Ch11 Sec3 6 issues (triage10)
 2026-11-22T20:14Z w29 Ch11 Sec3 rated-3 6 issues (triage10)
+2026-11-22T20:48Z w30 Ch12 Sec4 5 issues (triage11)
+2026-11-22T21:47Z w31 Ch13 Sec3 #5608 (+#5607 if gap note does not apply) (triage12)

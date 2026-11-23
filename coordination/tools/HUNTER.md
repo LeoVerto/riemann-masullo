@@ -148,6 +148,27 @@ a little thought. Skip anything deep.
   range (`scripts/paper.sh <p> <q>`, `--png <p>` for formulas).
 
 ## Elaboration traps and fixes that worked
+- **Goal vs witness defeq at default transparency** (#5181, Fable route, notes/5181.md): `exact`/`apply` of a
+  correct witness ran 600+ s. Fix: private lemma over abstract `Submodule B`/maps, `have key := lemma …` with
+  all arguments explicit and no expected type, then `with_reducible exact …` (here
+  `Submodule.topologicalClosure_mono (Submodule.span_mono key)`).
+- **`let`-bound statement variables** (#4091, Fable route, notes/4091.md): after `intro` of the statement's lets,
+  every check against a spec ran 240–500 s; the same checks without lets in context took ~1.3 s. Fix: never
+  `intro` the lets; prove a let-free helper (the let values as variables) by one generic lemma in term mode,
+  and close the theorem in term mode `:= helper … _ _ (…) x`. Bisect in separate scratch files to find this.
+- **`obtain` on an existential inside a heavy statement** (#4454, esc-ch06sec3): `obtain ⟨c, hc⟩ := DFunLike.ne_iff.mp _hω`
+  and `obtain ⟨u, hu⟩ : ∃ u, (QuotientGroup.mk u : C𝔽) = c.val := …` each ran 600+ s, ignoring maxHeartbeats. Fix:
+  `have h : ∃ c : C₁, ω c ≠ (1 : PontryaginDual C₁) c := …` with the type spelled out, or a standalone private helper.
+- **`FiniteDimensional ℂ ↥(range T)` compared against itself** (#5108, Fable route, notes/5108.md): gdb showed the hang
+  is `isDefEq` → `getFunInfo` → `FunInfo.collectDeps`, an uncached walk with no heartbeat check over a huge type,
+  hit whenever two non-syntactically-equal copies of the conclusion meet. Fix: generic lemma returns
+  `(LinearMap.range T.toLinearMap).FG`, then a small `S.FG → FiniteDimensional ℂ ↥S` lemma.
+- **`rw`/`▸` on a Submodule goal over a heavy space** (#5135, StrongCoprimalityThetaSpace): never finished; plain
+  `exact` of the span lemma too. Worked: `unfold <def>`, `have key := …` with explicit arguments, then
+  `with_reducible_and_instances exact key`; split long factorizations into separate `have`s (86 s → 13 s).
+  Avoid binder names that clash with the file's local notations (Sec5: `P`, `B`, `C₁`).
+- **Quotient types in general** (#5078, Fable route, notes/5078.md): run no tactic at the theta quotient types;
+  each step is a private lemma over abstract `{M Q Bm : Type*}`, applied in one term with the heavy objects as arguments.
 - **Principal-value maps** (`adelePrincipalValue`, Ch11 Sec1b, PR #5633): `rw`, `simp` and `congr_fun` hang on them.
   `LinearMap.ext_iff.mp` works, and private lemmas stated in exactly the definition's shape applied with `exact`.
   The F ∅ = id and composition helpers are in PR #5633 (Sec1b, private): copy them, do not re-derive.
