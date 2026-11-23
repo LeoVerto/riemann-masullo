@@ -7,6 +7,7 @@ public import RiemannMasullo.Ch09_HardySobolev.Sec3
 
 import all RiemannMasullo.AppA_AlgebraicNT.Sec3
 import all RiemannMasullo.Ch02_AdelicTheta.Sec3
+import all RiemannMasullo.Ch02_AdelicTheta.Sec2b
 
 import Mathlib.MeasureTheory.Measure.SeparableMeasure
 
@@ -962,13 +963,159 @@ theorem globalThetaSobolev_fourier_weight (a : ℝ) (f : ℬ₀) (g : C𝔽) :
       using adelicTheta_riemannRoch (F := F) f.val g⁻¹
   exact weights r ((ideleClassNorm F g⁻¹).val : ℝ) _ _ hr hinv hθ
 
+/-- A continuous linear map that preserves a submodule, preserves the kernel of a linear map
+on it, and is an involution modulo that kernel induces a unique continuous linear automorphism
+of the quotient. Stated for abstract modules, so that it elaborates without unfolding the
+Schwartz–Bruhat instances. -/
+private theorem existsUnique_globalPolarFreeThetaFourier_quotient {M N : Type*}
+    [AddCommGroup M] [Module ℂ M] [TopologicalSpace M] [AddCommGroup N] [Module ℂ N]
+    (P : Submodule ℂ M) (θ : M →ₗ[ℂ] N) (Φ : M →L[ℂ] M) (φ : M → M) (hΦ : ∀ f, Φ f = φ f)
+    (hP : ∀ f : P, φ f ∈ P) (hker : ∀ f : P, θ f = 0 → θ (φ f) = 0)
+    (hinv : ∀ f : P, θ (φ (φ f)) = θ f) :
+    ∃! T : (P ⧸ (LinearMap.ker θ).comap P.subtype) ≃L[ℂ]
+        (P ⧸ (LinearMap.ker θ).comap P.subtype),
+      ∀ f : P, T (Submodule.Quotient.mk f) = Submodule.Quotient.mk ⟨φ f, hP f⟩ := by
+  set Q := (LinearMap.ker θ).comap P.subtype
+  let Φ₀ : P →L[ℂ] P := (Φ.comp P.subtypeL).codRestrict P fun f ↦ by
+    rw [ContinuousLinearMap.comp_apply, Submodule.subtypeL_apply, hΦ]
+    exact hP f
+  have hΦ₀ (f : P) : Φ₀ f = ⟨φ f, hP f⟩ := Subtype.ext (hΦ f)
+  have hQ : Q ≤ (Q.mkQL.comp Φ₀).ker := by
+    intro f hf
+    change Q.mkQ (Φ₀ f) = 0
+    rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, hΦ₀]
+    exact hker f hf
+  let T₀ := Q.liftQL (Q.mkQL.comp Φ₀) hQ
+  have hT₀ (f : P) : T₀ (Submodule.Quotient.mk f) = Submodule.Quotient.mk ⟨φ f, hP f⟩ := by
+    change Q.mkQ (Φ₀ f) = _
+    rw [hΦ₀]
+    rfl
+  have hTT (x : P ⧸ Q) : T₀ (T₀ x) = x := by
+    refine Submodule.Quotient.induction_on _ x fun f ↦ ?_
+    rw [hT₀, hT₀, Submodule.Quotient.eq, Submodule.mem_comap, LinearMap.mem_ker, map_sub,
+      map_sub]
+    change θ (φ (φ f)) - θ f = 0
+    rw [hinv, sub_self]
+  refine ⟨ContinuousLinearEquiv.equivOfInverse T₀ T₀ hTT hTT, hT₀, fun T hT ↦ ?_⟩
+  refine ContinuousLinearEquiv.ext (funext fun x ↦ ?_)
+  refine Submodule.Quotient.induction_on _ x fun f ↦ ?_
+  exact (hT f).trans (hT₀ f).symm
+
+/-- Riemann–Roch for a theta transform, for a test whose polar values vanish together with
+those of its Fourier transform: the Fourier transform preserves vanishing of theta, and the
+double Fourier transform has the same theta. Stated for abstract data, so that it elaborates
+without unfolding the adelic types. -/
+private theorem existsUnique_globalPolarFreeThetaFourier_rr {B X : Type*} [InvolutiveInv X]
+    (Θ : B → X → ℂ) (Fo : B → B) (e : B → ℂ) (n : X → ℝ)
+    (hn : ∀ g, n g⁻¹ = (n g)⁻¹) (hpos : ∀ g, 0 < n g)
+    (hRR : ∀ f g, Θ f g = (n g)⁻¹ • Θ (Fo f) g⁻¹ + (n g)⁻¹ • e (Fo f) - e f)
+    (f : B) (hf0 : e f = 0) (hF0 : e (Fo f) = 0) :
+    ((∀ g, Θ f g = 0) → ∀ g, Θ (Fo f) g = 0) ∧
+      (e (Fo (Fo f)) = 0 → ∀ g, Θ (Fo (Fo f)) g = Θ f g) := by
+  refine ⟨fun hΘ g ↦ ?_, fun hFF0 g ↦ ?_⟩
+  · have h := hRR f g⁻¹
+    simp only [hf0, hF0, smul_zero, add_zero, sub_zero, inv_inv, hn, hΘ] at h
+    exact (smul_eq_zero.mp h.symm).resolve_left (hpos g).ne'
+  · have h1 := hRR f g
+    have h2 := hRR (Fo f) g⁻¹
+    have hr : n g ≠ 0 := (hpos g).ne'
+    simp only [hf0, hF0, smul_zero, add_zero, sub_zero, inv_inv, hn] at h1 h2
+    rw [h1, h2, smul_add, smul_smul, smul_smul, inv_mul_cancel₀ hr, one_smul, one_smul, hFF0,
+      add_zero]
+
+/-- The Fourier transform of a polar-free test whose theta vanishes has vanishing theta. -/
+private theorem existsUnique_globalPolarFreeThetaFourier_ker (f : ℬ₀)
+    (hf : adelicThetaLinearMap F f.val = 0) :
+    adelicThetaLinearMap F (adeleSchwartzFourier f.val) = 0 := by
+  have hz := (mem_adelePolarSubspace (F := F) f.val).mp f.property
+  have hn (g : C𝔽) :
+      ((ideleClassNorm F g⁻¹ : NNReal) : ℝ) = ((ideleClassNorm F g : NNReal) : ℝ)⁻¹ := by
+    simp only [map_inv, Units.val_inv_eq_inv_val, NNReal.coe_inv]
+  have hpos (g : C𝔽) : 0 < ((ideleClassNorm F g : NNReal) : ℝ) :=
+    NNReal.coe_pos.mpr (Units.zero_lt (ideleClassNorm F g))
+  have h := (existsUnique_globalPolarFreeThetaFourier_rr (fun f g ↦ adelicTheta (F := F) f g)
+    adeleSchwartzFourier (fun f ↦ f (Multiplicative.ofAdd 0))
+    (fun g ↦ ((ideleClassNorm F g : NNReal) : ℝ)) hn hpos (adelicTheta_riemannRoch (F := F))
+    f.val hz.1 hz.2).1 fun g ↦ DFunLike.congr_fun hf g
+  exact ContinuousMap.ext h
+
+/-- The double Fourier transform of a polar-free test has the same theta. -/
+private theorem existsUnique_globalPolarFreeThetaFourier_inv (f : ℬ₀) :
+    adelicThetaLinearMap F (adeleSchwartzFourier (adeleSchwartzFourier f.val)) =
+      adelicThetaLinearMap F f.val := by
+  have hz := (mem_adelePolarSubspace (F := F) f.val).mp f.property
+  have hz' := (mem_adelePolarSubspace (F := F) (adeleSchwartzFourier f.val)).mp
+    (adelePolarSubspace_fourier f)
+  have hn (g : C𝔽) :
+      ((ideleClassNorm F g⁻¹ : NNReal) : ℝ) = ((ideleClassNorm F g : NNReal) : ℝ)⁻¹ := by
+    simp only [map_inv, Units.val_inv_eq_inv_val, NNReal.coe_inv]
+  have hpos (g : C𝔽) : 0 < ((ideleClassNorm F g : NNReal) : ℝ) :=
+    NNReal.coe_pos.mpr (Units.zero_lt (ideleClassNorm F g))
+  have h := (existsUnique_globalPolarFreeThetaFourier_rr (fun f g ↦ adelicTheta (F := F) f g)
+    adeleSchwartzFourier (fun f ↦ f (Multiplicative.ofAdd 0))
+    (fun g ↦ ((ideleClassNorm F g : NNReal) : ℝ)) hn hpos (adelicTheta_riemannRoch (F := F))
+    f.val hz.1 hz.2).2 hz'.2
+  exact ContinuousMap.ext h
+
 /-- Paper: Theorem 10.1.2.1, pp. 437–438. The polar-free theta quotient has the
 continuous Fourier automorphism induced by the adelic transform of its tests. -/
 theorem existsUnique_globalPolarFreeThetaFourier :
     ∃! T : Θ₀ ≃L[ℂ] Θ₀, ∀ f : ℬ₀,
-      T (Submodule.Quotient.mk f) = Submodule.Quotient.mk (fourier₀(f)) := by sorry
+      T (Submodule.Quotient.mk f) = Submodule.Quotient.mk (fourier₀(f)) := by
+  obtain ⟨Φ, hΦ⟩ := exists_adeleFourier_clm (F := F)
+  exact existsUnique_globalPolarFreeThetaFourier_quotient (adelePolarSubspace F)
+    (adelicThetaLinearMap F) Φ adeleSchwartzFourier hΦ adelePolarSubspace_fourier
+    existsUnique_globalPolarFreeThetaFourier_ker existsUnique_globalPolarFreeThetaFourier_inv
 
 local notation "Fourier𝔽" => (existsUnique_globalPolarFreeThetaFourier (F := F)).exists.choose
+
+/-- A map that intertwines two maps through a surjection of their common domain sends the
+range of the first onto the range of the second. -/
+private theorem exists_globalThetaSobolevInversion_image {X W₁ W₂ : Type*} (k : W₁ → W₂)
+    (e₁ : X → W₁) (e₂ : X → W₂) (Fo : X → X) (hFo : Surjective Fo)
+    (h : ∀ x, k (e₁ x) = e₂ (Fo x)) : k '' range e₁ = range e₂ := by
+  rw [← range_comp]
+  ext y
+  constructor
+  · rintro ⟨x, rfl⟩
+    exact ⟨Fo x, (h x).symm⟩
+  · rintro ⟨x, rfl⟩
+    obtain ⟨z, rfl⟩ := hFo x
+    exact ⟨z, h z⟩
+
+/-- Inversion carries the weight-a theta embedding of a polar-free test to the weight-(1-a)
+theta embedding of its Fourier transform. -/
+private theorem exists_globalThetaSobolevInversion_mk (a : ℝ) {α β s : ℝ} (hI : α ≤ β)
+    (hs : 0 ≤ s) (f : ℬ₀) :
+    J𝔽(hI, hs) (E𝔽(a, hI, hs) (Submodule.Quotient.mk f)) =
+      E𝔽(1 - a, neg_le_neg hI, hs) (Submodule.Quotient.mk (fourier₀(f))) := by
+  have : (μ𝔽).Regular := (ideleClassTamagawaMeasure_isWeil F).2.1
+  have hinvMP : MeasurePreserving (fun g : C𝔽 ↦ g⁻¹) μ𝔽 μ𝔽 := Measure.measurePreserving_inv μ𝔽
+  have hK := (existsUnique_ideleClassSobolevInversion (F := F) α β s hI hs).exists.choose_spec
+  have hE₁ := (existsUnique_globalThetaSobolevEmbedding (F := F) a α β s hI hs).exists.choose_spec.2
+  have hE₂ := (existsUnique_globalThetaSobolevEmbedding (F := F) (1 - a) (-β) (-α) s
+    (neg_le_neg hI) hs).exists.choose_spec.2
+  apply Lp.ext
+  apply (withDensity_absolutelyContinuous μ𝔽 _).ae_eq
+  have h₂ := hinvMP.quasiMeasurePreserving.ae_eq_comp (hE₁ f)
+  filter_upwards [hK (E𝔽(a, hI, hs) (Submodule.Quotient.mk f)), h₂, hE₂ (fourier₀(f))]
+    with g hg h₂ h₃
+  rw [hg, h₃]
+  refine h₂.trans ?_
+  have hw := globalThetaSobolev_fourier_weight (F := F) (1 - a) f g
+  rw [sub_sub_cancel] at hw
+  exact hw.symm
+
+/-- Inversion intertwines the weight-a and weight-(1-a) theta embeddings with the Fourier
+automorphism of the polar-free theta space. -/
+private theorem exists_globalThetaSobolevInversion_key (a : ℝ) {α β s : ℝ} (hI : α ≤ β)
+    (hs : 0 ≤ s) (u : Θ₀) :
+    J𝔽(hI, hs) (E𝔽(a, hI, hs) u) = E𝔽(1 - a, neg_le_neg hI, hs) (Fourier𝔽 u) := by
+  have hFo := (existsUnique_globalPolarFreeThetaFourier (F := F)).exists.choose_spec
+  induction u using Quot.ind with
+  | mk f =>
+    exact (exists_globalThetaSobolevInversion_mk a hI hs f).trans
+      (congrArg (E𝔽(1 - a, neg_le_neg hI, hs)) (hFo f).symm)
 
 /-- Paper: Theorem 10.1.2.1, (10.1.2.1), and (10.1.2.5), pp. 437–438.
 Ambient inversion restricts to an isometric equivalence of the weighted theta
@@ -979,7 +1126,16 @@ theorem exists_globalThetaSobolevInversion (a : ℝ) {α β s : ℝ} (hI : α �
     ∃ J : H𝔽(a, hI, hs) ≃ₗᵢ[ℂ] H𝔽(1 - a, neg_le_neg hI, hs),
       (∀ u, (J u : W𝔽(-β, -α, s)) = J𝔽(hI, hs) u) ∧
       ∀ u : Θ₀, J (j𝔽(a, hI, hs) u) =
-        j𝔽(1 - a, neg_le_neg hI, hs) (Fourier𝔽 u) := by sorry
+        j𝔽(1 - a, neg_le_neg hI, hs) (Fourier𝔽 u) := by
+  refine ⟨((J𝔽(hI, hs)).submoduleMap _).trans (LinearIsometryEquiv.ofEq _ _ ?_),
+    fun _ ↦ rfl, fun u ↦ Subtype.ext (exists_globalThetaSobolevInversion_key a hI hs u)⟩
+  apply SetLike.coe_injective
+  rw [Submodule.map_coe, Submodule.topologicalClosure_coe, Submodule.topologicalClosure_coe]
+  change (J𝔽(hI, hs)).toHomeomorph '' closure (range (E𝔽(a, hI, hs))) =
+    closure (range (E𝔽(1 - a, neg_le_neg hI, hs)))
+  rw [Homeomorph.image_closure]
+  exact congrArg closure (exists_globalThetaSobolevInversion_image _ _ _ _ (Fourier𝔽).surjective
+    (exists_globalThetaSobolevInversion_key a hI hs))
 
 /-- Inversion intertwines left translation by `g` with left translation by `g⁻¹`, for
 closed subspaces of weighted L² spaces over an abstract commutative group. -/
