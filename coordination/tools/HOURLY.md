@@ -35,7 +35,7 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
 | fixer: `general-purpose`, model sonnet, effort medium | – | `Fix <failing check or review comment> on PR #<p> in worktree <wt>, following S/HUNTER.md "Checks and pull request". Model tag <M>.` |
 
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
-   last check (last seen: AGENTS 9d44796, ERRATA ecf567d), re-read the change, update the briefs
+   last check (last seen: AGENTS 4b0ecf3 (import rebuild cost, Sec<N>_Imports.lean; in HUNTER), ERRATA c11594c), re-read the change, update the briefs
    (HUNTER.md first), and update "last seen" here.
 0a. **#5889 MERGED** (2026-11-23 ~03:45Z, merge 0b7a2349). Claimed and queued (opus): #3878 (AppB Sec6,
    crowded: elmismisimoxhunca holds #3879), #5673 (Ch01 Sec4; #6012 merged 03:58Z, so no longer crowded; launch once warm has fb3acbf0), #4973
