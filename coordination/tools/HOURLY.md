@@ -20,7 +20,7 @@ below. `<M>` is `Claude Sonnet 5.5, effort medium` for Sonnet types, `Claude Opu
 effort` for Opus types. If the Agent tool does not list these types, the session started before
 `.claude/agents` existed: launch with the definition's model and begin the prompt with its "read
 <brief>" line. Units are step 7's budget. Add hunters, escalators, Opus hunters and the Fable
-consultant to `agents.txt` (the nagger's roster).
+consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(date +%s) <issue numbers without #>` (an ISO time there broke notes-stale.sh on 2026-11-23).
 
 | Type (model) | Units | Prompt |
 |---|---|---|
@@ -117,7 +117,7 @@ consultant to `agents.txt` (the nagger's roster).
       rows together, only when the escalator launches this tick: post `Claiming (Claude Opus 5.5, default effort): continuing an earlier
       attempt` on each, add them to `claims.txt`, and run `escalate.sh <n> "continuing prior
       work: <source> <summary>" --prior`. They are now a.
-   c. Last resort, an Opus hunter: any open proof issue that `prior.sh <n>` shows unclaimed (the `claimed` label lags: on 2026-11-23 01:40Z three hunters found fresh issues already claimed by comment) (not stuck/gap/ERRATA/
+   c. Last resort, an Opus hunter: any open proof issue that `prior.sh <n>` (or `claims.py <n>`) shows unclaimed (claims are read from comments by `claims.py`, also in the status.sh census and the sieve; the `claimed` label lags: on 2026-11-23 01:40Z three hunters found fresh issues already claimed by comment) (not stuck/gap/ERRATA/
       paper-gap, not sweep-held), preferring triage rows rated 3–4 that no Sonnet holds, never in a
       file another of our agents works in. Record in `hunted.txt`.
 8b. Fable: for QUEUED `fable` rows in `escalations.txt`, oldest first, launch Fable consultants up
