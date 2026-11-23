@@ -17,15 +17,15 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 
 - **Restarted after a sandbox reboot** (~18:05Z): services restarted (watchdog with all-projects
   `PROJ`, memguard, warm and sieve at nice 19); the token needed `sbx secret set` again after the
-  reboot. Hourly cron at minute 17 (session-only). Nagger running.
-- **Budget 10 units (user, 23:10Z; was 12), 12 in use until two agents finish:** Opus escalators esc-ch11sec1b (Ch11 Sec1b #5175
-  #5177 #5181 #5184), esc-ch07sec4 (#5078 #5079 #5108), esc-ch10sec3 (#5207 #5208 #5204),
-  esc-ch07sec3a (#4603, ours, prior work), esc-ch05sec3a2 (Ch05 Sec3a #4135 #4136 #4140 #4141
-  #4174 #4175 #4181 #4184: elmismisimoxhunca's attempts built but their auditor gave no verdict);
-  Sonnets w27 (follow-up #5478, Ch11 Sec2b), w29 (Ch11 Sec3 rated-3: #5494 first, #5495 #5497
-  #5492 #5502 #5512).
-- **Reserved:** #5135 (Ch07 Sec5) waits for esc-ch11sec1b's adelePrincipalValue helpers (one
-  follow-up by SendMessage), so two Opus do not build the same helpers.
+  reboot. Hourly cron at minute 17 (session-only). Nagger stopped 00:30Z (quota); relaunch per step 4 once agents run again.
+- **Current state (2026-11-23 01:08Z):** budget scales with token usage (HOURLY step 7, max 10). At 01:08Z 5h=97%
+  (reset ~01:30Z), so budget 0: one Opus escalator still runs, esc-ch05sec3a5 (Ch05 Sec3a #4184, resuming the
+  paused work; launched 00:56Z under the earlier 2-unit cap). Paused for quota at 00:28Z, rows QUEUED with notes
+  ("paused for quota … resume from notes"): #4078 (helpers in notes/4078-work, theorem E left) and #4079 (same
+  file, shares helpers), #5108 (Fable route, one PolynormableSpace instance left), #4116 #4117 #4127 #4128 #4132
+  (Ch05 Sec2b, plans only). Open PRs awaiting review: #5724 #5740 #5813 #5835 #5850 #5859. Leads: AppB Sec6 via
+  vendored StrongPNT (#5822): #3860 #3878 released with routes, #3869 #3875 #3879 held by elmismisimoxhunca;
+  cleanup of duplicated adelePrincipalValue_empty helpers (leads.txt), now possible since #5697 merged.
 - **PRs opened this session:** #5433 #5441 #5447 #5450 merged; open #5454 (#5288; Verdict
   `error` because main cec1c13 did not build: push an empty commit once main builds, leads.txt),
   #5538 (#4344, Fable route), #5542 (#4144), #5547 (#4535), #5551 (Ch11 Sec3, 5 issues), #5553
