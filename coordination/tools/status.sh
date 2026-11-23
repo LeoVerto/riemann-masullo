@@ -5,6 +5,7 @@
 T=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools; R=mccorvie/riemann-masullo
 echo "== $(date '+%H:%M') host"; free -m | awk 'NR==2{print "mem avail "$7"MB"}'; df -h / | awk 'NR==2{print "disk free "$4}'; uptime | sed 's/.*load/load/'
 echo "== token"; $T/tokencheck.sh
+echo "== claude usage (5h / 7d windows; WARN at 85%, see usage.sh)"; $T/usage.sh
 echo "lake cache (unique, excluding hardlinks into packages) $(du -sh /mnt/faststorage/math/riemann-masullo/.lake/packages /mnt/faststorage/math/riemann-masullo/.lake/artifact-cache 2>/dev/null | tail -1 | cut -f1)"
 echo "== PRs (LeoVerto, open + merged today)"
 gh pr list --repo $R --author LeoVerto --state all --limit 30 --json number,state,title,statusCheckRollup,reviews,comments \
