@@ -10,6 +10,17 @@ echo "lake cache (unique, excluding hardlinks into packages) $(du -sh /mnt/fasts
 echo "== PRs (LeoVerto, open + merged today)"
 gh pr list --repo $R --author LeoVerto --state all --limit 30 --json number,state,title,statusCheckRollup,reviews,comments \
   --jq '.[] | select(.state=="OPEN" or .state=="MERGED") | "\(.number) \(.state) \([.statusCheckRollup[]? | select(.name=="Verdict") | .conclusion] | join(",")) rev=\(.reviews|length) com=\(.comments|length) \(.title[:60])"' 2>&1 | head -30
+# User, 2026-11-23: catch merge conflicts ourselves instead of waiting for the integrator to say so.
+echo "== merge conflicts (open LeoVerto PRs that GitHub reports as conflicting with main)"
+prq() { gh pr list --repo $R --author LeoVerto --state open --limit 50 --json number,mergeable,headRefName,title \
+  --jq '.[] | "\(.number) \(.mergeable) \(.headRefName) \(.title[:60])"'; }
+# GitHub computes mergeability lazily: a first query may say UNKNOWN and starts the computation, so ask once more.
+if out=$(prq); then
+  grep -q '^[0-9]* UNKNOWN ' <<<"$out" && { sleep 8; out=$(prq) || true; }
+  awk '$2=="CONFLICTING" {n++; t=$0; for (i=1;i<=3;i++) sub(/^[^ ]+ /,"",t); print "CONFLICT #" $1 " " $3 " " t}
+       $2=="UNKNOWN" {u=u " #" $1}
+       END {if (!n) print "(none)"; if (u) print "(mergeability not computed yet:" u "; next run)"}' <<<"$out"
+else echo "(gh failed)"; fi
 echo "== claims.txt ($(wc -l < $T/claims.txt))"; tr '\n' ' ' < $T/claims.txt; echo
 echo "== warm base"; echo "ready $(cut -c1-8 $T/base/COMMIT)  main $(git -C /mnt/faststorage/math/riemann-masullo rev-parse --short=8 origin/main)  $(tail -1 $T/warm.log)"
 echo "== memguard"; tail -1 $T/memguard.log
@@ -68,8 +79,10 @@ if new=$(gh api --paginate "repos/$R/issues/comments?since=$seen&per_page=100" -
   awk 'NR==FNR {c[$1]; next} $1 in c {n=$1; $1=""; print "NEW #" n ":" $0}' $T/claims.txt <(echo "$new")
   [ "${1:-}" = --mark ] && echo "$stamp" > $T/comments.seen
 else echo "(gh failed; will retry from $seen)"; fi
-echo "== label census (unclaimed open proof issues; newest issue number; last hunter start)"
-gh api --paginate "repos/$R/issues?state=open&labels=proof&per_page=100" --jq '.[] | select(.pull_request|not) | select([.labels[].name] | (index("claimed") or index("blocked") or index("stuck")) | not) | "\([.labels[].name] | map(select(. != "proof")) | join(",")) \(.number)"' |
+echo "== label census (open proof issues unclaimed by comment (claims.py; the claimed label lags), not blocked/stuck; newest issue number; last hunter start)"
+heldn=$(python3 -I $T/claims.py --held | grep -oE '^#[0-9]+' | tr -d '#')
+gh api --paginate "repos/$R/issues?state=open&labels=proof&per_page=100" --jq '.[] | select(.pull_request|not) | select([.labels[].name] | (index("blocked") or index("stuck")) | not) | "\([.labels[].name] | map(select(. != "proof" and . != "claimed")) | join(",")) \(.number)"' |
+  awk 'NR==FNR {h[$1]; next} !($2 in h)' <(echo "$heldn") - |
   awk '{c[$1]++; if ($2>m[$1]) m[$1]=$2} END {for (l in c) print l, c[l], m[l]}' | sort -k2 -nr |
   while read l c m; do h=$(awk -v l="$l" '$1==l {h=$2} END {print h}' $T/hunted.txt); echo "$l unclaimed=$c newest=#$m last_hunt=${h:-NEVER}"; done
 true
