@@ -172,6 +172,7 @@ Launch prompts: HOURLY.md "Launching agents".
 | `escalate.sh <n> "<reason>"` | Hands a stuck issue to the next tier (`--to opus` default, `--to fable` with a stuck packet) without releasing it: no comment, stays in `claims.txt`, row in `escalations.txt`, note appended; `--prior` (coordinator) restores archived notes or seeds a stub for a re-claimed issue. |
 | `prior.sh <n> [--local]` | All earlier work on an issue: current claim, full comments, referencing PRs; our notes, released notes, reports, patches, queue lines, commits, worktrees. |
 | `resumable.sh [max]` | Open unclaimed issues with earlier attempts (ours first, then others'), by file, with any agents.txt holder: HOURLY.md step 8b. ~1.5 min. |
+| `claims.py <n>…` / `--held` | Claim state from the comments (upstream's Claims rules), not the lagging label: `#n HELD by <who>` or `#n FREE`; `--held` lists all held issues (~14 s). Used by status.sh, prior.sh, resumable.sh, sieve_status.py. Check every issue with it before handing it out. |
 | `release.sh <n> "<reason>"` | Posts `Releasing (<M>): reason` plus `notes/<n>.md`, updates `claims.txt`, archives to `notes/released/`. |
 | `watchdog.sh` | When every transcript has been idle for 20 min, releases all claims via `release.sh`; auto-resume after 2 h is disabled by `no-resume`. |
 | `memguard.sh` | Below 1000 MB available (`LOW`), kills the newest sieve Lean process, otherwise the newest Lean process. |
