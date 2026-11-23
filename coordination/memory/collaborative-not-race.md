@@ -10,3 +10,5 @@ The user, 2026-11-22: "Not a fan of pre-proving. While I'd like to see lots of c
 **Why:** the project is shared with the integrator's agents and other contributors.
 
 **How to apply:** HANDOVER "Collaborative, not a race" (no proving sorries without an issue, the sieve computes on CPU only, hints on held files, step back when someone claimed first). Related: [[sieve-naming]], [[claims-notes-attribution]].
+
+User, 2026-11-23 ~01:35Z: "elmismisimoxhunca does not read comments once they've claimed an issue, assume they think it's their claim and will keep working on it." So an unreleased elmismisimoxhunca Claiming always wins, whatever the order: release ours with notes, stop our agent (HOURLY.md step 3).

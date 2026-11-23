@@ -53,7 +53,7 @@ consultant to `agents.txt` (the nagger's roster).
    S/prior.sh <n> and take it into account." For a queued issue, add an `Upstream:` line to
    `notes/<n>.md`. A `Claiming` by someone else, or a github-actions "already claimed" reply to
    ours: check the Claiming/Releasing sequence (`prior.sh <n>`). If an unreleased claim by someone
-   else came before ours, release ours; a leftover `claimed` label (as on #4411, our own claim) is no reason.
+   else came before ours, release ours. An unreleased Claiming by elmismisimoxhunca always wins, whatever the order (user, 2026-11-23 ~01:35Z: "does not read comments once they've claimed an issue, assume they think it's their claim and will keep working on it"): release ours with notes and stop our agent on it. A leftover `claimed` label (as on #4411, our own claim) is no reason.
    An integrator decision (statement changed, gap, closed) goes to the holder as "stop".
 4. Finished agents: read new `S/notes/report-*.md` (agents woken by the nagger report to it), relay
    each in one line, move the file to `notes/reports-done/`. TaskStop them once no Lean process
@@ -93,7 +93,7 @@ consultant to `agents.txt` (the nagger's roster).
       units for it instead of starting Sonnet hunters or Opus beyond the two above.
    3. Sonnet hunters while quick-win rows (7a) exist, up to 6 Sonnets.
    4. What is left, two units at a time, to Opus (step 8). One unit left over waits.
-7a. New issues first: proof issues newer than the last shortlisted (last: #5707, triage13) get
+7a. New issues first: proof issues newer than the last shortlisted (last: #5820, triage14) get
    `shortlist.py` on their files and a triage agent into a new `triage<k>.tsv`; update "last"
    here. Hunters take rows rated 1–2 (then 3) with unclaimed issues not labelled `stuck`, listed in
    the prompt by file (run `trap5398.py` on them and append `(RISK-5398)` to flagged issues):

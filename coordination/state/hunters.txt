@@ -102,3 +102,4 @@ handin-2b3 2026-11-23T00:36Z PR #5835 (#4125 #4126, inherited sorryAx)
 esc-ch07sec5 2026-11-23T00:48Z PR #5850 (#5135, inherited sorryAx)
 esc-appbsec6 2026-11-23T00:56Z PR #5859 (#3877 from #3878, moved #3878 decl above it); #3860 #3878 released with routes
 esc-ch05sec3a5 2026-11-23T01:22Z PR #5874 (#4184, clean axioms)
+esc-ch07sec1b3 01:36Z stopped at start: #4078/#4079 held by elmismisimoxhunca (user: they keep working on their claims), released

@@ -13,30 +13,18 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 
 **Time zones:** the shell, `status.sh` and service logs use CET (UTC+1); the cron tool uses UTC.
 
-## Current state (2026-11-23 ~01:15Z, coordinator session a9c138b2 handing over; new session after the 01:30Z reset)
+## Current state (2026-11-23 ~01:45Z, coordinator session 5fefc259)
 
-- **State at 01:08Z:** budget scales with token usage (HOURLY step 7, max 10). At 01:08Z 5h=97%
-  (reset ~01:30Z), so budget 0. No agent runs since 01:25Z: esc-ch05sec3a5 handed in #4184 as PR #5874 (clean axioms; it resumed the
-  paused work). Paused for quota at 00:28Z, rows QUEUED with notes
-  ("paused for quota … resume from notes"): #4078 (helpers in notes/4078-work, theorem E left) and #4079 (same
-  file, shares helpers), #5108 (Fable route, one PolynormableSpace instance left), #4116 #4117 #4127 #4128 #4132
-  (Ch05 Sec2b, plans only). Open PRs awaiting review: #5724 #5740 #5813 #5835 #5850 #5859 #5874. Leads: AppB Sec6 via
-  vendored StrongPNT (#5822): #3860 #3878 released with routes, #3869 #3875 #3879 held by elmismisimoxhunca;
-  cleanup of duplicated adelePrincipalValue_empty helpers (leads.txt), now possible since #5697 merged.
-- **For the next session (user restarts after the reset to load the edited subagent definitions):**
-  1. Startup checklist steps 2–6 below; `CronList`, then create the hourly cron (session-only, it died with
-     a9c138b2). Budget from `S/usage.sh` per HOURLY step 7 (table, max 10).
-  2. Work order once units are free: #4078 (+#4079 in the same PR, shared helpers; code in
-     `notes/4078-work/`, J/B 3 small errors, theorem E left; elmismisimoxhunca also posted Claiming after
-     ours) → #5108 (Fable route, PolynormableSpace instance left; Sec4 free since #5806 merged) → Ch05 Sec2b
-     #4116 #4117 #4127 #4128 #4132 → AppB Sec6 #3878 then #3860 (routes in notes; koffie's plan on #3860;
-     vendored StrongPNT #5822) → `adelePrincipalValue_empty` cleanup (leads.txt). Paused rows' 2 h grace
-     ends ~02:30Z: launch or release then.
-  3. Nagger: relaunch (step 4) once agents run. Watch #5724 (conflict fixed d2381d0, Verdict pending).
-  4. A peer session edits the live files and this branch for the user and messages the coordinator
-     (find it with ListAgents); `git pull` before editing.
-- **Lead:** Ch05 Sec3a has ~30 more issues with failed automated attempts by elmismisimoxhunca, most
-  failing only on inherited sorryAx: good Opus work (`resumable.sh`).
+- Services restarted 02:32 CET (all were down); hourly cron `17 * * * *` created in this session.
+  Usage after the reset: 5h 0%, 7d 22%, fable-7d 13% → budget 10.
+- **Ch05 Sec2b (#4116 #4127 #4128 #4132) and Ch07 Sec1b (#4078 #4079) released to
+  elmismisimoxhunca** with our notes (they claimed them and keep working; see the claims rule).
+  #4117 closed. AppB Sec6 crowded (koffie #3860, elmismisimoxhunca #3869/#3875/#3879): skipped.
+  Ch05 Sec3a: ~17 issues held by elmismisimoxhunca, skipped.
+- Running: esc-ch07sec4b (#5108, Fable route), esc-ch07sec2p (Ch07 Sec2_Printed refutations
+  #4559 #4561 #4562 #4563 #4566, continuing CalebAlbers; #4567 #4569–#4573 in the same file have
+  attempts too), triage14 (20 new refutation issues #5708–#5820, shortlisted), nagger.
+- Open PRs awaiting review: #5740 #5813 #5835 #5874.
 
 ## Standing instructions from the user
 
@@ -65,7 +53,7 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
   escalation keeps the claim only as a hand-over, at most 2 h in the queue, then `release.sh`
   posts the notes (HOURLY.md step 3, `status.sh` `QUEUED … RELEASE`); re-post a claim only while an
   agent is still working on it; release only via `release.sh`; skip `stuck` issues; watch others'
-  comments on our claims. After a halt (the watchdog releases everything), re-claim only what the
+  comments on our claims; an unreleased elmismisimoxhunca claim always wins (user, 2026-11-23: they do not read comments after claiming and keep working). After a halt (the watchdog releases everything), re-claim only what the
   resumed agents work on.
 - **Parallel probes are fine** (user, 2026-11-22: upstream's one-check-at-a-time rule is for
   hardware-bound provers; we are token-bound). `probe.sh start` builds the shared imports once
