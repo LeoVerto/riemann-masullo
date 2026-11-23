@@ -105,3 +105,4 @@ esc-ch05sec3a5 2026-11-23T01:22Z PR #5874 (#4184, clean axioms)
 esc-ch07sec1b3 01:36Z stopped at start: #4078/#4079 held by elmismisimoxhunca (user: they keep working on their claims), released
 opus5770 01:41Z no work: #5770 held by ADB991 (file sweep)
 opus5749 01:41Z no work: #5749 held by ADB991
+esc-ch07sec4b 01:52Z PR #5910 (#5108, sorryAx only via archNuclearityStrongDual_finest)
