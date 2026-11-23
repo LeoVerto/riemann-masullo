@@ -5795,7 +5795,7 @@ private theorem elementary_stage_separates {m n r : ℕ} {F : Type} [AddCommGrou
   · simpa [huy hx] using (Circle.coe_ne_zero (χ (Multiplicative.ofAdd x.2.1))).symm
 /-- Tests can be nonzero at any given point and distinguish it from any other
 point by passing to an elementary quotient in which their ratio survives. -/
-theorem schwartzBruhat_exists_test (x y : G) :
+theorem schwartzBruhat_exists_separating_function (x y : G) :
     ∃ f : SchwartzBruhat G, f x ≠ 0 ∧ (y ≠ x → f y ≠ f x) := by
   classical
   let U := if y = x then univ else ({y / x} : Set G)ᶜ
@@ -5833,7 +5833,7 @@ theorem schwartzBruhat_exists_test (x y : G) :
 
 /-- A nuclear space is separable for each of its continuous seminorms. A
 totally bounded zero-neighborhood spans the space and has separable span. -/
-private theorem seminorm_separable_of_nuclear {E : Type*} [AddCommGroup E] [Module ℂ E]
+theorem seminorm_separable_of_nuclear {E : Type*} [AddCommGroup E] [Module ℂ E]
     [TopologicalSpace E] [IsTopologicalAddGroup E] [ContinuousSMul ℂ E]
     [PolynormableSpace ℂ E] [T2Space E]
     (h : IsNuclearTVS.{v} E) (p : Seminorm ℂ E) (hp : Continuous p) :
@@ -5922,11 +5922,11 @@ private theorem countable_tests_of_nuclear (h : IsNuclearTVS.{v} (SchwartzBruhat
   refine ⟨u, fun x ↦ ?_, fun x y hxy ↦ ?_⟩
   · by_contra! hz
     have he := hu.equalizer (hc x) (continuous_const (y := (0 : ℂ))) (funext hz)
-    obtain ⟨f, hf, _⟩ := schwartzBruhat_exists_test x x
+    obtain ⟨f, hf, _⟩ := schwartzBruhat_exists_separating_function x x
     exact hf (congrFun he f)
   · by_contra hne
     have he := hu.equalizer (hc x) (hc y) (funext fun n ↦ congrFun hxy n)
-    obtain ⟨f, _, hf⟩ := schwartzBruhat_exists_test y x
+    obtain ⟨f, _, hf⟩ := schwartzBruhat_exists_separating_function y x
     exact hf hne (congrFun he f)
 
 /-- Paper: Remark D.1.5.8, p. 764. The Schwartz–Bruhat space of a group that
@@ -6264,7 +6264,7 @@ private theorem schwartzBruhat_not_metrizable_of_small_powers (y : ℕ → G)
     (hsmall : ∀ U ∈ 𝓝 (1 : G), ∀ᶠ n in atTop, ∀ k : ℕ, (y n) ^ k ∈ U) :
     ¬ MetrizableSpace (SchwartzBruhat G) := by
   intro hmetric
-  choose f _ hsep using fun n ↦ schwartzBruhat_exists_test 1 (y n)
+  choose f _ hsep using fun n ↦ schwartzBruhat_exists_separating_function 1 (y n)
   have hf (n : ℕ) := hsep n (hne n)
   obtain ⟨c, hc, hbounded⟩ := exists_bounded_rescaling f
   obtain ⟨a, e, C, _, hC⟩ := schwartzBruhat_bounded_lift hbounded
