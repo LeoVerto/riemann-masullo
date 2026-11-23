@@ -37,14 +37,14 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
 0. `git fetch origin`. If AGENTS.md, CONTRIBUTING.md or ERRATA.md changed on origin/main since the
    last check (last seen: AGENTS ed9dbb7, ERRATA 0d2e5b1), re-read the change, update the briefs
    (HUNTER.md first), and update "last seen" here.
-0a. **Watch PR #5889** (user, 2026-11-23 ~01:50Z: "if that merges we can solve a lot of previously
-   hard issues"): `gh pr view 5889 -R mccorvie/riemann-masullo --json state -q .state`. While OPEN,
-   nothing. Once MERGED (warm base at or past the merge): for #3878 #3879 #5673 #3869 #3875 #4982
-   #4973 #3884 #3889 (the PR's list; modules in `RiemannMasullo/External/Grh/`), run `prior.sh`,
-   and offer the unclaimed ones as step 8b prior work to Opus escalators (one file each, ahead of
-   fresh issues), the prompt naming the vendored lemmas the PR body assigns to each issue. Held
-   issues: a hint on the issue is upstream posting, so ask the user first. Tell the user it merged;
-   then mark this step done (leads.txt #5889 line too).
+0a. **#5889 MERGED** (2026-11-23 ~03:45Z, merge 0b7a2349). Claimed and queued (opus): #3878 (AppB Sec6,
+   crowded: elmismisimoxhunca holds #3879), #5673 (Ch01 Sec4, crowded: integrator PR #6012), #4973
+   (Ch10 Sec2, RISK-5398). Launch them (step 8a, one escalator each, #3878 first) only once
+   `git merge-base --is-ancestor 0b7a2349 <warm base>` holds (warm.log `ready` line); prompts name the
+   vendored `RiemannMasullo/External/Grh/` lemmas the PR body assigns (horizontal estimates: finite zero
+   factors, disk lower bound, log averaging; #4973: real-line L2, tail and pairing) and say "crowded file"
+   where noted. Held ones (#3879 #3869 #3875 #3884 #3889 elmismisimoxhunca, #4982 factory-davidgu):
+   hints only if the user says so. Then mark this step done.
 0b. (Done 2026-11-23 ~03:15Z: #4078/#4079 re-claimed by us after the user noted the last claims were ~5 h old; escalator esc-ch07sec1b4.)
 0c. **Watch PRs #5887 and #5972** (Tau Ceti vendoring; #5972 is stacked on #5887; asked by the user's
    vendoring helper session, 2026-11-23 ~03:55Z): `gh pr view <p> --json state -q .state` for both.
