@@ -3,6 +3,7 @@ module
 public import RiemannMasullo.Ch09_HardySobolev.Sec2
 public import RiemannMasullo.AppC_LCTVS.Sec3b
 public import RiemannMasullo.AppC_LCTVS.Sec4
+import RiemannMasullo.ForMathlib.Topology.Algebra.PontryaginDual.Separation
 import all RiemannMasullo.AppC_LCTVS.Sec3a
 import all RiemannMasullo.AppC_LCTVS.Sec3a_part2
 import RiemannMasullo.ForMathlib.MeasureTheory.Group.Arithmetic
