@@ -108,3 +108,4 @@ opus5749 01:41Z no work: #5749 held by ADB991
 esc-ch07sec4b 01:52Z PR #5910 (#5108, sorryAx only via archNuclearityStrongDual_finest)
 esc-ch07sec1bp 02:01Z PR #5921 (#4840 #4842 clean); #4838 released (needs a zeta zero)
 esc-appbsec6p 02:06Z PR #5925 (#4662 clean); #4660 released (needs a zeta zero)
+opus5751 02:12Z PR #5929 (#5751 refuted; sorryAx inherited via AppD/Ch02 open lemmas)
