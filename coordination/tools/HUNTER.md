@@ -100,7 +100,7 @@ a little thought. Skip anything deep.
   The failed approaches above it (with their errors) are part of the packet. Then run
   `$S/escalate.sh <n> "<one-line reason>" --to fable`: the claim stays ours. Only once per issue:
   if the notes already have a `## Fable route` that also failed, release instead.
-- After the PR is open, remove its issues from `claims.txt` and delete their `notes/<n>.md`.
+- After the PR is open, remove its issues from `claims.txt` and move each `notes/<n>.md` to `notes/released/<n>-done-pr<p>.md` (never `/tmp`, never `rm`).
 
 ## Builds and processes
 - Build only your module while working. Single modules take 1–5 min on an idle machine, up to 3x
