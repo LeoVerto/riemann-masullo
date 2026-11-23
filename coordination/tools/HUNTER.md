@@ -249,6 +249,8 @@ declarations do not collide with the sweeper's).
   renames `u_1` and the signature compare flags them).
 
 ### Imports and vendored code (AGENTS.md 9d44796 / #6034, `External/README.md`; binding)
+
+- **Rebuild cost (AGENTS 4b0ecf3):** every added or removed `import` line and every new public declaration in a low file rebuilds all modules above it (one import in Ch05 Sec3b rebuilt 58 modules). Use what the file already imports where you can, keep helpers `private`, and put an unavoidable new import in the section's `Sec<N>_Imports.lean` when it has one (as `public import`). Name every import you add in the PR body.
 Your own new helpers still go in your file as private helpers (above). These rules cover *using*
 declarations that live in other files.
 - **Never add `import all`.** The PR check refuses it (#6103). It makes every proof edit in the
