@@ -890,6 +890,53 @@ section IsotypicMellin
 
 attribute [local instance] ideleClassGroupMeasurableSpaceSec2b normOneSIdeleQuotientMeasurableSpaceSec2b
 
+/-- A Pettis isotypic average multiplies by the Haar mass at any evaluation of a continuous
+linear map into continuous functions on which the action is the character. -/
+private theorem globalThetaMellin_isotypicAverage_eval {G E X : Type*} [Monoid G]
+    [TopologicalSpace G] [MeasurableSpace G] [AddCommGroup E] [Module ℂ E] [TopologicalSpace E]
+    [TopologicalSpace X] (M : Submodule ℂ C(X, ℂ)) (L : E →ₗ[ℂ] M) (hL : Continuous L) (x0 : X)
+    (μ : Measure G) (ρ : G →* (E →L[ℂ] E)) (ω : PontryaginDual G) (P : E →L[ℂ] E)
+    (hP : IsPettisIsotypicAverageOn μ Set.univ ρ ω P) (u : E)
+    (hu : ∀ g, (L (ρ g u)).val x0 = (ω g : ℂ) * (L u).val x0) :
+    (L (P u)).val x0 = (μ.real Set.univ : ℂ) * (L u).val x0 := by
+  let φ : StrongDual ℂ E :=
+    { toFun := fun y ↦ (L y).val x0
+      map_add' := fun a b ↦ by simp
+      map_smul' := fun a b ↦ by simp
+      cont := (continuous_eval_const x0).comp (continuous_subtype_val.comp hL) }
+  obtain ⟨_, he⟩ := hP u
+  have h := LinearMap.congr_fun he φ
+  change φ (P u) = ∫ g, φ (star (ω g : ℂ) • ρ g u) ∂(μ.restrict Set.univ) at h
+  refine h.trans ?_
+  have hg : ∀ g, φ (star (ω g : ℂ) • ρ g u) = φ u := fun g ↦ by
+    rw [map_smul, smul_eq_mul]
+    change star (ω g : ℂ) * (L (ρ g u)).val x0 = (L u).val x0
+    rw [hu g, ← mul_assoc]
+    have h1 : star (ω g : ℂ) * (ω g : ℂ) = 1 := by
+      rw [Complex.star_def, ← Complex.normSq_eq_conj_mul_self, Circle.normSq_coe,
+        Complex.ofReal_one]
+    rw [h1, one_mul]
+  simp only [hg, Measure.restrict_univ, integral_const]
+  rfl
+
+/-- A functional that scales translates of representatives by a character scales the
+induced action on the quotient by the same character. -/
+private theorem globalThetaMellin_isotypicAverage_translate {IG CG Q B : Type*} (q : B → Q)
+    (hq : Surjective q) (π : IG → CG) (hπ : Surjective π) (ρ : CG → Q → Q) (T : IG → B → B)
+    (hρ : ∀ g f, ρ (π g) (q f) = q (T g f)) (φ : Q → ℂ) (χ : CG → ℂ)
+    (hT : ∀ g f, φ (q (T g f)) = χ (π g) * φ (q f)) (g : CG) (x : Q) :
+    φ (ρ g x) = χ g * φ x := by
+  obtain ⟨f, rfl⟩ := hq x
+  obtain ⟨g, rfl⟩ := hπ g
+  rw [hρ, hT]
+
+/-- A map induced on a quotient by a continuous linear map is continuous. -/
+private theorem globalThetaMellin_isotypicAverage_continuous {E Y : Type*} [AddCommGroup E]
+    [Module ℂ E] [TopologicalSpace E] [AddCommGroup Y] [Module ℂ Y] [TopologicalSpace Y]
+    (K : Submodule ℂ E) (L : E →ₗ[ℂ] Y) (h : K ≤ LinearMap.ker L) (hL : Continuous L) :
+    Continuous (K.liftQ L h) :=
+  K.isQuotientMap_mkQ.continuous_iff.mpr hL
+
 /-- Paper: Remark 5.2.3.5, p. 238.
 On each component the global Mellin transform of the Tamagawa average equals
 the Mellin transform of the original class times the norm-one Haar mass. -/
@@ -897,7 +944,20 @@ theorem globalThetaMellin_isotypicAverage (ω : PontryaginDual C₁) (x : Θ𝔽
     (c : {c : QuasiCharacter C𝔽 // 0 ≤ globalIdelicOrderBound c})
     (hc : ∀ g : C₁, c.val g.val = (ω g : ℂ)) :
     (globalThetaMellin (F := F) (P𝔽(ω) x)).val c =
-      ((μ𝔽₁).real Set.univ : ℂ) * (globalThetaMellin (F := F) x).val c := by sorry
+      ((μ𝔽₁).real Set.univ : ℂ) * (globalThetaMellin (F := F) x).val c :=
+  globalThetaMellin_isotypicAverage_eval _ (globalThetaMellin (F := F))
+    (globalThetaMellin_isotypicAverage_continuous _ _
+      (globalIdelicMellin_vanishes_on_theta_kernel (F := F))
+      (globalIdelicMellin_continuous (F := F))) c _ _ ω _
+    (existsUnique_globalThetaIsotypicAverage (F := F) ω).exists.choose_spec x
+    (fun g ↦ (globalThetaMellin_isotypicAverage_translate Submodule.Quotient.mk
+      (Submodule.mkQ_surjective _) QuotientGroup.mk QuotientGroup.mk_surjective
+      (fun g y ↦ (existsUnique_globalThetaAction (F := F)).exists.choose g y)
+      schwartzBruhatUnitTranslate
+      (existsUnique_globalThetaAction (F := F)).exists.choose_spec.2
+      (fun y ↦ (globalThetaMellin (F := F) y).val c) (fun g ↦ c.val g)
+      (fun g f ↦ globalIdelicMellin_unitTranslate g f c) g.val x).trans
+      (congrArg (· * _) (hc g)))
 
 /-- Paper: Remark 5.2.3.5, p. 238.
 On each S-local component the Mellin transform of the Tamagawa average equals
@@ -906,7 +966,20 @@ theorem sLocalThetaMellin_isotypicAverage (χ : PontryaginDual (J₁(S))) (x : �
     (c : {c : QuasiCharacter (Jₛ(S)) // 0 ≤ sLocalIdelicOrderBound c})
     (hc : ∀ g : J₁(S), c.val g.val = (χ g : ℂ)) :
     (sLocalThetaMellin (F := F) (S := S) (Pₛ(S, χ) x)).val c =
-      ((μₛ₁(S)).real Set.univ : ℂ) * (sLocalThetaMellin (F := F) (S := S) x).val c := by sorry
+      ((μₛ₁(S)).real Set.univ : ℂ) * (sLocalThetaMellin (F := F) (S := S) x).val c :=
+  globalThetaMellin_isotypicAverage_eval _ (sLocalThetaMellin (F := F) (S := S))
+    (globalThetaMellin_isotypicAverage_continuous _ _
+      (sLocalIdelicMellin_vanishes_on_theta_kernel (F := F) (S := S))
+      (sLocalIdelicMellin_continuous (F := F) (S := S))) c _ _ χ _
+    (existsUnique_sLocalThetaIsotypicAverage (F := F) (S := S) χ).exists.choose_spec x
+    (fun g ↦ (globalThetaMellin_isotypicAverage_translate Submodule.Quotient.mk
+      (Submodule.mkQ_surjective _) QuotientGroup.mk QuotientGroup.mk_surjective
+      (fun g y ↦ (existsUnique_sLocalThetaAction (F := F) (S := S)).exists.choose g y)
+      schwartzBruhatUnitTranslate
+      (existsUnique_sLocalThetaAction (F := F) (S := S)).exists.choose_spec.2
+      (fun y ↦ (sLocalThetaMellin (F := F) (S := S) y).val c) (fun g ↦ c.val g)
+      (fun g f ↦ sLocalIdelicMellin_unitTranslate g f c) g.val x).trans
+      (congrArg (· * _) (hc g)))
 
 end IsotypicMellin
 
