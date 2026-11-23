@@ -22,13 +22,17 @@ a little thought. Skip anything deep.
 2. **Before claiming each issue**, check all of these:
    - The full thread and all prior work: `$S/prior.sh <n>` (every comment in full, the PRs that
      reference the issue, and our notes, patches, commits and worktrees for it).
-     An unreleased `Claiming`/`Claimed` by anyone means hands off (the `claimed` label lags).
+     An unreleased `Claiming`/`Claimed` by anyone means hands off (the `claimed` label lags; never go by it).
+     `$S/claims.py <n>...` checks a batch of issues from their comments, case-insensitive.
    - The issue is not in `$S/claims.txt` (our other agents).
    - Its file is not held by an open upstream sweep issue:
      `gh issue list -R mccorvie/riemann-masullo --label sweep --state open --json title --jq ".[].title"`.
    - Prefer files low in the import order and nearly finished (CONTRIBUTING).
-   - The file is not crowded: two or three other people with claims or open PRs in it
-     (`gh pr list --repo mccorvie/riemann-masullo --search <file-stem>`) means skip it and say so.
+   - Prefer uncrowded files: two or three other people with claims or open PRs in it
+     (`gh pr list --repo mccorvie/riemann-masullo --search <file-stem>`) means crowded. Take an
+     issue in a crowded file only when your prompt says "crowded file" (user, 2026-11-23: few
+     sorries are left): then your diff stays inside your theorem and private helpers directly
+     above it, and you rebase on origin/main right before handing in. Otherwise skip it and say so.
    - ERRATA.md and gap markers (see "Paper errors, gaps, ERRATA" below).
 3. **Claim first, then work.** Comment with the first line `Claiming (<M>)`, append the number to
    `$S/claims.txt`, and create `$S/notes/<n>.md` (format below).

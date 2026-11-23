@@ -1,7 +1,7 @@
-# Hourly coordinator check
+# Hourly coordinator check (runs every 30 min: cron `17,47 * * * *`, user 2026-11-23 ~02:10Z)
 
 The scheduled run reads this file every time. **Edit it here** (live: `S/HOURLY.md`) to change what
-the hourly check does; the cron job never needs re-creating. Keep it short: it is read every hour.
+the hourly check does; the cron job never needs re-creating. Keep it short: it is read every 30 min.
 The cron prompt is only: `Read /mnt/faststorage/math/riemann-masullo/.agent/sweeptools/HOURLY.md and follow it.`
 
 S=/mnt/faststorage/math/riemann-masullo/.agent/sweeptools.
@@ -45,6 +45,12 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
    fresh issues), the prompt naming the vendored lemmas the PR body assigns to each issue. Held
    issues: a hint on the issue is upstream posting, so ask the user first. Tell the user it merged;
    then mark this step done (leads.txt #5889 line too).
+0b. **Watch #4078 #4079** (user, 2026-11-23 ~02:10Z: "check if those open up again"; we released
+   them to elmismisimoxhunca at 01:36Z): `claims.py 4078 4079`. HELD: nothing. FREE (or closed
+   without a merged proof): tell the user; if FREE, claim both, `escalate.sh <n> "continuing prior
+   work: ours, Fable route" --prior`, and launch one escalator per step 8a on both, its prompt
+   naming `notes/4078-work/`, `notes/4078-Route.lean`, `notes/4079-Route.lean` and
+   `notes/released/4078-20261123T0236.md`. Then mark this step done.
 1. Run `status.sh --mark` (advances the new-comments window) and `cleanup.sh` under timeout,
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
@@ -106,8 +112,13 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
    here. Hunters take rows rated 1–2 (then 3) with unclaimed issues not labelled `stuck`, listed in
    the prompt by file (run `trap5398.py` on them and append `(RISK-5398)` to flagged issues):
    files in sequence, ONE PR PER TOUCHED FILE, until the list is done, 4 PRs or ~3 h (user:
-   "Files in sequence"). No overlap (`claims.txt`, `hunters.txt`), no file crowded by 2–3 other
-   claimants or open PRs.
+   "Files in sequence"). No overlap (`claims.txt`, `hunters.txt`), prefer files not crowded by 2–3
+   other claimants or open PRs. **Crowded files as a fallback** (user, 2026-11-23 ~02:10Z: "Only
+   10% of theorems are left unproven so we might not be able to avoid cluttering files much
+   longer"): when free units have no uncrowded work, an agent may take an issue that `claims.py`
+   shows FREE in a crowded file (never a sweep-held file, never someone's claimed issue); the
+   prompt then says "crowded file: diff only inside your theorem and private helpers directly
+   above it, rebase on origin/main before handing in". Same in step 8c.
 8. Opus work: each Opus that step 7 allows takes the first of these that exists (user,
    2026-11-22: escalation and prior work before any fresh issue).
    a. Escalator: the oldest file with QUEUED `opus` or `refute` rows in `S/escalations.txt` that our

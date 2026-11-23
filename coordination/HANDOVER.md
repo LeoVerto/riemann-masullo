@@ -24,7 +24,8 @@ which the library bans. The folders here (`tools/`, `state/`, `critical/`, `siev
 - Running: esc-ch07sec4b (#5108, Fable route), esc-ch07sec2p (Ch07 Sec2_Printed refutations
   #4559 #4561 #4562 #4563 #4566, continuing CalebAlbers; #4567 #4569–#4573 in the same file have
   attempts too), triage14 (20 new refutation issues #5708–#5820, shortlisted), nagger.
-- Open PRs awaiting review: #5740 #5813 #5835 #5874.
+- Open PRs awaiting review: #5740 #5813 #5835 #5874 #5910 #5921.
+- Watches (HOURLY 0a/0b): PR #5889 merge (vendored grh lemmas); #4078/#4079 becoming free again.
 
 ## Standing instructions from the user
 
@@ -69,7 +70,7 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
 - **Collaborative, not a race.** No pre-proving of sorries without an issue (the sieve may compute
   hits on CPU only). Do not race other contributors or upstream sweepers; help on held files with
   hints. Step back when someone else claimed first.
-- **One PR per touched Lean file**; don't crowd a file that 2–3 others hold (HUNTER.md).
+- **One PR per touched Lean file**; prefer files that 2–3 others do not hold. With ~10% of sorries left, crowded files are a fallback (user, 2026-11-23 ~02:10Z: "we might not be able to avoid cluttering files much longer"): free issues only, diff confined to the theorem and helpers above it (HOURLY 7a, HUNTER.md).
 - **Models and tags:** fixed by the agent definitions (`.agent/agents/`); tags `<M>` per HOURLY.md.
   Claims start `Claiming (<M>)` (upstream parses only the first word); PR bodies carry `Prover: <M>` above the 🤖 line. Sonnet agents
   run until their list is done, 4 PRs or about 3 h.
@@ -125,7 +126,7 @@ Where a rule is carried out, the procedure is named; the quotes and dates are th
    (symlink to `../.agent/agents`, in `.git/info/exclude`) only if it existed when the session
    started; a new definition file loads mid-session, an edited one only after a restart, so keep
    role logic in the briefs.
-5. **One hourly check:** `CronList` first (duplicates have happened), then create it with the
+5. **One hourly check:** `CronList` first (duplicates have happened), then create it (`17,47 * * * *`, every 30 min since 2026-11-23) with the
    one-line prompt under "Hourly check".
 6. **Relaunch** per HOURLY.md (nagger if any agent runs, then steps 7–8). Never resume long dead
    transcripts with SendMessage (an uncached replay is expensive): start fresh agents from
