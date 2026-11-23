@@ -21,6 +21,7 @@ import Mathlib.Analysis.SpecialFunctions.Complex.CircleAddChar
 import Mathlib.Analysis.SpecialFunctions.Gaussian.FourierTransform
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
+import Mathlib.Analysis.SpecialFunctions.PolarCoord
 import Mathlib.LinearAlgebra.Countable
 import Mathlib.LinearAlgebra.TensorProduct.Basis
 import Mathlib.MeasureTheory.Integral.Pi
