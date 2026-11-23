@@ -2901,7 +2901,7 @@ section RatAdeleSelfDuality
 local instance : BorelSpace 𝔸[ℚ] := ⟨rfl⟩
 
 /-- The real coordinate of a rational adele in the unique real completion. -/
-private def ratRealPart (a : 𝔸[ℚ]) : ℝ :=
+def ratRealPart (a : 𝔸[ℚ]) : ℝ :=
   extensionEmbeddingOfIsReal Rat.isReal_infinitePlace (a.1 Rat.infinitePlace)
 
 local notation "ratIntegralAdeles" => (integralAdelesOutside ℚ ∅ : Set 𝔸[ℚ])
@@ -2988,7 +2988,7 @@ private theorem ratAdeleGaussian_integrable_memLp :
       (hg₂.comp_measurePreserving ratTamagawaMeasurePreserving_realPart)⟩
 
 /-- The standard character on the completion at a finite rational place. -/
-private def ratLocalCharacter (v : Primes(ℚ)) (x : v.adicCompletion ℚ) : Circle :=
+def ratLocalCharacter (v : Primes(ℚ)) (x : v.adicCompletion ℚ) : Circle :=
   let p := Rat.HeightOneSpectrum.primesEquiv v
   letI : Fact p.val.Prime := ⟨p.property⟩
   padicStandardCharacter p.val (Rat.HeightOneSpectrum.adicCompletion.padicEquiv v x)
