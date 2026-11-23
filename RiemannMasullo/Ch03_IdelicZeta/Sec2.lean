@@ -37,7 +37,6 @@ import RiemannMasullo.ForMathlib.NumberTheory.NumberField.HeckeLFunction
 import RiemannMasullo.ForMathlib.NumberTheory.NumberField.Completion.FinitePlace
 import RiemannMasullo.ForMathlib.NumberTheory.LSeries.Convergence
 
-import RiemannMasullo.ForMathlib.NumberTheory.NumberField.Completion.FinitePlace
 
 /-!
 # Global idelic zeta functions

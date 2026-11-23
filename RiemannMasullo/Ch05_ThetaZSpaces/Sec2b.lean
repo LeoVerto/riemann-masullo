@@ -12,7 +12,6 @@ import RiemannMasullo.ForMathlib.Topology.Algebra.Module.StrongDualQuotient
 import RiemannMasullo.ForMathlib.Analysis.LocallyConvex.StrongDual
 import RiemannMasullo.ForMathlib.Analysis.LocallyConvex.StrongBidual
 
-import all RiemannMasullo.Ch05_ThetaZSpaces.Sec2
 import RiemannMasullo.ForMathlib.Topology.ContinuousMap.Sigma
 import RiemannMasullo.ForMathlib.MeasureTheory.Integral.Bochner.Regular
 import RiemannMasullo.ForMathlib.NumberTheory.NumberField.Completion.FinitePlace

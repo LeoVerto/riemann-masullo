@@ -13,7 +13,6 @@ import Mathlib.Analysis.Normed.Group.FunctionSeries
 import Mathlib.Analysis.Normed.Module.Dual
 import RiemannMasullo.ForMathlib.Analysis.Normed.Operator.AbsolutelySumming.Composition
 import RiemannMasullo.ForMathlib.Analysis.Normed.Operator.Compact.Hilbert
-import RiemannMasullo.ForMathlib.Analysis.Normed.Module.Seminorm.DirectSum
 import RiemannMasullo.ForMathlib.Analysis.Normed.Module.WeakDual
 import RiemannMasullo.ForMathlib.Analysis.LocallyConvex.StrongBidual
 import RiemannMasullo.ForMathlib.Analysis.LocallyConvex.WithSeminorms

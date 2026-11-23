@@ -8,12 +8,10 @@ import Mathlib.Analysis.Real.Pi.Irrational
 
 import Mathlib.Analysis.Meromorphic.RCLike
 
-import Mathlib.Algebra.Field.ULift
 import all RiemannMasullo.Ch07_SchauderBasesZeta.Sec1a
 import RiemannMasullo.Ch02_AdelicTheta.Sec2a
 import RiemannMasullo.ForMathlib.Analysis.SpecialFunctions.Gaussian.Schwartz
 
-import Mathlib.Algebra.Field.ULift
 import all RiemannMasullo.AppB_AnalyticNT.Sec3
 import all RiemannMasullo.Ch03_IdelicZeta.Sec3b
 
