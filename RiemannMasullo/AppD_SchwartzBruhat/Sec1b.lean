@@ -10,7 +10,7 @@ import all RiemannMasullo.AppC_LCTVS.Sec2b
 import all RiemannMasullo.AppD_SchwartzBruhat.Sec1a
 import Mathlib.Algebra.Category.Grp.Injective
 import RiemannMasullo.ForMathlib.Analysis.Calculus.FDeriv.Symmetric
-import all RiemannMasullo.AppC_LCTVS.Sec1
+import RiemannMasullo.AppC_LCTVS.Sec1
 import Mathlib.Analysis.LocallyConvex.ContinuousOfBounded
 import RiemannMasullo.ForMathlib.MeasureTheory.Integral.Bochner.Convex
 import RiemannMasullo.ForMathlib.Analysis.Calculus.IteratedDeriv.UnitCube

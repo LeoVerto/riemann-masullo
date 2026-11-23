@@ -19,9 +19,7 @@ import RiemannMasullo.ForMathlib.NumberTheory.NumberField.Completion.FinitePlace
 
 import Mathlib.MeasureTheory.Integral.Pi
 
-import all RiemannMasullo.AppC_LCTVS.Sec1
-
-import all RiemannMasullo.AppC_LCTVS.Sec1
+import RiemannMasullo.AppC_LCTVS.Sec1
 
 /-! # Homogeneous theta spaces and Fourier descent
 
