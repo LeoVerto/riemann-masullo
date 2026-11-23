@@ -80,3 +80,8 @@
 4562 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean 2026-11-23T01:38Z TAKEN esc-ch07sec2p 2026-11-23T01:39Z (earlier attempts by others): continuing prior work: CalebAlbers' attempt (obstacle analysis in the release comment)
 4563 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean 2026-11-23T01:38Z TAKEN esc-ch07sec2p 2026-11-23T01:39Z (earlier attempts by others): continuing prior work: CalebAlbers' attempt (obstacle analysis in the release comment)
 4566 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec2_Printed.lean 2026-11-23T01:38Z TAKEN esc-ch07sec2p 2026-11-23T01:39Z (earlier attempts by others): continuing prior work: CalebAlbers' attempt (obstacle analysis in the release comment)
+4660 opus RiemannMasullo/AppB_AnalyticNT/Sec6_Printed.lean 2026-11-23T01:42Z QUEUED (earlier attempts by others): continuing prior work: elmismisimoxhunca's automated attempt (see their release comment)
+4662 opus RiemannMasullo/AppB_AnalyticNT/Sec6_Printed.lean 2026-11-23T01:42Z QUEUED (earlier attempts by others): continuing prior work: elmismisimoxhunca's automated attempt (see their release comment)
+4838 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b_Printed.lean 2026-11-23T01:42Z QUEUED (earlier attempts by others): continuing prior work: elmismisimoxhunca's automated attempt (see their release comment)
+4840 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b_Printed.lean 2026-11-23T01:42Z QUEUED (earlier attempts by others): continuing prior work: elmismisimoxhunca's automated attempt (see their release comment)
+4842 opus RiemannMasullo/Ch07_SchauderBasesZeta/Sec1b_Printed.lean 2026-11-23T01:42Z QUEUED (earlier attempts by others): continuing prior work: elmismisimoxhunca's automated attempt (see their release comment)

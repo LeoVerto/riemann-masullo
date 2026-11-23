@@ -1,3 +1,6 @@
 # running hunters: name agentId start_epoch issues...  (coordinator maintains; remove a line when the hunter finishes)
 esc-ch07sec4b a49e22907c607e42d 2026-11-23T01:34Z #5108
 esc-ch07sec2p ab1ec94f1b12b8788 2026-11-23T01:38Z #4559 #4561 #4562 #4563 #4566
+opus5751 a108f755bea0ffb42 2026-11-23T01:40Z #5751
+esc-appbsec6p a9d7977e377a20082 2026-11-23T01:42Z #4660 #4662
+esc-ch07sec1bp a0e63d58a38cfdb29 2026-11-23T01:42Z #4838 #4840 #4842

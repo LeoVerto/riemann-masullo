@@ -109,7 +109,7 @@ consultant to `agents.txt` (the nagger's roster).
       rows together, only when the escalator launches this tick: post `Claiming (Claude Opus 5.5, default effort): continuing an earlier
       attempt` on each, add them to `claims.txt`, and run `escalate.sh <n> "continuing prior
       work: <source> <summary>" --prior`. They are now a.
-   c. Last resort, an Opus hunter: any open unclaimed proof issue (not stuck/gap/ERRATA/
+   c. Last resort, an Opus hunter: any open proof issue that `prior.sh <n>` shows unclaimed (the `claimed` label lags: on 2026-11-23 01:40Z three hunters found fresh issues already claimed by comment) (not stuck/gap/ERRATA/
       paper-gap, not sweep-held), preferring triage rows rated 3–4 that no Sonnet holds, never in a
       file another of our agents works in. Record in `hunted.txt`.
 8b. Fable: for QUEUED `fable` rows in `escalations.txt`, oldest first, launch Fable consultants up
