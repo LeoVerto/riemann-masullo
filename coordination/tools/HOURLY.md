@@ -38,19 +38,18 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
    last check (last seen: AGENTS ed9dbb7, ERRATA 0d2e5b1), re-read the change, update the briefs
    (HUNTER.md first), and update "last seen" here.
 0a. **#5889 MERGED** (2026-11-23 ~03:45Z, merge 0b7a2349). Claimed and queued (opus): #3878 (AppB Sec6,
-   crowded: elmismisimoxhunca holds #3879), #5673 (Ch01 Sec4, crowded: integrator PR #6012), #4973
-   (Ch10 Sec2, RISK-5398). Launch them (step 8a, one escalator each, #3878 first) only once
+   crowded: elmismisimoxhunca holds #3879), #5673 (Ch01 Sec4; #6012 merged 03:58Z, so no longer crowded; launch once warm has fb3acbf0), #4973
+   (Ch10 Sec2, RISK-5398). #3878 LAUNCHED 04:00Z (esc-appbsec6b); #4973 LAUNCHED 04:1xZ (esc-ch10sec2). Launch the rest (step 8a, one escalator each) only once
    `git merge-base --is-ancestor 0b7a2349 <warm base>` holds (warm.log `ready` line); prompts name the
    vendored `RiemannMasullo/External/Grh/` lemmas the PR body assigns (horizontal estimates: finite zero
    factors, disk lower bound, log averaging; #4973: real-line L2, tail and pairing) and say "crowded file"
    where noted. Held ones (#3879 #3869 #3875 #3884 #3889 elmismisimoxhunca, #4982 factory-davidgu):
-   hints only if the user says so. Then mark this step done.
+   no hints (user 04:0xZ: the integrator already commented on them). Then mark this step done.
 0b. (Done 2026-11-23 ~03:15Z: #4078/#4079 re-claimed by us after the user noted the last claims were ~5 h old; escalator esc-ch07sec1b4.)
-0c. **Watch PRs #5887 and #5972** (Tau Ceti vendoring; #5972 is stacked on #5887; asked by the user's
-   vendoring helper session, 2026-11-23 ~03:55Z): `gh pr view <p> --json state -q .state` for both.
-   If #5887 changes or is force-pushed while #5972 is open, tell the user (#5972 needs a rebase by
-   the helper session). Once #5972 is MERGED and the warm base contains it: tell the user; check
-   `claims.py 4666`; if FREE, claim it and run `escalate.sh 4666 "unblocked by #5972 (vendored
+0c. **Watch PR #6043** (Tau Ceti Runge vendoring, rebased onto main; replaces closed #5972, whose base
+   #5887 was split into #6011 and #6012; asked by the user's vendoring helper session):
+   `gh pr view 6043 --json state -q .state`. Once #6043 is MERGED and the warm base contains it: tell the user; check
+   `claims.py 4666`; if FREE, claim it and run `escalate.sh 4666 "unblocked by #6043 (vendored
    Runge)" --prior`, then launch one Opus escalator (it is a large refutation, not Sonnet work). Its prompt says:
    use `IsCompact.isConnected_compl_iff_forall_differentiableOn_exists_polynomial_norm_sub_lt`
    (import `RiemannMasullo.External.TauCeti.Analysis.Complex.Runge.Approximation`); what is left
