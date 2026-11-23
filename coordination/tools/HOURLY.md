@@ -46,6 +46,18 @@ consultant to `agents.txt` (the nagger's roster), one line `<name> <agentId> $(d
    issues: a hint on the issue is upstream posting, so ask the user first. Tell the user it merged;
    then mark this step done (leads.txt #5889 line too).
 0b. (Done 2026-11-23 ~03:15Z: #4078/#4079 re-claimed by us after the user noted the last claims were ~5 h old; escalator esc-ch07sec1b4.)
+0c. **Watch PRs #5887 and #5972** (Tau Ceti vendoring; #5972 is stacked on #5887; asked by the user's
+   vendoring helper session, 2026-11-23 ~03:55Z): `gh pr view <p> --json state -q .state` for both.
+   If #5887 changes or is force-pushed while #5972 is open, tell the user (#5972 needs a rebase by
+   the helper session). Once #5972 is MERGED and the warm base contains it: tell the user; check
+   `claims.py 4666`; if FREE, claim it and run `escalate.sh 4666 "unblocked by #5972 (vendored
+   Runge)" --prior`, then launch one Opus escalator (it is a large refutation, not Sonnet work). Its prompt says:
+   use `IsCompact.isConnected_compl_iff_forall_differentiableOn_exists_polynomial_norm_sub_lt`
+   (import `RiemannMasullo.External.TauCeti.Analysis.Complex.Runge.Approximation`); what is left
+   is the inductive entire-function construction of ERRATA F22 plus connected complements of each
+   stage's square ∪ discs ∪ points; vendored Tau Ceti names live in `RiemannMasullo.External.TauCeti`
+   except `_root_` ones (`IsCompact.…`, `IsOpen.…`, `Differentiable.exists_polynomial_norm_sub_lt`).
+   Weaker leads after the merge (leads.txt): #4072, #4079, #4078. Never queue #4666 before the merge.
 1. Run `status.sh --mark` (advances the new-comments window) and `cleanup.sh` under timeout,
    output tailed.
 2. Failing Verdicts or review comments: one fixer each; re-check the PR's state first.
