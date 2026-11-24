@@ -10,7 +10,6 @@ import Mathlib.RingTheory.RamificationInertia.Basic
 import Mathlib.Analysis.Complex.LocallyUniformLimit
 import Mathlib.NumberTheory.LSeries.WienerIkehara
 import all RiemannMasullo.Ch03_IdelicZeta.Sec2
-import all RiemannMasullo.External.Grh.Lemmas.LogLossGoodHeight
 import RiemannMasullo.External.Grh.Lemmas.AnalyticGoodHeightDisk
 import RiemannMasullo.ForMathlib.Analysis.Complex.LandauLemma
 import RiemannMasullo.ForMathlib.Analysis.SpecialFunctions.Pow.Complex
@@ -3608,6 +3607,45 @@ private theorem finiteHeckeL_outside_horizontal_lower_bound_off_small_set_enlarg
   rw [← hφu, ENNReal.ofReal_toReal (hfin u hu.2)]
 
 
+section LogLoss
+
+/-- The logarithmic loss `max 0 (-log |x|)`. This definition and the three lemmas after it are
+copied unchanged from `Proofs/Lemmas/LogLossGoodHeight.lean` of Neal Patel's `thatnealpatel/grh`
+(MIT), where they are private; see `External/ATTRIBUTION.md`. -/
+private noncomputable def logLoss (x : ℝ) : ℝ := max 0 (-Real.log |x|)
+
+private theorem logLoss_nonneg (x : ℝ) : 0 ≤ logLoss x := le_max_left _ _
+
+private theorem logLoss_integrable_and_integral :
+    Integrable logLoss ∧ (∫ x, logLoss x) = 2 := by
+  -- `Real.log_abs` holds also at zero, where Lean sets `Real.log 0 = 0`.
+  have hcut : logLoss = (Icc (-1 : ℝ) 1).indicator (fun x ↦ -Real.log x) := by
+    funext x
+    by_cases hx : x ∈ Icc (-1 : ℝ) 1
+    · have hn := Real.log_nonpos (abs_nonneg x) (abs_le.mpr hx)
+      rw [indicator_of_mem hx, logLoss, max_eq_right (neg_nonneg.mpr hn), Real.log_abs]
+    · have hx' : 1 ≤ |x| := le_of_not_gt fun h ↦ hx ⟨(abs_lt.mp h).1.le, (abs_lt.mp h).2.le⟩
+      rw [indicator_of_notMem hx, logLoss, max_eq_left (neg_nonpos.mpr (Real.log_nonneg hx'))]
+  rw [hcut]
+  have hab : (-1 : ℝ) ≤ 1 := by norm_num
+  have hlog : IntervalIntegrable (fun x ↦ -Real.log x) volume (-1) 1 :=
+    (intervalIntegral.intervalIntegrable_log' (a := -1) (b := 1)).neg
+  refine ⟨((intervalIntegrable_iff_integrableOn_Icc_of_le hab).1 hlog).integrable_indicator
+    measurableSet_Icc, ?_⟩
+  rw [integral_indicator measurableSet_Icc, integral_Icc_eq_integral_Ioc,
+    ← intervalIntegral.integral_of_le hab, intervalIntegral.integral_neg, integral_log]
+  norm_num [Real.log_neg_eq_log]
+
+private theorem logLoss_translate (a : ℝ) :
+    Integrable (fun t ↦ logLoss (t - a)) ∧ (∫ t, logLoss (t - a)) = 2 := by
+  have hp := measurePreserving_sub_right (volume : Measure ℝ) a
+  have he : MeasurableEmbedding (fun t : ℝ ↦ t - a) :=
+    (Homeomorph.subRight a).isClosedEmbedding.measurableEmbedding
+  exact ⟨(hp.integrable_comp_emb he).2 logLoss_integrable_and_integral.1,
+    (hp.integral_comp he logLoss).trans logLoss_integrable_and_integral.2⟩
+
+end LogLoss
+
 /-- Markov's inequality for the multiplicity-weighted logarithmic losses of finitely many
 ordinates. The integral bound is adapted from Patel's `exists_goodHeight_sum_posLog`. -/
 private theorem finiteHeckeL_outside_horizontal_lower_bound_off_small_set_markov
@@ -3629,7 +3667,7 @@ private theorem finiteHeckeL_outside_horizontal_lower_bound_off_small_set_markov
       (continuous_abs.measurable.comp (measurable_id.sub_const _))).neg
   have hterm (ρ : ℂ) : Integrable (fun t ↦ (n ρ : ℝ) * max 0 (-Real.log |t - ρ.im|))
       (volume.restrict I) :=
-    ((External.Grh.logLoss_translate ρ.im).1.const_mul (n ρ : ℝ)).integrableOn
+    ((logLoss_translate ρ.im).1.const_mul (n ρ : ℝ)).integrableOn
   have hFi : Integrable F (volume.restrict I) := integrable_finsetSum A fun ρ _ ↦ hterm ρ
   have hF0 : ∀ t, 0 ≤ F t := fun t ↦
     Finset.sum_nonneg fun ρ _ ↦ mul_nonneg (Nat.cast_nonneg _) (le_max_left _ _)
@@ -3639,11 +3677,11 @@ private theorem finiteHeckeL_outside_horizontal_lower_bound_off_small_set_markov
     _ ≤ ∑ ρ ∈ A, (n ρ : ℝ) * 2 := by
       apply Finset.sum_le_sum
       intro ρ _
-      rw [integral_const_mul, ← (External.Grh.logLoss_translate ρ.im).2]
+      rw [integral_const_mul, ← (logLoss_translate ρ.im).2]
       exact mul_le_mul_of_nonneg_left
         (integral_mono_measure Measure.restrict_le_self
-          (Eventually.of_forall fun t ↦ External.Grh.logLoss_nonneg (t - ρ.im))
-          (External.Grh.logLoss_translate ρ.im).1) (Nat.cast_nonneg _)
+          (Eventually.of_forall fun t ↦ logLoss_nonneg (t - ρ.im))
+          (logLoss_translate ρ.im).1) (Nat.cast_nonneg _)
     _ = 2 * N := by rw [hN, Finset.mul_sum]; exact Finset.sum_congr rfl fun _ _ ↦ mul_comm _ _
   have hmk := mul_meas_ge_le_integral_of_nonneg (μ := volume.restrict I)
     (Eventually.of_forall hF0) hFi c
